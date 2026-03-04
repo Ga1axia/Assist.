@@ -220,6 +220,8 @@ export interface MemberItem {
     joinDate: string;
     linkedin: string | null;
     bio: string | null;
+    skills: string[];
+    openToMentorship: boolean;
 }
 
 export function useMembers() {
@@ -240,8 +242,10 @@ export function useMembers() {
                 ? `${raw.engagementMetrics.attendanceRate}%`
                 : "—",
             joinDate: formatTimestamp(raw.joinDate) || formatTimestamp(raw.createdAt),
-            linkedin: raw.alumni?.linkedinUrl || null,
+            linkedin: raw.linkedin || raw.alumni?.linkedinUrl || null,
             bio: raw.bio || null,
+            skills: raw.skills || [],
+            openToMentorship: raw.openToMentorship || false,
         })
     );
 }
@@ -483,6 +487,35 @@ export function useActionItems() {
     };
 
     return { ...result, completeActionItem };
+}
+
+// ──────────────────────────────────────
+// Startups (Alumni Gallery)
+// ──────────────────────────────────────
+export interface StartupItem {
+    id: string;
+    name: string;
+    description: string;
+    founders: string;
+    foundedYear: string;
+    website: string | null;
+    createdAt: string;
+}
+
+export function useStartups() {
+    return useCollection<StartupItem>(
+        "startups",
+        [orderBy("createdAt", "desc")],
+        (raw, id) => ({
+            id,
+            name: raw.name || "Unknown Startup",
+            description: raw.description || "",
+            founders: raw.founders || "",
+            foundedYear: raw.foundedYear || "",
+            website: raw.website || null,
+            createdAt: formatTimestamp(raw.createdAt),
+        })
+    );
 }
 
 // ──────────────────────────────────────

@@ -25,6 +25,9 @@ export function PublicNav() {
                 </Link>
 
                 <div className="flex items-center gap-3 sm:gap-4">
+                    <Link href="/startups" className="text-[10px] sm:text-xs font-mono font-bold text-muted-foreground hover:text-primary uppercase tracking-widest transition-colors hidden sm:block">
+                        STARTUPS
+                    </Link>
                     <Link href="/hall-of-fame" className="text-[10px] sm:text-xs font-mono font-bold text-muted-foreground hover:text-primary uppercase tracking-widest transition-colors hidden sm:block">
                         HALL_OF_FAME
                     </Link>

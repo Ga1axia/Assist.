@@ -24,6 +24,8 @@ import {
     X,
     Code2,
     Terminal,
+    GraduationCap,
+    Rocket,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isAdmin as checkAdmin } from "@/lib/roles";
@@ -43,12 +45,14 @@ const navItems: NavItem[] = [
     { label: "Feed", href: "/feed", icon: <Activity className="w-4 h-4" /> },
     { label: "Events", href: "/events", icon: <CalendarDays className="w-4 h-4" /> },
     { label: "Members", href: "/members", icon: <Users2 className="w-4 h-4" /> },
+    { label: "Alumni Network", href: "/network", icon: <GraduationCap className="w-4 h-4" /> },
     { label: "Profile", href: "/profile", icon: <User className="w-4 h-4" /> },
     { label: "Admin Tools", href: "/admin", icon: <Shield className="w-4 h-4" />, adminOnly: true },
 ];
 
 const bottomItems: NavItem[] = [
     { label: "Hall of Fame", href: "/hall-of-fame", icon: <Trophy className="w-4 h-4" /> },
+    { label: "Startups Gallery", href: "/startups", icon: <Rocket className="w-4 h-4" /> },
     { label: "Community FAQ", href: "/faq", icon: <HelpCircle className="w-4 h-4" /> },
 ];
 

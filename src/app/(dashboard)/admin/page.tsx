@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useAuth } from "@/contexts/auth-context";
-import { useInquiries, useResources, useProjects, useMembers, useActionItems } from "@/hooks/useFirestore";
+import { useInquiries, useResources, useProjects, useMembers, useActionItems, useStartups } from "@/hooks/useFirestore";
 import { isAdmin } from "@/lib/roles";
 import { getRoleLabel, ALL_ROLES } from "@/lib/roles";
 import { cn } from "@/lib/utils";
@@ -24,10 +24,11 @@ import {
     Check,
     X,
     CheckSquare,
-    Target
+    Target,
+    Rocket
 } from "lucide-react";
 
-type AdminTab = "announcements" | "actionItems" | "applications" | "inquiries" | "pitches" | "resources" | "profiles";
+type AdminTab = "announcements" | "actionItems" | "startups" | "applications" | "inquiries" | "pitches" | "resources" | "profiles";
 
 export default function AdminPage() {
     const { profile, user } = useAuth();
@@ -36,6 +37,7 @@ export default function AdminPage() {
     const { data: projects, loading: projectsLoading } = useProjects();
     const { data: members, loading: membersLoading } = useMembers();
     const { data: actionItems, loading: actionItemsLoading } = useActionItems();
+    const { data: startups, loading: startupsLoading } = useStartups();
 
     const [activeTab, setActiveTab] = useState<AdminTab>("announcements");
     const [replyText, setReplyText] = useState("");
@@ -54,11 +56,19 @@ export default function AdminPage() {
     const [actionLink, setActionLink] = useState("");
     const [actionSending, setActionSending] = useState(false);
 
+    // Startups state
+    const [startupName, setStartupName] = useState("");
+    const [startupDesc, setStartupDesc] = useState("");
+    const [startupFounders, setStartupFounders] = useState("");
+    const [startupYear, setStartupYear] = useState("");
+    const [startupWebsite, setStartupWebsite] = useState("");
+    const [startupSending, setStartupSending] = useState(false);
+
     // Applications state
     const [selectedRoles, setSelectedRoles] = useState<Record<string, string>>({});
 
     const userIsAdmin = isAdmin(profile?.role);
-    const loading = inquiriesLoading || resourcesLoading || projectsLoading || membersLoading || actionItemsLoading;
+    const loading = inquiriesLoading || resourcesLoading || projectsLoading || membersLoading || actionItemsLoading || startupsLoading;
 
     const pendingInquiries = inquiries.filter((i) => i.status === "pending");
     const pendingResources = resources.filter((r) => !r.approved);
@@ -82,6 +92,7 @@ export default function AdminPage() {
     const tabs: { key: AdminTab; label: string; icon: React.ReactNode; count?: number }[] = [
         { key: "announcements", label: "BROADCASTS", icon: <Megaphone className="w-4 h-4" /> },
         { key: "actionItems", label: "DEADLINES", icon: <CheckSquare className="w-4 h-4" /> },
+        { key: "startups", label: "STARTUPS", icon: <Rocket className="w-4 h-4" /> },
         { key: "applications", label: "APPLICATIONS", icon: <UserPlus className="w-4 h-4" />, count: pendingApplications.length },
         { key: "inquiries", label: "COMMUNICATIONS", icon: <MessageSquare className="w-4 h-4" />, count: pendingInquiries.length },
         { key: "pitches", label: "PROPOSALS", icon: <FileText className="w-4 h-4" />, count: pendingPitches.length },
@@ -161,6 +172,45 @@ export default function AdminPage() {
             console.error("Action item error:", err);
         } finally {
             setActionSending(false);
+        }
+    };
+
+    // ── Startup Generation ──
+    const handleCreateStartup = async () => {
+        if (!startupName.trim() || !startupDesc.trim() || !startupFounders.trim() || !startupYear.trim()) return;
+        setStartupSending(true);
+        try {
+            await addDoc(collection(db, "startups"), {
+                name: startupName.trim(),
+                description: startupDesc.trim(),
+                founders: startupFounders.trim(),
+                foundedYear: startupYear.trim(),
+                website: startupWebsite.trim() || null,
+                createdAt: serverTimestamp(),
+            });
+
+            // Announce to feed
+            await addDoc(collection(db, "activityFeed"), {
+                type: "milestone_update",
+                actorId: profile?.uid || "admin",
+                actorName: "System",
+                targetId: "startups",
+                targetName: startupName,
+                description: `Added "${startupName}" to the Alumni Startups Gallery.`,
+                pinned: false,
+                pinnedBy: null,
+                createdAt: serverTimestamp(),
+            });
+
+            setStartupName("");
+            setStartupDesc("");
+            setStartupFounders("");
+            setStartupYear("");
+            setStartupWebsite("");
+        } catch (err) {
+            console.error("Startup creation error:", err);
+        } finally {
+            setStartupSending(false);
         }
     };
 
@@ -316,6 +366,86 @@ export default function AdminPage() {
                                         </button>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* ── Startups Tab ── */}
+                    {activeTab === "startups" && (
+                        <div className="space-y-6">
+                            <div className="hud-panel bg-card/60 border border-primary/40 p-6 sm:p-8 scanlines relative">
+                                <div className="absolute top-0 right-0 w-32 h-1 bg-gradient-to-r from-transparent to-primary/50" />
+                                <h3 className="font-bold text-lg mb-6 flex items-center gap-3 uppercase tracking-tight relative z-10 text-primary border-b border-primary/20 pb-4">
+                                    <Rocket className="w-5 h-5" /> INITIALIZE ALUMNI STARTUP
+                                </h3>
+
+                                <div className="space-y-5 relative z-10 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+                                    <div className="space-y-1.5 md:col-span-1">
+                                        <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">COMPANY DESIGNATION</label>
+                                        <input type="text" value={startupName} onChange={(e) => setStartupName(e.target.value)} placeholder="e.g. OpenAI..." className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono uppercase transition-colors focus:outline-none" />
+                                    </div>
+
+                                    <div className="space-y-1.5 md:col-span-1">
+                                        <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">YEAR ESTABLISHED</label>
+                                        <input type="text" value={startupYear} onChange={(e) => setStartupYear(e.target.value)} placeholder="e.g. 2024..." className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none" />
+                                    </div>
+
+                                    <div className="space-y-1.5 md:col-span-1">
+                                        <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">FOUNDING OPERATIVES</label>
+                                        <input type="text" value={startupFounders} onChange={(e) => setStartupFounders(e.target.value)} placeholder="e.g. Alice & Bob..." className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono uppercase transition-colors focus:outline-none" />
+                                    </div>
+
+                                    <div className="space-y-1.5 md:col-span-1">
+                                        <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">EXTERNAL DOMAIN</label>
+                                        <input type="url" value={startupWebsite} onChange={(e) => setStartupWebsite(e.target.value)} placeholder="https://..." className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none" />
+                                    </div>
+
+                                    <div className="space-y-1.5 col-span-1 md:col-span-2">
+                                        <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">MISSION SYNOPSIS</label>
+                                        <textarea value={startupDesc} onChange={(e) => setStartupDesc(e.target.value)} placeholder="Describe the startup's purpose..." rows={3} className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none resize-none" />
+                                    </div>
+
+                                    <div className="col-span-1 md:col-span-2 pt-2 flex items-center justify-between">
+                                        <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest leading-relaxed max-w-sm border-l-2 border-primary/30 pl-3">
+                                            NEW STARTUP DATA WILL BE PUBLISHED IMMEDIATELY TO THE PUBLIC STARTUP GALLERY.
+                                        </p>
+                                        <button
+                                            onClick={handleCreateStartup}
+                                            disabled={startupSending || !startupName.trim() || !startupDesc.trim()}
+                                            className="hud-panel bg-primary text-primary-foreground px-8 py-3.5 text-xs font-mono font-bold uppercase tracking-widest hover:brightness-110 transition-all glow-border disabled:opacity-50 flex items-center gap-3"
+                                        >
+                                            {startupSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                                            {startupSending ? "INITIALIZING..." : "PUBLISH STARTUP"}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Existing Startups List Admin View */}
+                            <div className="hud-panel bg-card/40 border border-border/40 p-6 sm:p-8 scanlines relative mt-6">
+                                <h3 className="font-bold text-sm mb-4 flex items-center gap-2 uppercase tracking-tight relative z-10 text-muted-foreground">
+                                    <Rocket className="w-4 h-4" /> EXTANT STARTUPS
+                                    <span className="ml-auto text-[10px] bg-primary/10 text-primary border border-primary/30 px-2 py-0.5">{startups.length} REGISTERED</span>
+                                </h3>
+                                {startups.length === 0 ? (
+                                    <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest relative z-10">NO DATA LOGS REQUIRE REVIEW.</p>
+                                ) : (
+                                    <div className="space-y-3 relative z-10">
+                                        {startups.map(startup => (
+                                            <div key={startup.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 hud-panel-sm bg-background/50 border border-border/40 hover:border-primary/40 transition-colors">
+                                                <div>
+                                                    <p className="font-bold font-mono tracking-tight uppercase text-sm">
+                                                        {startup.name}
+                                                        <span className="text-muted-foreground ml-2">[{startup.foundedYear}]</span>
+                                                    </p>
+                                                    <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest mt-0.5">
+                                                        FOUNDERS: <span className="text-foreground">{startup.founders}</span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}

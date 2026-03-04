@@ -17,6 +17,9 @@ import {
     Users2,
     Loader2,
     Briefcase,
+    Terminal,
+    X,
+    Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -37,6 +40,7 @@ export default function MembersPage() {
     const { data: members, loading } = useMembers();
     const [search, setSearch] = useState("");
     const [roleFilter, setRoleFilter] = useState<string>("all");
+    const [selectedMember, setSelectedMember] = useState<any | null>(null);
 
     const userIsAdmin = isAdmin(profile?.role);
 
@@ -131,20 +135,28 @@ export default function MembersPage() {
                         const isHighCommand = ADMIN_ROLES.includes(member.role as any);
 
                         return (
-                            <div key={member.id} className={cn("group bg-card/60 border p-5 transition-all hover:border-primary/50 relative flex flex-col scanlines", i % 2 === 0 ? 'hud-panel' : 'hud-corners', isHighCommand ? "border-primary/40 bg-primary/5" : "border-border/40")}>
+                            <div
+                                key={member.id}
+                                onClick={() => setSelectedMember(member)}
+                                className={cn("group bg-card/60 border p-5 transition-all hover:border-primary/50 relative flex flex-col scanlines cursor-pointer", i % 2 === 0 ? 'hud-panel' : 'hud-corners', isHighCommand ? "border-primary/40 bg-primary/5" : "border-border/40")}
+                            >
                                 {isHighCommand && (
                                     <div className="absolute top-0 right-0 w-12 h-12 bg-gradient-to-bl from-primary/20 to-transparent pointer-events-none z-10" />
                                 )}
 
                                 <div className="flex items-start gap-4 mb-4 relative z-10">
-                                    <div className={cn("w-14 h-14 hud-corners flex items-center justify-center font-black text-xl border shadow-inner", isHighCommand ? "bg-primary/20 border-primary text-primary shadow-[inset_0_0_10px_rgba(203,247,2,0.2)]" : "bg-background border-border/50 text-muted-foreground")}>
-                                        {member.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
-                                    </div>
+                                    {member.photoURL ? (
+                                        <img src={member.photoURL} alt="" className={cn("w-14 h-14 hud-corners object-cover border shadow-inner", isHighCommand ? "border-primary shadow-[inset_0_0_10px_rgba(203,247,2,0.2)]" : "border-border/50")} />
+                                    ) : (
+                                        <div className={cn("w-14 h-14 hud-corners flex items-center justify-center font-black text-xl border shadow-inner", isHighCommand ? "bg-primary/20 border-primary text-primary shadow-[inset_0_0_10px_rgba(203,247,2,0.2)]" : "bg-background border-border/50 text-muted-foreground")}>
+                                            {member.name.split(" ").map((n: string) => n[0]).join("").slice(0, 2)}
+                                        </div>
+                                    )}
                                     <div className="flex-1 min-w-0 pt-0.5">
                                         <div className="flex items-center justify-between gap-2 mb-1">
-                                            <h3 className="font-bold font-mono tracking-tight uppercase truncate group-hover:text-primary transition-colors">{member.name}</h3>
+                                            <h3 className="font-bold font-mono tracking-tight uppercase truncate group-hover:text-primary transition-colors pr-2">{member.name}</h3>
                                             {member.linkedin && (
-                                                <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="p-1 hud-panel-sm bg-background border border-border/50 text-muted-foreground hover:text-primary hover:border-primary/50 transition-colors">
+                                                <a href={member.linkedin} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="p-1 hud-panel-sm bg-background border border-border/50 text-muted-foreground hover:text-primary hover:border-primary/50 transition-colors shrink-0">
                                                     <ExternalLink className="w-3.5 h-3.5" />
                                                 </a>
                                             )}
@@ -193,6 +205,126 @@ export default function MembersPage() {
                 <div className="flex flex-col items-center justify-center py-20 hud-panel bg-card/40 border border-border/40 scanlines">
                     <Users className="w-16 h-16 text-muted-foreground/30 mb-4 relative z-10" />
                     <p className="text-xs font-mono font-bold text-muted-foreground uppercase tracking-widest relative z-10 text-center">NO MEMBERS MATCHING YOUR SEARCH.</p>
+                </div>
+            )}
+
+            {/* Member Dossier Modal */}
+            {selectedMember && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 animate-fade-in">
+                    <div className="absolute inset-0 bg-background/80 backdrop-blur-sm pointer-events-none" />
+
+                    <div className="relative w-full max-w-2xl bg-card border border-primary/50 hud-panel scanlines shadow-[0_0_50px_rgba(0,0,0,0.8)] flex flex-col max-h-full overflow-hidden">
+                        {/* Modal Header */}
+                        <div className="flex items-center justify-between p-4 border-b border-primary/30 bg-primary/5">
+                            <div className="flex items-center gap-2 text-primary font-mono tracking-widest text-xs uppercase font-bold">
+                                <Terminal className="w-4 h-4" />
+                                TARGET_DOSSIER: {selectedMember.id.slice(0, 8)}
+                            </div>
+                            <button
+                                onClick={() => setSelectedMember(null)}
+                                className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors hud-panel-sm"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        </div>
+
+                        {/* Modal Body */}
+                        <div className="p-5 sm:p-8 overflow-y-auto custom-scroll flex-1">
+                            <div className="flex flex-col sm:flex-row gap-6 mb-8">
+                                <div className="shrink-0 flex justify-center">
+                                    {selectedMember.photoURL ? (
+                                        <img src={selectedMember.photoURL} alt="" className="w-32 h-32 sm:w-40 sm:h-40 hud-corners object-cover border border-primary shadow-[0_0_15px_rgba(203,247,2,0.2)]" />
+                                    ) : (
+                                        <div className="w-32 h-32 sm:w-40 sm:h-40 hud-corners bg-background/80 flex items-center justify-center font-black text-5xl border border-primary text-primary shadow-[0_0_15px_rgba(203,247,2,0.2)]">
+                                            {selectedMember.name.split(" ").map((n: string) => n[0]).join("").slice(0, 2)}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="flex-1">
+                                    <h2 className="text-3xl font-black uppercase tracking-tight mb-2 text-center sm:text-left">{selectedMember.name}</h2>
+
+                                    <div className="flex flex-wrap items-center gap-2 mb-4 justify-center sm:justify-start">
+                                        <span className={cn("inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-widest px-3 py-1.5 border hud-panel-sm", roleConfig[selectedMember.role]?.color || roleConfig.resident.color)}>
+                                            {roleConfig[selectedMember.role]?.icon || roleConfig.resident.icon} {roleConfig[selectedMember.role]?.label || roleConfig.resident.label}
+                                        </span>
+                                        {selectedMember.role === "alumni" && selectedMember.openToMentorship && (
+                                            <span className="inline-flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-widest px-2 py-1.5 border border-chart-2/50 bg-chart-2/10 text-chart-2 hud-panel-sm">
+                                                <Users className="w-3 h-3" /> OPEN TO OUTREACH
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    <div className="text-sm font-mono text-muted-foreground mb-4 text-center sm:text-left">
+                                        <Mail className="w-4 h-4 inline mr-2 text-primary" />
+                                        {selectedMember.email}
+                                    </div>
+
+                                    {selectedMember.bio && (
+                                        <div className="bg-background/50 border border-border/40 p-4 hud-panel-sm relative">
+                                            <div className="absolute top-0 left-0 w-1 h-full bg-primary/50" />
+                                            <p className="text-sm italic text-foreground/80 font-mono leading-relaxed">
+                                                "{selectedMember.bio}"
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="grid sm:grid-cols-2 gap-6">
+                                <div className="space-y-4">
+                                    <div>
+                                        <div className="text-[10px] font-mono text-primary/60 uppercase tracking-widest mb-2 border-b border-border/30 pb-1">PRIMARY SPECIALTY</div>
+                                        <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 border border-primary text-primary hud-corners font-bold font-mono tracking-widest uppercase text-sm glow-border">
+                                            <Star className="w-4 h-4 fill-primary" />
+                                            {selectedMember.standoutSkill}
+                                        </div>
+                                    </div>
+
+                                    {selectedMember.skills && selectedMember.skills.length > 0 && (
+                                        <div>
+                                            <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest mb-2 border-b border-border/30 pb-1 flex items-center gap-2">
+                                                <Terminal className="w-3 h-3 text-primary" /> ACQUIRED SKILLS
+                                            </div>
+                                            <div className="flex flex-wrap gap-1.5">
+                                                {selectedMember.skills.map((skill: string) => (
+                                                    <span key={skill} className={cn("px-2 py-1 flex items-center gap-1.5 hud-panel-sm text-[10px] font-mono tracking-widest uppercase border", skill === selectedMember.standoutSkill ? "bg-primary/5 border-primary/50 text-primary font-bold" : "bg-card border-border/50 text-muted-foreground")}>
+                                                        {skill === selectedMember.standoutSkill && <Check className="w-3 h-3" />}
+                                                        {skill}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest mb-2 border-b border-border/30 pb-1 flex items-center gap-2">
+                                        <Briefcase className="w-3 h-3 text-primary" /> ENGAGEMENT METRICS
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="hud-panel-sm bg-background/60 border border-border/40 p-3 text-center">
+                                            <div className="text-xl font-black text-primary font-mono">{selectedMember.projects}</div>
+                                            <div className="text-[9px] font-mono font-bold text-muted-foreground uppercase tracking-widest mt-1">PROJECTS</div>
+                                        </div>
+                                        <div className="hud-panel-sm bg-background/60 border border-border/40 p-3 text-center">
+                                            <div className="text-xl font-black text-chart-2 font-mono">{selectedMember.uploads}</div>
+                                            <div className="text-[9px] font-mono font-bold text-muted-foreground uppercase tracking-widest mt-1">UPLOADS</div>
+                                        </div>
+                                        <div className="hud-panel-sm bg-background/60 border border-border/40 p-3 text-center col-span-2">
+                                            <div className="text-xl font-black text-chart-4 font-mono">{selectedMember.attendance}</div>
+                                            <div className="text-[9px] font-mono font-bold text-muted-foreground uppercase tracking-widest mt-1">ATTENDANCE RATE</div>
+                                        </div>
+                                    </div>
+
+                                    {selectedMember.linkedin && (
+                                        <a href={selectedMember.linkedin} target="_blank" rel="noopener noreferrer" className="mt-4 flex flex-col items-center justify-center p-3 hud-panel-sm bg-background border border-border/50 hover:bg-primary/10 hover:border-primary/50 hover:text-primary transition-colors text-xs font-bold font-mono uppercase tracking-widest text-muted-foreground text-center gap-1">
+                                            <ExternalLink className="w-4 h-4" /> VISIT PROFESSIONAL NETWORK
+                                        </a>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

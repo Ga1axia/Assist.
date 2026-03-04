@@ -25,6 +25,8 @@ interface UserProfile {
     standoutSkill: string | null;
     skills?: string[];
     onboarded?: boolean;
+    openToMentorship?: boolean;
+    linkedin?: string | null;
 }
 
 interface AuthContextType {
@@ -67,6 +69,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                             standoutSkill: data.standoutSkill || null,
                             skills: data.skills || [],
                             onboarded: data.onboarded === true,
+                            openToMentorship: data.openToMentorship || false,
+                            linkedin: data.linkedin || data.alumni?.linkedinUrl || null,
                         });
                         setNeedsOnboarding(data.onboarded !== true);
                     } else {
@@ -97,6 +101,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                             standoutSkill: null,
                             skills: [],
                             onboarded: false,
+                            openToMentorship: false,
+                            linkedin: null,
                         });
                         setNeedsOnboarding(true);
                     }
@@ -110,6 +116,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         status: "pending",
                         standoutSkill: null,
                         skills: [],
+                        openToMentorship: false,
+                        linkedin: null,
                     });
                 }
             } else {
@@ -158,6 +166,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     standoutSkill: data.standoutSkill || null,
                     skills: data.skills || [],
                     onboarded: data.onboarded === true,
+                    openToMentorship: data.openToMentorship || false,
+                    linkedin: data.linkedin || data.alumni?.linkedinUrl || null,
                 });
                 setNeedsOnboarding(data.onboarded !== true);
             }
