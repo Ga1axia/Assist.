@@ -38,6 +38,7 @@ export async function POST(req: Request) {
                 interests: body.interests || [],
                 displayName: body.displayName || null,
                 onboarded: true,
+                status: "pending",
                 updatedAt: new Date(),
             }, { merge: true });
             return NextResponse.json({ message: "Onboarding complete" });
@@ -50,6 +51,7 @@ export async function POST(req: Request) {
             displayName: body.displayName || decodedToken.name || null,
             photoURL: body.photoURL || decodedToken.picture || null,
             role: "member",
+            status: "pending",
             standoutSkill: body.standoutSkill || null,
             bio: body.bio || null,
             skills: body.skills || [],

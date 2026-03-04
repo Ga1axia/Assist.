@@ -117,7 +117,7 @@ export default function EventsPage() {
                 <div>
                     <div className="flex items-center gap-2 text-[10px] font-mono text-primary/80 uppercase tracking-widest mb-1.5">
                         <CalendarDays className="w-3.5 h-3.5" />
-                        SYSTEM_MODULE / EVENTS
+                        EVENTS
                     </div>
                     <h1 className="text-2xl md:text-4xl font-black tracking-tighter uppercase">
                         OPERATIONAL <span className="gradient-text-cyber">CALENDAR</span>
@@ -128,7 +128,7 @@ export default function EventsPage() {
                         onClick={() => setShowCreate(true)}
                         className="hud-panel-sm bg-primary text-primary-foreground px-5 py-2.5 text-xs font-bold uppercase tracking-widest hover:brightness-110 transition-all glow-border-strong flex items-center gap-2 group"
                     >
-                        <Plus className="w-3.5 h-3.5 group-hover:rotate-90 transition-transform duration-300" /> NEW DIRECTIVE
+                        <Plus className="w-3.5 h-3.5 group-hover:rotate-90 transition-transform duration-300" /> CREATE EVENT
                     </button>
                 )}
             </div>
@@ -139,7 +139,7 @@ export default function EventsPage() {
                     <div className="absolute top-0 right-0 w-32 h-1 bg-gradient-to-r from-transparent to-primary/50" />
 
                     <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 border border-primary/30 text-primary text-[10px] font-mono font-bold uppercase tracking-widest glow-border">
-                        <Star className="w-3 h-3 fill-primary animate-pulse" /> PRIORITY DIRECTIVE
+                        <Star className="w-3 h-3 fill-primary animate-pulse" /> FEATURED EVENT
                     </div>
 
                     <div className="relative z-10 lg:w-3/4">
@@ -180,7 +180,7 @@ export default function EventsPage() {
                                 profile?.uid && featured.attendees.includes(profile.uid) && "bg-background text-primary border border-primary hover:bg-primary/10"
                             )}
                         >
-                            {profile?.uid && featured.attendees.includes(profile.uid) ? "ABORT RSVP" : "CONFIRM DEPLOYMENT"}
+                            {profile?.uid && featured.attendees.includes(profile.uid) ? "CANCEL RSVP" : "CONFIRM RSVP"}
                         </button>
                     </div>
                 </div>
@@ -296,7 +296,7 @@ export default function EventsPage() {
                                                     : "bg-primary border-primary text-primary-foreground hover:brightness-110"
                                         )}
                                     >
-                                        {isAttending ? "ABORT RSVP" : isFull ? "LOCKOUT" : "INITIATE RSVP"}
+                                        {isAttending ? "CANCEL RSVP" : isFull ? "FULL" : "RSVP"}
                                     </button>
                                 )}
                             </div>
@@ -309,7 +309,7 @@ export default function EventsPage() {
                 <div className="flex-1 flex flex-col items-center justify-center py-16 hud-panel bg-card/40 border border-border/40 scanlines">
                     <CalendarDays className="w-16 h-16 text-muted-foreground/30 mb-4 relative z-10" />
                     <p className="text-xs font-mono text-muted-foreground uppercase tracking-widest relative z-10">
-                        {userIsAdmin ? "NO DIRECTIVES FOUND. AWAITING NEW INPUT." : "DATABASE EMPTY. CHECK BACK SOON."}
+                        {userIsAdmin ? "NO EVENTS FOUND. CREATE ONE TO GET STARTED." : "NO EVENTS CURRENTLY SCHEDULED."}
                     </p>
                 </div>
             )}
@@ -328,7 +328,7 @@ export default function EventsPage() {
                                     <span className="text-[10px] font-mono text-primary uppercase tracking-widest">E-BOARD ACCESS ONLY</span>
                                 </div>
                                 <h3 className="font-black text-xl uppercase tracking-tight flex items-center gap-2">
-                                    <CalendarDays className="w-5 h-5 text-primary" /> NEW DIRECTIVE PARAMETERS
+                                    <CalendarDays className="w-5 h-5 text-primary" /> NEW EVENT DETAILS
                                 </h3>
                             </div>
                             <button onClick={() => setShowCreate(false)} className="p-2 hud-panel-sm border border-border/50 hover:border-primary/50 text-muted-foreground hover:text-primary transition-colors bg-background/50"><X className="w-4 h-4" /></button>
@@ -338,8 +338,8 @@ export default function EventsPage() {
                             <div className="p-4 hud-corners bg-background/40 border border-border/50 space-y-4">
                                 {/* Title */}
                                 <div>
-                                    <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">DIRECTIVE TITLE <span className="text-primary">*</span></label>
-                                    <input type="text" value={newEvent.title} onChange={(e) => update("title", e.target.value)} placeholder="e.g. SYSTEM UPDATE BRIEFING" className="w-full px-4 py-2.5 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono uppercase transition-colors focus:outline-none" />
+                                    <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">EVENT TITLE <span className="text-primary">*</span></label>
+                                    <input type="text" value={newEvent.title} onChange={(e) => update("title", e.target.value)} placeholder="e.g. ALL HANDS MEETING" className="w-full px-4 py-2.5 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono uppercase transition-colors focus:outline-none" />
                                 </div>
 
                                 {/* Description */}
@@ -413,7 +413,7 @@ export default function EventsPage() {
                             {/* Tags */}
                             <div className="p-4 hud-corners bg-background/40 border border-border/50">
                                 <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
-                                    <Hash className="w-3.5 h-3.5" /> SYSTEM TAGS <span className="opacity-50">(CSV)</span>
+                                    <Hash className="w-3.5 h-3.5" /> TAGS <span className="opacity-50">(CSV)</span>
                                 </label>
                                 <input type="text" value={newEvent.tags} onChange={(e) => update("tags", e.target.value)} placeholder="e.g. REACT, FRONTEND" className="w-full px-4 py-2.5 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono uppercase transition-colors focus:outline-none" />
                                 {newEvent.tags && (
@@ -431,7 +431,7 @@ export default function EventsPage() {
                                 <div className="flex items-center gap-3">
                                     <Sparkles className="w-5 h-5 text-primary animate-pulse" />
                                     <div>
-                                        <p className="text-sm font-bold font-mono tracking-tight uppercase text-primary">PRIORITY DIRECTIVE</p>
+                                        <p className="text-sm font-bold font-mono tracking-tight uppercase text-primary">FEATURED EVENT</p>
                                         <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Pin to global dashboard feed.</p>
                                     </div>
                                 </div>
@@ -447,7 +447,7 @@ export default function EventsPage() {
 
                         {/* Modal Footer */}
                         <div className="p-6 pt-2 flex gap-3 relative z-10">
-                            <button onClick={() => setShowCreate(false)} className="flex-[1] py-3 hud-panel-sm border border-border/50 text-muted-foreground text-xs font-mono font-bold uppercase tracking-widest hover:bg-accent hover:text-foreground transition-all">ABORT</button>
+                            <button onClick={() => setShowCreate(false)} className="flex-[1] py-3 hud-panel-sm border border-border/50 text-muted-foreground text-xs font-mono font-bold uppercase tracking-widest hover:bg-accent hover:text-foreground transition-all">CANCEL</button>
                             <button
                                 onClick={handleCreate}
                                 disabled={creating || !newEvent.title.trim() || !newEvent.date}

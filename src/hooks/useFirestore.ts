@@ -211,6 +211,7 @@ export interface MemberItem {
     name: string;
     email: string;
     role: string;
+    status: string;
     photoURL: string | null;
     standoutSkill: string;
     projects: number;
@@ -230,6 +231,7 @@ export function useMembers() {
             name: raw.displayName || "Unknown",
             email: raw.email || "",
             role: raw.role || "member",
+            status: raw.status || (raw.onboarded ? "approved" : "pending"),
             photoURL: raw.photoURL || null,
             standoutSkill: raw.standoutSkill || "—",
             projects: raw.engagementMetrics?.projectsCompleted || raw.projects?.length || 0,

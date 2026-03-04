@@ -21,7 +21,9 @@ interface UserProfile {
     displayName: string | null;
     photoURL: string | null;
     role: UserRole;
+    status: "pending" | "approved" | "rejected";
     standoutSkill: string | null;
+    skills?: string[];
     onboarded?: boolean;
 }
 
@@ -61,7 +63,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                             displayName: data.displayName || firebaseUser.displayName,
                             photoURL: data.photoURL || firebaseUser.photoURL,
                             role: (data.role as UserRole) || "resident",
+                            status: data.status || (data.onboarded ? "approved" : "pending"), // Handle legacy users
                             standoutSkill: data.standoutSkill || null,
+                            skills: data.skills || [],
                             onboarded: data.onboarded === true,
                         });
                         setNeedsOnboarding(data.onboarded !== true);
@@ -74,6 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                                 displayName: firebaseUser.displayName || null,
                                 photoURL: firebaseUser.photoURL || null,
                                 role: "resident",
+                                status: "pending",
                                 onboarded: false,
                                 createdAt: serverTimestamp(),
                                 updatedAt: serverTimestamp(),
@@ -88,7 +93,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                             displayName: firebaseUser.displayName,
                             photoURL: firebaseUser.photoURL,
                             role: "resident",
+                            status: "pending",
                             standoutSkill: null,
+                            skills: [],
                             onboarded: false,
                         });
                         setNeedsOnboarding(true);
@@ -100,7 +107,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         displayName: firebaseUser.displayName,
                         photoURL: firebaseUser.photoURL,
                         role: "resident",
+                        status: "pending",
                         standoutSkill: null,
+                        skills: [],
                     });
                 }
             } else {
@@ -145,7 +154,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     displayName: data.displayName || currentUser.displayName,
                     photoURL: data.photoURL || currentUser.photoURL,
                     role: data.role || "member",
+                    status: data.status || (data.onboarded ? "approved" : "pending"),
                     standoutSkill: data.standoutSkill || null,
+                    skills: data.skills || [],
                     onboarded: data.onboarded === true,
                 });
                 setNeedsOnboarding(data.onboarded !== true);

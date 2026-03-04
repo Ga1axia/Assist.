@@ -42,7 +42,7 @@ export default function FAQPage() {
                         <HelpCircle className="w-8 h-8" />
                     </div>
                     <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter uppercase mb-4">
-                        SYSTEM <span className="gradient-text-cyber">FAQ</span>
+                        COMMUNITY <span className="gradient-text-cyber">FAQ</span>
                     </h1>
                     <div className="hud-panel-sm border border-border/50 bg-card/60 px-6 py-3 scanlines mx-auto max-w-lg">
                         <p className="relative z-10 text-muted-foreground text-sm font-mono tracking-wider">
@@ -54,7 +54,7 @@ export default function FAQPage() {
                 {/* Search */}
                 <div className="relative mb-6 sm:mb-8 max-w-2xl mx-auto animate-slide-up">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/70" />
-                    <input type="text" placeholder="QUERY DATABASE..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-12 pr-4 py-3.5 hud-panel bg-card/80 border border-primary/30 focus:border-primary/70 text-sm font-mono uppercase tracking-widest transition-colors focus:outline-none glow-border" />
+                    <input type="text" placeholder="SEARCH FAQ..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-12 pr-4 py-3.5 hud-panel bg-card/80 border border-primary/30 focus:border-primary/70 text-sm font-mono uppercase tracking-widest transition-colors focus:outline-none glow-border" />
                     {searchQuery && (
                         <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 text-[10px] font-mono text-primary animate-pulse">
                             <div className="w-1.5 h-1.5 rounded-full bg-primary" /> SEARCHING
@@ -115,7 +115,7 @@ export default function FAQPage() {
 
                     <MessageSquare className="w-8 h-8 text-primary mx-auto mb-4 relative z-10" />
                     <h3 className="font-black text-xl sm:text-2xl mb-2 uppercase tracking-tight relative z-10">Unresolved Query?</h3>
-                    <p className="text-xs font-mono text-muted-foreground mb-6 uppercase tracking-wider relative z-10">Submit a direct inquiry to the system administrators.</p>
+                    <p className="text-xs font-mono text-muted-foreground mb-6 uppercase tracking-wider relative z-10">Submit a direct inquiry to the E-Board.</p>
 
                     <Link href={user ? "/dashboard" : "/login"} className="inline-flex hud-panel-sm bg-primary text-primary-foreground px-8 py-3.5 text-xs font-bold uppercase tracking-widest hover:brightness-110 transition-all glow-border-strong relative z-10">
                         OPEN COMM CHANNEL

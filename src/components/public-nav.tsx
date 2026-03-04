@@ -29,7 +29,7 @@ export function PublicNav() {
                         HALL_OF_FAME
                     </Link>
                     <Link href="/faq" className="text-[10px] sm:text-xs font-mono font-bold text-muted-foreground hover:text-primary uppercase tracking-widest transition-colors hidden sm:block">
-                        SYSTEM_FAQ
+                        FAQ
                     </Link>
 
                     <div className="w-px h-6 bg-border/50 hidden sm:block mx-1"></div>
@@ -56,7 +56,7 @@ export function PublicNav() {
                                     </div>
                                 )}
                                 <span className="text-[10px] sm:text-xs font-mono font-bold uppercase tracking-widest hidden sm:inline max-w-[120px] truncate group-hover:text-primary transition-colors mt-0.5">
-                                    {profile?.displayName || user.email?.split("@")[0] || "OPERATIVE"}
+                                    {profile?.displayName || user.email?.split("@")[0] || "MEMBER"}
                                 </span>
                             </button>
 

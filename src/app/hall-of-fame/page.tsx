@@ -47,7 +47,7 @@ export default function HallOfFamePage() {
                     <div className="mt-6 flex justify-center">
                         <div className="hud-panel border border-border/50 bg-card/60 px-6 py-3 scanlines">
                             <p className="relative z-10 text-muted-foreground text-sm font-mono tracking-wider">
-                                <span className="text-primary font-bold">&gt;</span> Accessing successful deployments and completed system objectives.
+                                <span className="text-primary font-bold">&gt;</span> Accessing successful deployments and completed club projects.
                             </p>
                         </div>
                     </div>
@@ -57,7 +57,7 @@ export default function HallOfFamePage() {
                 {loading && (
                     <div className="flex flex-col items-center justify-center py-20 gap-4">
                         <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                        <span className="text-xs font-mono text-primary tracking-widest uppercase animate-pulse">Querying Database...</span>
+                        <span className="text-xs font-mono text-primary tracking-widest uppercase animate-pulse">Loading Projects...</span>
                     </div>
                 )}
 

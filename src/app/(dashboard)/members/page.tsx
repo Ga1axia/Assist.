@@ -21,15 +21,15 @@ import {
 import { cn } from "@/lib/utils";
 
 const roleConfig: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
-    president: { label: "COMMANDER", color: "bg-destructive/10 border-destructive/50 text-destructive", icon: <Crown className="w-3.5 h-3.5" /> },
-    "vice-president": { label: "VICE CMD", color: "bg-chart-2/10 border-chart-2/50 text-chart-2", icon: <Shield className="w-3.5 h-3.5" /> },
-    "community-manager": { label: "COMMS HEAD", color: "bg-chart-2/10 border-chart-2/50 text-chart-2", icon: <Shield className="w-3.5 h-3.5" /> },
-    marketing: { label: "PR/MARKETING", color: "bg-primary/10 border-primary/50 text-primary", icon: <Star className="w-3.5 h-3.5" /> },
-    events: { label: "LOGISTICS", color: "bg-chart-3/10 border-chart-3/50 text-chart-3", icon: <Star className="w-3.5 h-3.5" /> },
-    finance: { label: "RESOURCES", color: "bg-chart-1/10 border-chart-1/50 text-chart-1", icon: <Briefcase className="w-3.5 h-3.5" /> },
-    associate: { label: "SPECIALIST", color: "bg-chart-4/10 border-chart-4/50 text-chart-4", icon: <User className="w-3.5 h-3.5" /> },
-    resident: { label: "OPERATIVE", color: "bg-background border-border/50 text-muted-foreground", icon: <User className="w-3.5 h-3.5" /> },
-    alumni: { label: "VETERAN", color: "bg-chart-5/10 border-chart-5/50 text-chart-5", icon: <User className="w-3.5 h-3.5" /> },
+    president: { label: "PRESIDENT", color: "bg-destructive/10 border-destructive/50 text-destructive", icon: <Crown className="w-3.5 h-3.5" /> },
+    "vice-president": { label: "VICE PRES", color: "bg-chart-2/10 border-chart-2/50 text-chart-2", icon: <Shield className="w-3.5 h-3.5" /> },
+    "community-manager": { label: "COMM MGR", color: "bg-chart-2/10 border-chart-2/50 text-chart-2", icon: <Shield className="w-3.5 h-3.5" /> },
+    marketing: { label: "MARKETING", color: "bg-primary/10 border-primary/50 text-primary", icon: <Star className="w-3.5 h-3.5" /> },
+    events: { label: "EVENTS", color: "bg-chart-3/10 border-chart-3/50 text-chart-3", icon: <Star className="w-3.5 h-3.5" /> },
+    finance: { label: "FINANCE", color: "bg-chart-1/10 border-chart-1/50 text-chart-1", icon: <Briefcase className="w-3.5 h-3.5" /> },
+    associate: { label: "ASSOCIATE", color: "bg-chart-4/10 border-chart-4/50 text-chart-4", icon: <User className="w-3.5 h-3.5" /> },
+    resident: { label: "MEMBER", color: "bg-background border-border/50 text-muted-foreground", icon: <User className="w-3.5 h-3.5" /> },
+    alumni: { label: "ALUMNI", color: "bg-chart-5/10 border-chart-5/50 text-chart-5", icon: <User className="w-3.5 h-3.5" /> },
 };
 
 export default function MembersPage() {
@@ -58,24 +58,24 @@ export default function MembersPage() {
             <div className="border-b border-border/50 pb-5">
                 <div className="flex items-center gap-2 text-[10px] font-mono text-primary/80 uppercase tracking-widest mb-1.5">
                     <Users2 className="w-3.5 h-3.5" />
-                    SYSTEM_MODULE / DIRECTORY
+                    MEMBER DIRECTORY
                 </div>
                 <h1 className="text-2xl md:text-4xl font-black tracking-tighter uppercase">
-                    ACTIVE <span className="gradient-text-cyber">PERSONNEL</span>
+                    CLUB <span className="gradient-text-cyber">DIRECTORY</span>
                 </h1>
                 <div className="text-muted-foreground mt-2 text-xs font-mono uppercase tracking-widest flex items-center gap-2">
                     <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                    {roleCounts.total} REGISTERED UNIT{roleCounts.total !== 1 ? "S" : ""} IN DB.
+                    {roleCounts.total} REGISTERED MEMBER{roleCounts.total !== 1 ? "S" : ""}
                 </div>
             </div>
 
             {/* Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {[
-                    { label: "HIGH COMMAND", value: roleCounts.eboard, color: "text-chart-2", border: "border-chart-2/40", bg: "bg-chart-2/5" },
-                    { label: "SPECIALISTS", value: roleCounts.associates, color: "text-primary", border: "border-primary/40", bg: "bg-primary/5" },
-                    { label: "OPERATIVES", value: roleCounts.residents, color: "text-chart-4", border: "border-chart-4/40", bg: "bg-chart-4/5" },
-                    { label: "VETERANS", value: roleCounts.alumni, color: "text-chart-5", border: "border-chart-5/40", bg: "bg-chart-5/5" },
+                    { label: "E-BOARD", value: roleCounts.eboard, color: "text-chart-2", border: "border-chart-2/40", bg: "bg-chart-2/5" },
+                    { label: "ASSOCIATES", value: roleCounts.associates, color: "text-primary", border: "border-primary/40", bg: "bg-primary/5" },
+                    { label: "MEMBERS", value: roleCounts.residents, color: "text-chart-4", border: "border-chart-4/40", bg: "bg-chart-4/5" },
+                    { label: "ALUMNI", value: roleCounts.alumni, color: "text-chart-5", border: "border-chart-5/40", bg: "bg-chart-5/5" },
                 ].map((stat) => (
                     <div key={stat.label} className={cn("hud-corners border p-5 text-center relative scanlines overflow-hidden group", stat.bg, stat.border)}>
                         <div className="absolute top-0 right-0 w-8 h-8 pointer-events-none" style={{ background: `radial-gradient(circle, var(--${stat.color.split('-')[1]}) 0%, transparent 70%)`, opacity: 0.1 }} />
@@ -91,7 +91,7 @@ export default function MembersPage() {
                     <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
                     <input
                         type="text"
-                        placeholder="QUERY BY DESIGNATION OR SPECIALTY..."
+                        placeholder="SEARCH BY NAME OR SKILL..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         className="w-full pl-12 pr-4 py-3 bg-transparent text-sm font-mono uppercase tracking-wide focus:outline-none placeholder:text-muted-foreground/50 transition-colors"
@@ -109,7 +109,7 @@ export default function MembersPage() {
                                     : "bg-background/50 border-border/50 text-muted-foreground hover:bg-accent hover:text-foreground"
                             )}
                         >
-                            {r === "all" ? "GLOBAL" : r === "eboard" ? "COMMAND" : r === "resident" ? "OPS" : r === "associate" ? "SPEC" : "VET"}
+                            {r === "all" ? "ALL" : r === "eboard" ? "E-BOARD" : r === "resident" ? "MEMBERS" : r === "associate" ? "ASSISTANTS" : "ALUMNI"}
                         </button>
                     ))}
                 </div>
@@ -119,7 +119,7 @@ export default function MembersPage() {
             {loading && (
                 <div className="flex flex-col items-center justify-center py-20 gap-4">
                     <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                    <span className="text-xs font-mono text-primary uppercase tracking-widest animate-pulse">EXTRACTING PERSONNEL RECORDS...</span>
+                    <span className="text-xs font-mono text-primary uppercase tracking-widest animate-pulse">LOADING MEMBERS...</span>
                 </div>
             )}
 
@@ -166,15 +166,15 @@ export default function MembersPage() {
                                 <div className="grid grid-cols-3 gap-2 relative z-10">
                                     <div className="hud-panel-sm bg-background/60 border border-border/40 py-2.5 px-1 text-center group-hover:border-primary/30 transition-colors">
                                         <div className="text-sm font-black text-primary font-mono">{member.projects}</div>
-                                        <div className="text-[8px] font-mono font-bold text-muted-foreground uppercase tracking-widest mt-1">MISSIONS</div>
+                                        <div className="text-[8px] font-mono font-bold text-muted-foreground uppercase tracking-widest mt-1">PROJECTS</div>
                                     </div>
                                     <div className="hud-panel-sm bg-background/60 border border-border/40 py-2.5 px-1 text-center group-hover:border-primary/30 transition-colors">
                                         <div className="text-sm font-black text-chart-2 font-mono">{member.uploads}</div>
-                                        <div className="text-[8px] font-mono font-bold text-muted-foreground uppercase tracking-widest mt-1">DATA UPL.</div>
+                                        <div className="text-[8px] font-mono font-bold text-muted-foreground uppercase tracking-widest mt-1">UPLOADS</div>
                                     </div>
                                     <div className="hud-panel-sm bg-background/60 border border-border/40 py-2.5 px-1 text-center group-hover:border-primary/30 transition-colors">
                                         <div className="text-sm font-black text-chart-4 font-mono">{member.attendance}</div>
-                                        <div className="text-[8px] font-mono font-bold text-muted-foreground uppercase tracking-widest mt-1">SYNC RT.</div>
+                                        <div className="text-[8px] font-mono font-bold text-muted-foreground uppercase tracking-widest mt-1">ATTENDED</div>
                                     </div>
                                 </div>
 
@@ -192,7 +192,7 @@ export default function MembersPage() {
             {!loading && filtered.length === 0 && (
                 <div className="flex flex-col items-center justify-center py-20 hud-panel bg-card/40 border border-border/40 scanlines">
                     <Users className="w-16 h-16 text-muted-foreground/30 mb-4 relative z-10" />
-                    <p className="text-xs font-mono font-bold text-muted-foreground uppercase tracking-widest relative z-10 text-center">NO PERSONNEL MATCHING THE PROVIDED QUERY.</p>
+                    <p className="text-xs font-mono font-bold text-muted-foreground uppercase tracking-widest relative z-10 text-center">NO MEMBERS MATCHING YOUR SEARCH.</p>
                 </div>
             )}
         </div>

@@ -40,10 +40,10 @@ export default function FeedPage() {
                 <div>
                     <div className="flex items-center gap-2 text-[10px] font-mono text-primary/80 uppercase tracking-widest mb-1.5">
                         <Activity className="w-3.5 h-3.5" />
-                        SYSTEM_MODULE / FEED
+                        FEED
                     </div>
                     <h1 className="text-2xl md:text-4xl font-black tracking-tighter uppercase">
-                        LIVE <span className="gradient-text-cyber">TELEMETRY</span>
+                        NETWORK <span className="gradient-text-cyber">ACTIVITY LOG</span>
                     </h1>
                 </div>
                 <div className="flex gap-2">
@@ -77,7 +77,7 @@ export default function FeedPage() {
             {loading && (
                 <div className="flex-1 flex flex-col items-center justify-center py-20 gap-4">
                     <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                    <span className="text-xs font-mono text-primary uppercase tracking-widest animate-pulse">SYNCING TELEMETRY DATA...</span>
+                    <span className="text-xs font-mono text-primary uppercase tracking-widest animate-pulse">SYNCING ACTIVITY DATA...</span>
                 </div>
             )}
 
@@ -147,7 +147,7 @@ export default function FeedPage() {
                         <div className="flex-1 flex flex-col items-center justify-center py-24 hud-panel bg-card/40 border border-border/40 scanlines">
                             <Activity className="w-16 h-16 text-muted-foreground/30 mb-4" />
                             <p className="text-xs font-mono font-bold text-muted-foreground uppercase tracking-widest text-center max-w-sm leading-relaxed relative z-10">
-                                {filter === "pinned" ? "NO PINNED TELEMETRY FOUND IN CURRENT LOG." : "AWAITING TELEMETRY. SYSTEM ACTIONS WILL BE BROADCASTED HERE."}
+                                {filter === "pinned" ? "NO PINNED POSTS FOUND." : "NO ACTIVITY RECORDED."}
                             </p>
                         </div>
                     )}

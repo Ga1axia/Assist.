@@ -64,7 +64,7 @@ export default function ResourcesPage() {
                 <div>
                     <div className="flex items-center gap-2 text-[10px] font-mono text-primary/80 uppercase tracking-widest mb-1.5">
                         <BookOpen className="w-3.5 h-3.5" />
-                        SYSTEM_MODULE / ARCHIVE
+                        RESOURCES
                     </div>
                     <h1 className="text-2xl md:text-4xl font-black tracking-tighter uppercase relative group">
                         KNOWLEDGE <span className="gradient-text-cyber">BASE</span>
@@ -141,7 +141,7 @@ export default function ResourcesPage() {
             {loading && (
                 <div className="flex flex-col items-center justify-center py-20 gap-4">
                     <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                    <span className="text-xs font-mono text-primary uppercase tracking-widest animate-pulse">ACCESSING DATABASE...</span>
+                    <span className="text-xs font-mono text-primary uppercase tracking-widest animate-pulse">LOADING...</span>
                 </div>
             )}
 
@@ -190,7 +190,7 @@ export default function ResourcesPage() {
                 <div className="flex flex-col items-center justify-center py-20 hud-panel bg-card/40 border border-border/40 scanlines">
                     <BookOpen className="w-16 h-16 text-muted-foreground/30 mb-4 relative z-10" />
                     <p className="text-xs font-mono font-bold text-muted-foreground uppercase tracking-widest relative z-10 text-center max-w-sm leading-relaxed">
-                        DATABASE QUERY RETURNED ZERO RESULTS. ADJUST PARAMETERS OR UPLOAD NEW DATA.
+                        NO RESULTS FOUND.
                     </p>
                 </div>
             )}
@@ -249,7 +249,7 @@ export default function ResourcesPage() {
 
                             <div className="p-4 hud-corners bg-background/40 border border-border/50">
                                 <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">
-                                    SYSTEM TAGS <span className="opacity-50">(CSV)</span>
+                                    TAGS <span className="opacity-50">(CSV)</span>
                                 </label>
                                 <input type="text" value={newResource.topics} onChange={(e) => setNewResource({ ...newResource, topics: e.target.value })} placeholder="e.g. REACT, TYPESCRIPT" className="w-full px-4 py-2.5 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono uppercase transition-colors focus:outline-none" />
                             </div>

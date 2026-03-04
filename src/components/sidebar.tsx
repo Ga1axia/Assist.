@@ -49,7 +49,7 @@ const navItems: NavItem[] = [
 
 const bottomItems: NavItem[] = [
     { label: "Hall of Fame", href: "/hall-of-fame", icon: <Trophy className="w-4 h-4" /> },
-    { label: "System FAQ", href: "/faq", icon: <HelpCircle className="w-4 h-4" /> },
+    { label: "Community FAQ", href: "/faq", icon: <HelpCircle className="w-4 h-4" /> },
 ];
 
 export function Sidebar() {
@@ -169,7 +169,7 @@ export function Sidebar() {
                             <Sun className="w-4 h-4 hidden dark:block" />
                             <Moon className="w-4 h-4 dark:hidden" />
                         </div>
-                        {!collapsed && <span>{mounted ? (theme === "dark" ? "LIGHT SYSTEM" : "DARK SYSTEM") : "SYS_THEME"}</span>}
+                        {!collapsed && <span>{mounted ? (theme === "dark" ? "LIGHT THEME" : "DARK THEME") : "THEME"}</span>}
                     </button>
                 </div>
 

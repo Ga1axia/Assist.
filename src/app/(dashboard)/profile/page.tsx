@@ -15,14 +15,60 @@ import {
     Terminal,
     Target,
     Shield,
+    X,
+    Plus,
+    Loader2,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 export default function ProfilePage() {
-    const { profile } = useAuth();
+    const { profile, refreshProfile } = useAuth();
     const [standoutSkill, setStandoutSkill] = useState(profile?.standoutSkill || "");
+    const [skills, setSkills] = useState<string[]>(profile?.skills || []);
     const [editing, setEditing] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [newSkill, setNewSkill] = useState("");
+
+    useEffect(() => {
+        if (profile) {
+            setStandoutSkill(profile.standoutSkill || "");
+            setSkills(profile.skills || []);
+        }
+    }, [profile]);
+
+    const handleSave = async () => {
+        if (!profile) return;
+        setSaving(true);
+        try {
+            await updateDoc(doc(db, "users", profile.uid), {
+                standoutSkill,
+                skills,
+            });
+            await refreshProfile();
+            setEditing(false);
+        } catch (error) {
+            console.error("Failed to update profile", error);
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const addSkill = () => {
+        if (newSkill.trim() && !skills.includes(newSkill.trim().toUpperCase())) {
+            setSkills([...skills, newSkill.trim().toUpperCase()]);
+            setNewSkill("");
+        }
+    };
+
+    const removeSkill = (skillToRemove: string) => {
+        setSkills(skills.filter(s => s !== skillToRemove));
+        if (standoutSkill === skillToRemove) {
+            setStandoutSkill("");
+        }
+    };
 
     const engagementMetrics = [
         { label: "SYNC RATE", value: "92%", icon: <Calendar className="w-4 h-4" />, color: "text-chart-1", border: "border-chart-1/40", bg: "bg-chart-1/5" },
@@ -46,25 +92,29 @@ export default function ProfilePage() {
                     SYSTEM_MODULE / USER_DATA
                 </div>
                 <h1 className="text-3xl md:text-4xl font-black tracking-tighter uppercase relative group inline-block">
-                    OPERATIVE <span className="gradient-text-cyber">DOSSIER</span>
+                    MEMBER <span className="gradient-text-cyber">PROFILE</span>
                 </h1>
             </div>
 
             {/* Profile Card */}
-            <div className="hud-panel bg-card/60 border border-primary/40 overflow-hidden relative scanlines">
+            <div className="hud-panel bg-card/60 border border-primary/40 overflow-hidden relative scanlines shadow-lg">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/10 to-transparent pointer-events-none" />
 
                 <div className="h-28 sm:h-36 bg-gradient-to-r from-background via-card to-background relative border-b border-border/50">
                     <div className="absolute inset-0 bg-[url('https://transparenttextures.com/patterns/cubes.png')] opacity-10" />
                     <div className="absolute -bottom-10 sm:-bottom-12 left-6 sm:left-8 z-10">
-                        <div className="w-20 h-20 sm:w-24 sm:h-24 hud-corners bg-background/80 backdrop-blur-md border border-primary text-primary flex items-center justify-center text-3xl sm:text-4xl font-black shadow-[0_0_15px_rgba(203,247,2,0.3)]">
-                            {profile?.displayName?.[0]?.toUpperCase() || "U"}
-                        </div>
+                        {profile?.photoURL ? (
+                            <img src={profile.photoURL} alt="" className="w-20 h-20 sm:w-24 sm:h-24 hud-corners object-cover bg-background border border-primary text-primary shadow-[0_0_15px_rgba(203,247,2,0.3)]" />
+                        ) : (
+                            <div className="w-20 h-20 sm:w-24 sm:h-24 hud-corners bg-background/80 backdrop-blur-md border border-primary text-primary flex items-center justify-center text-3xl sm:text-4xl font-black shadow-[0_0_15px_rgba(203,247,2,0.3)]">
+                                {profile?.displayName?.[0]?.toUpperCase() || "U"}
+                            </div>
+                        )}
                     </div>
                 </div>
 
                 <div className="pt-14 sm:pt-16 px-6 sm:px-8 pb-8 relative z-10">
-                    <h2 className="text-2xl font-black uppercase tracking-tight">{profile?.displayName || "UNKNOWN OPERATIVE"}</h2>
+                    <h2 className="text-2xl font-black uppercase tracking-tight">{profile?.displayName || "UNKNOWN MEMBER"}</h2>
 
                     <div className="flex flex-wrap items-center gap-3 mt-2">
                         <span className="text-xs font-mono text-muted-foreground flex items-center gap-1.5 uppercase tracking-widest bg-background/50 border border-border/50 px-3 py-1">
@@ -77,33 +127,81 @@ export default function ProfilePage() {
                         </span>
                     </div>
 
-                    {/* Standout Skill */}
+                    {/* Acquired Skills */}
                     <div className="mt-8 p-5 hud-panel-sm bg-background/40 border border-border/40 relative group">
                         <div className="absolute top-0 left-0 w-1 h-full bg-primary/50 group-hover:bg-primary transition-colors" />
-                        <div className="flex items-center justify-between mb-3 pl-2">
+
+                        <div className="flex items-center justify-between mb-4 pl-2 border-b border-border/40 pb-3">
                             <h3 className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-                                <Star className="w-4 h-4 text-primary" />
-                                PRIMARY DESIGNATION
+                                <Terminal className="w-4 h-4 text-primary" />
+                                ACQUIRED SKILLS & SPECIALTIES
                             </h3>
-                            <button onClick={() => setEditing(!editing)} className="text-[10px] font-mono font-bold px-3 py-1 hud-panel-sm bg-primary/10 text-primary border border-primary/30 hover:bg-primary hover:text-primary-foreground transition-all flex items-center gap-1.5 uppercase">
-                                <Terminal className="w-3 h-3" />
-                                {editing ? "COMMIT" : "OVERRIDE"}
-                            </button>
-                        </div>
-                        <div className="pl-2">
                             {editing ? (
-                                <input
-                                    type="text"
-                                    value={standoutSkill}
-                                    onChange={(e) => setStandoutSkill(e.target.value)}
-                                    placeholder="ENTER DESIGNATION..."
-                                    className="w-full px-4 py-2.5 hud-panel-sm bg-card border border-primary/50 text-sm font-mono uppercase focus:outline-none glow-border"
-                                    autoFocus
-                                />
+                                <div className="flex items-center gap-2">
+                                    <button onClick={() => { setEditing(false); setSkills(profile?.skills || []); setStandoutSkill(profile?.standoutSkill || ""); }} className="text-[10px] font-mono font-bold px-3 py-1 hud-panel-sm border border-border text-muted-foreground hover:bg-accent transition-all flex items-center gap-1.5 uppercase">
+                                        CANCEL
+                                    </button>
+                                    <button onClick={handleSave} disabled={saving} className="text-[10px] font-mono font-bold px-3 py-1 hud-panel-sm bg-primary text-primary-foreground border border-primary hover:brightness-110 transition-all flex items-center gap-1.5 uppercase glow-border">
+                                        {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : "COMMIT"}
+                                    </button>
+                                </div>
                             ) : (
-                                <p className="text-lg font-black font-mono tracking-tight uppercase text-foreground/90 glow-text-subtle">
-                                    <span className="text-primary/50 mr-2">&gt;</span>
-                                    {standoutSkill || "AWAITING INPUT"}
+                                <button onClick={() => setEditing(true)} className="text-[10px] font-mono font-bold px-3 py-1 hud-panel-sm bg-primary/10 text-primary border border-primary/30 hover:bg-primary hover:text-primary-foreground transition-all flex items-center gap-1.5 uppercase">
+                                    <Terminal className="w-3 h-3" />
+                                    OVERRIDE
+                                </button>
+                            )}
+                        </div>
+
+                        <div className="pl-2 space-y-4">
+                            {editing && (
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        value={newSkill}
+                                        onChange={(e) => setNewSkill(e.target.value)}
+                                        onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
+                                        placeholder="ENTER NEW SKILL..."
+                                        className="w-full sm:w-64 px-4 py-2 hud-panel-sm bg-card border border-border/50 focus:border-primary/50 text-xs font-mono uppercase focus:outline-none"
+                                    />
+                                    <button onClick={addSkill} className="hud-panel-sm bg-accent border border-border/50 hover:bg-primary/20 hover:border-primary/50 hover:text-primary px-3 py-2 flex items-center justify-center transition-colors">
+                                        <Plus className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            )}
+
+                            {skills.length === 0 ? (
+                                <p className="text-xs font-mono text-muted-foreground italic uppercase">NO DATA FOUND.</p>
+                            ) : (
+                                <div className="flex flex-wrap gap-2">
+                                    {skills.map((skill) => (
+                                        <div
+                                            key={skill}
+                                            className={cn(
+                                                "flex items-center gap-2 px-3 py-1.5 border text-xs font-mono font-bold uppercase tracking-widest transition-all",
+                                                standoutSkill === skill
+                                                    ? "bg-primary/10 border-primary text-primary glow-border hud-corners"
+                                                    : "bg-background/80 border-border/50 text-foreground hud-panel-sm",
+                                                editing && standoutSkill !== skill && "cursor-pointer hover:border-primary/50"
+                                            )}
+                                            onClick={() => editing && setStandoutSkill(skill)}
+                                            title={editing ? (standoutSkill === skill ? "Primary Specialty" : "Click to set as Primary Specialty") : (standoutSkill === skill ? "Primary Specialty" : "")}
+                                        >
+                                            {standoutSkill === skill && <Star className="w-3.5 h-3.5 fill-primary text-primary" />}
+                                            {skill}
+                                            {editing && (
+                                                <button onClick={(e) => { e.stopPropagation(); removeSkill(skill); }} className="ml-1 text-muted-foreground hover:text-destructive transition-colors">
+                                                    <X className="w-3 h-3" />
+                                                </button>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {editing && skills.length > 0 && (
+                                <p className="text-[10px] font-mono text-muted-foreground uppercase mt-2">
+                                    * Click a skill token to designate it as your <span className="text-primary font-bold">PRIMARY SPECIALTY</span>.
                                 </p>
                             )}
                         </div>
@@ -176,7 +274,7 @@ export default function ProfilePage() {
                         <label className="flex items-start justify-between p-4 hud-panel-sm bg-background/50 border border-border/40 hover:border-primary/40 transition-colors cursor-pointer group">
                             <div className="pr-4">
                                 <p className="text-sm font-bold font-mono uppercase tracking-tight group-hover:text-primary transition-colors">STANDARD INTEL</p>
-                                <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest mt-1">Receive updates via email protocol</p>
+                                <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest mt-1">Receive updates via email</p>
                             </div>
                             <div className="w-12 h-6 border border-primary hud-panel-sm bg-primary/20 relative cursor-pointer shrink-0 mt-1">
                                 <div className="absolute right-0.5 top-0.5 w-4 h-4 bg-primary transition-all glow-border shadow-[0_0_8px_rgba(203,247,2,1)]" />

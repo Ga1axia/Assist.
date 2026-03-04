@@ -63,7 +63,7 @@ export default function LoginPage() {
                     </h1>
                     <div className="relative hud-panel-sm bg-card/60 border border-border/50 p-6 scanlines mt-6">
                         <p className="relative z-10 text-muted-foreground text-sm font-mono leading-relaxed">
-                            <span className="text-primary font-bold">&gt;</span> The operating system for Babson&apos;s Community of Developers and Entrepreneurs. Authentication required for system access.
+                            <span className="text-primary font-bold">&gt;</span> The operating system for Babson&apos;s Community of Developers and Entrepreneurs. Login required for access.
                         </p>
                     </div>
 
@@ -88,7 +88,7 @@ export default function LoginPage() {
 
                     <div className="flex items-center justify-between mb-8 sm:mb-10">
                         <Link href="/" className="flex items-center gap-2 text-xs font-mono text-muted-foreground hover:text-primary transition-colors uppercase tracking-wider">
-                            <ArrowLeft className="w-3 h-3" /> ABORT
+                            <ArrowLeft className="w-3 h-3" /> BACK
                         </Link>
                         <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} className="p-2 hud-panel-sm bg-card border border-border/50 hover:border-primary/50 transition-colors text-muted-foreground hover:text-foreground">
                             <Sun className="w-4 h-4 hidden dark:block" />
@@ -116,7 +116,7 @@ export default function LoginPage() {
                                 AUTHORIZATION REQUIRED
                             </div>
 
-                            <h2 className="text-2xl font-black tracking-tight mb-2">SYSTEM LOGIN</h2>
+                            <h2 className="text-2xl font-black tracking-tight mb-2">LOGIN</h2>
                             <p className="text-muted-foreground text-xs font-mono mb-6">Enter credentials to establish connection.</p>
 
                             {error && (

@@ -60,10 +60,10 @@ export default function ProjectsPage() {
                 <div>
                     <div className="flex items-center gap-2 text-[10px] font-mono text-primary/80 uppercase tracking-widest mb-2">
                         <FolderKanban className="w-3.5 h-3.5" />
-                        SYSTEM_MODULE / PROJECTS
+                        PROJECTS
                     </div>
                     <h1 className="text-2xl md:text-4xl font-black tracking-tighter uppercase">
-                        ACTIVE <span className="gradient-text-cyber text-transparent bg-clip-text">PROTOCOLS</span>
+                        ACTIVE <span className="gradient-text-cyber text-transparent bg-clip-text">PROJECTS</span>
                     </h1>
                 </div>
                 <button onClick={() => setShowNewProjectModal(true)} className="hud-panel-sm bg-primary text-primary-foreground px-5 py-2.5 text-xs font-bold uppercase tracking-widest hover:brightness-110 transition-all glow-border-strong flex items-center gap-2 group">
@@ -75,7 +75,7 @@ export default function ProjectsPage() {
             <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/60" />
-                    <input type="text" placeholder="SEARCH PROTOCOL DIRECTORY..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-3 hud-panel-sm bg-card/60 border border-border/50 focus:border-primary/50 text-sm font-mono uppercase tracking-widest transition-colors focus:outline-none" />
+                    <input type="text" placeholder="SEARCH PROJECTS..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-3 hud-panel-sm bg-card/60 border border-border/50 focus:border-primary/50 text-sm font-mono uppercase tracking-widest transition-colors focus:outline-none" />
                 </div>
                 <div className="flex gap-2 overflow-x-auto pb-1 custom-scroll">
                     {statuses.map((status) => (
@@ -142,7 +142,7 @@ export default function ProjectsPage() {
             {!loading && filteredProjects.length === 0 && (
                 <div className="text-center py-20 hud-panel bg-card/40 border border-border/50 scanlines max-w-2xl mx-auto">
                     <Terminal className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4 relative z-10" />
-                    <p className="text-xs font-mono text-muted-foreground uppercase tracking-widest relative z-10">NO PROTOCOLS FOUND MATCHING CURRENT PARAMETERS.</p>
+                    <p className="text-xs font-mono text-muted-foreground uppercase tracking-widest relative z-10">NO PROJECTS FOUND MATCHING YOUR SEARCH.</p>
                 </div>
             )}
 
@@ -156,13 +156,13 @@ export default function ProjectsPage() {
                             <div className="w-12 h-12 hud-panel-sm bg-primary/10 border border-primary/30 flex items-center justify-center text-primary mx-auto mb-3">
                                 <Plus className="w-6 h-6" />
                             </div>
-                            <h3 className="font-black text-xl uppercase tracking-tight">INITIALIZE NEW PROTOCOL</h3>
+                            <h3 className="font-black text-xl uppercase tracking-tight">CREATE NEW PROJECT</h3>
                             <p className="text-xs font-mono text-muted-foreground uppercase tracking-widest mt-1">Submit proposal to E-Board for authorization.</p>
                         </div>
 
                         <div className="space-y-5 relative z-10">
                             <div>
-                                <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">PROTOCOL DESIGNATION</label>
+                                <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">PROJECT NAME</label>
                                 <input type="text" value={newProject.name} onChange={(e) => setNewProject({ ...newProject, name: e.target.value })} placeholder="e.g., NEURAL_NET_V2" className="w-full px-4 py-3 hud-panel-sm bg-background/50 border border-border/50 focus:border-primary/50 text-sm font-mono uppercase transition-colors focus:outline-none" />
                             </div>
                             <div>
@@ -171,7 +171,7 @@ export default function ProjectsPage() {
                             </div>
                             <div className="flex gap-3 pt-2">
                                 <button onClick={() => setShowNewProjectModal(false)} className="flex-1 hud-panel-alt border border-border/60 text-muted-foreground hover:text-foreground hover:bg-accent py-3 text-xs font-mono font-bold uppercase tracking-widest transition-all">
-                                    ABORT
+                                    CANCEL
                                 </button>
                                 <button onClick={handleSubmit} className="flex-[2] bg-primary text-primary-foreground py-3 hud-panel text-xs font-mono font-bold uppercase tracking-widest hover:brightness-110 transition-all glow-border">
                                     TRANSMIT PROPOSAL

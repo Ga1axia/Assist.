@@ -57,7 +57,7 @@ export default function LandingPage() {
           {/* System Status Badge */}
           <div className="inline-flex items-center gap-2.5 hud-panel-sm bg-card/80 border border-primary/30 text-primary px-4 py-2 text-xs font-mono tracking-wider mb-8 animate-fade-in animate-border-pulse">
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            <span className="uppercase">System Online</span>
+            <span className="uppercase">Platform Online</span>
             <span className="text-muted-foreground">·</span>
             <span className="text-muted-foreground">Babson CODE</span>
           </div>
@@ -72,7 +72,7 @@ export default function LandingPage() {
           <div className="mt-8 max-w-2xl mx-auto animate-slide-up">
             <div className="relative hud-panel bg-card/60 border border-border/50 px-6 py-4 scanlines">
               <p className="relative z-10 text-sm sm:text-base text-muted-foreground font-mono leading-relaxed">
-                <span className="text-primary font-bold">&gt;</span> CODE OS is the operating system for our coding club — manage projects, resources, and member engagement all in one place.
+                <span className="text-primary font-bold">&gt;</span> CODE OS is the management platform for our coding club — manage projects, resources, and member engagement all in one place.
               </p>
             </div>
           </div>
@@ -84,7 +84,7 @@ export default function LandingPage() {
               className="group relative w-full sm:w-auto hud-panel bg-primary text-primary-foreground px-8 py-3.5 text-sm font-bold uppercase tracking-wider hover:brightness-110 transition-all glow-border-strong flex items-center justify-center gap-3"
             >
               <Terminal className="w-4 h-4" />
-              {user ? "ENTER DASHBOARD" : "INITIALIZE"}
+              {user ? "ENTER DASHBOARD" : "GET STARTED"}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
             </Link>
             <Link
@@ -117,7 +117,7 @@ export default function LandingPage() {
         <div className="text-center mb-12 sm:mb-16">
           <div className="inline-flex items-center gap-2 text-xs font-mono text-primary tracking-widest uppercase mb-4">
             <span className="w-8 h-px bg-primary/50" />
-            SYSTEM MODULES
+            PLATFORM FEATURES
             <span className="w-8 h-px bg-primary/50" />
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter">
@@ -153,7 +153,7 @@ export default function LandingPage() {
                 {/* Module link indicator */}
                 <div className="mt-4 flex items-center gap-1.5 text-[10px] font-mono text-primary/50 uppercase tracking-wider group-hover:text-primary transition-colors">
                   <ChevronRight className="w-3 h-3" />
-                  ACCESS MODULE
+                  VIEW MODULE
                 </div>
               </div>
             </div>
@@ -187,7 +187,7 @@ export default function LandingPage() {
               className="mt-8 inline-flex items-center gap-3 hud-panel bg-primary text-primary-foreground px-8 py-3.5 text-sm font-bold uppercase tracking-wider hover:brightness-110 transition-all glow-border-strong"
             >
               <Shield className="w-4 h-4" />
-              {user ? "ENTER DASHBOARD" : "AUTHENTICATE"}
+              {user ? "ENTER DASHBOARD" : "GET STARTED"}
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

@@ -78,7 +78,7 @@ export default function ProjectDetailPage() {
                 <div className="flex-1">
                     <div className="flex items-center gap-2 text-[10px] font-mono text-primary/80 uppercase tracking-widest mb-1.5">
                         <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                        PROTOCOL OVERVIEW
+                        PROJECT OVERVIEW
                     </div>
                     <div className="flex items-center gap-3 flex-wrap">
                         <h1 className="text-2xl md:text-3xl font-black tracking-tighter uppercase">
@@ -174,7 +174,7 @@ export default function ProjectDetailPage() {
 
                         <div className="flex items-center gap-2 mb-6 border-b border-border/40 pb-4 relative z-10">
                             <MessageSquare className="w-5 h-5 text-primary" />
-                            <h2 className="font-black text-xl tracking-tight uppercase">SYSTEM LOGS</h2>
+                            <h2 className="font-black text-xl tracking-tight uppercase">PROJECT LOGS</h2>
                         </div>
 
                         {/* Add note */}
@@ -266,7 +266,7 @@ export default function ProjectDetailPage() {
                     {/* Quick Stats */}
                     <div className="hud-corners bg-card/60 border border-border/40 p-6 scanlines relative">
                         <div className="relative z-10">
-                            <h2 className="font-bold font-mono tracking-tight uppercase mb-5 pb-3 border-b border-border/40">SYSTEM METRICS</h2>
+                            <h2 className="font-bold font-mono tracking-tight uppercase mb-5 pb-3 border-b border-border/40">PROJECT METRICS</h2>
                             <div className="space-y-4">
                                 <div className="flex flex-col gap-1">
                                     <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">STATUS</span>

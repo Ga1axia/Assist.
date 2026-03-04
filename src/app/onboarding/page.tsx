@@ -286,7 +286,7 @@ export default function OnboardingPage() {
                     {/* Search */}
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                        <input type="text" value={skillSearch} onChange={(e) => setSkillSearch(e.target.value)} placeholder="Search database..." className="w-full pl-10 pr-4 py-2.5 hud-panel-sm bg-background/50 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none" />
+                        <input type="text" value={skillSearch} onChange={(e) => setSkillSearch(e.target.value)} placeholder="Search..." className="w-full pl-10 pr-4 py-2.5 hud-panel-sm bg-background/50 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none" />
                     </div>
 
                     {/* Selected pills */}
@@ -435,7 +435,7 @@ export default function OnboardingPage() {
         // ── Step 5: Summary ──
         {
             title: "PROFILE VERIFICATION",
-            subtitle: "Review system entry before finalizing initialization.",
+            subtitle: "Review your profile before submitting your application. Access will be granted once your clearance is approved by the E-Board.",
             content: (
                 <div className="py-2 space-y-6">
                     <div className="flex items-center gap-4 hud-panel-sm bg-card/60 border border-border/50 p-4">
@@ -534,7 +534,7 @@ export default function OnboardingPage() {
                             {isLast ? (
                                 <button onClick={handleFinish} disabled={submitting} className="flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground text-xs font-mono font-bold uppercase tracking-widest transition-all glow-border-strong hover:brightness-110 disabled:opacity-50 hud-panel transition-all">
                                     {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Terminal className="w-4 h-4" />}
-                                    {submitting ? "PROCESSING" : "FINALIZE"}
+                                    {submitting ? "SUBMITTING" : "SUBMIT APPLICATION"}
                                 </button>
                             ) : (
                                 <button onClick={() => setStep(Math.min(steps.length - 1, step + 1))} disabled={!canProceed} className={cn("flex items-center gap-1.5 px-6 py-2.5 text-xs font-mono font-bold uppercase tracking-widest transition-all hud-panel", canProceed ? "bg-primary text-primary-foreground glow-border hover:brightness-110" : "bg-card border border-border/50 text-muted-foreground cursor-not-allowed")}>
