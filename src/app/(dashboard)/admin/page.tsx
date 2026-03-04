@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useAuth } from "@/contexts/auth-context";
-import { useInquiries, useResources, useProjects, useMembers } from "@/hooks/useFirestore";
+import { useInquiries, useResources, useProjects, useMembers, useActionItems } from "@/hooks/useFirestore";
 import { isAdmin } from "@/lib/roles";
 import { getRoleLabel, ALL_ROLES } from "@/lib/roles";
 import { cn } from "@/lib/utils";
@@ -23,9 +23,11 @@ import {
     Plus,
     Check,
     X,
+    CheckSquare,
+    Target
 } from "lucide-react";
 
-type AdminTab = "announcements" | "applications" | "inquiries" | "pitches" | "resources" | "profiles";
+type AdminTab = "announcements" | "actionItems" | "applications" | "inquiries" | "pitches" | "resources" | "profiles";
 
 export default function AdminPage() {
     const { profile, user } = useAuth();
@@ -33,6 +35,7 @@ export default function AdminPage() {
     const { data: resources, loading: resourcesLoading, approveResource, rejectResource } = useResources(false);
     const { data: projects, loading: projectsLoading } = useProjects();
     const { data: members, loading: membersLoading } = useMembers();
+    const { data: actionItems, loading: actionItemsLoading } = useActionItems();
 
     const [activeTab, setActiveTab] = useState<AdminTab>("announcements");
     const [replyText, setReplyText] = useState("");
@@ -43,11 +46,19 @@ export default function AdminPage() {
     const [announcementBody, setAnnouncementBody] = useState("");
     const [announcementSending, setAnnouncementSending] = useState(false);
 
+    // Action Items state
+    const [actionTitle, setActionTitle] = useState("");
+    const [actionDesc, setActionDesc] = useState("");
+    const [actionDeadline, setActionDeadline] = useState("");
+    const [actionType, setActionType] = useState<"external" | "form">("external");
+    const [actionLink, setActionLink] = useState("");
+    const [actionSending, setActionSending] = useState(false);
+
     // Applications state
     const [selectedRoles, setSelectedRoles] = useState<Record<string, string>>({});
 
     const userIsAdmin = isAdmin(profile?.role);
-    const loading = inquiriesLoading || resourcesLoading || projectsLoading || membersLoading;
+    const loading = inquiriesLoading || resourcesLoading || projectsLoading || membersLoading || actionItemsLoading;
 
     const pendingInquiries = inquiries.filter((i) => i.status === "pending");
     const pendingResources = resources.filter((r) => !r.approved);
@@ -70,6 +81,7 @@ export default function AdminPage() {
 
     const tabs: { key: AdminTab; label: string; icon: React.ReactNode; count?: number }[] = [
         { key: "announcements", label: "BROADCASTS", icon: <Megaphone className="w-4 h-4" /> },
+        { key: "actionItems", label: "DEADLINES", icon: <CheckSquare className="w-4 h-4" /> },
         { key: "applications", label: "APPLICATIONS", icon: <UserPlus className="w-4 h-4" />, count: pendingApplications.length },
         { key: "inquiries", label: "COMMUNICATIONS", icon: <MessageSquare className="w-4 h-4" />, count: pendingInquiries.length },
         { key: "pitches", label: "PROPOSALS", icon: <FileText className="w-4 h-4" />, count: pendingPitches.length },
@@ -117,6 +129,38 @@ export default function AdminPage() {
             console.error("Announcement error:", err);
         } finally {
             setAnnouncementSending(false);
+        }
+    };
+
+    // ── Action Items ──
+    const handleCreateActionItem = async () => {
+        if (!actionTitle.trim() || !actionDesc.trim() || !actionDeadline) return;
+        setActionSending(true);
+        try {
+            const res = await fetch("/api/action-items", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    title: actionTitle,
+                    description: actionDesc,
+                    deadline: actionDeadline,
+                    type: actionType,
+                    link: actionType === "form" ? actionLink : null,
+                })
+            });
+            if (res.ok) {
+                setActionTitle("");
+                setActionDesc("");
+                setActionDeadline("");
+                setActionType("external");
+                setActionLink("");
+            } else {
+                console.error("Failed to create action item");
+            }
+        } catch (err) {
+            console.error("Action item error:", err);
+        } finally {
+            setActionSending(false);
         }
     };
 
@@ -216,6 +260,61 @@ export default function AdminPage() {
                                         {announcementSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                                         {announcementSending ? "TRANSMITTING..." : "EXECUTE BROADCAST"}
                                     </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* ── Action Items Tab ── */}
+                    {activeTab === "actionItems" && (
+                        <div className="space-y-6">
+                            <div className="hud-panel bg-card/60 border border-primary/40 p-6 sm:p-8 scanlines relative">
+                                <div className="absolute top-0 right-0 w-32 h-1 bg-gradient-to-r from-transparent to-primary/50" />
+                                <h3 className="font-bold text-lg mb-6 flex items-center gap-3 uppercase tracking-tight relative z-10 text-primary border-b border-primary/20 pb-4">
+                                    <Target className="w-5 h-5" /> CREATE ACTION ITEM (DEADLINE)
+                                </h3>
+
+                                <div className="space-y-5 relative z-10 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+                                    <div className="space-y-1.5 col-span-1 md:col-span-2">
+                                        <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">DIRECTIVE OBJECTIVE</label>
+                                        <input type="text" value={actionTitle} onChange={(e) => setActionTitle(e.target.value)} placeholder="e.g. SUBMIT RESUME FOR SHF..." className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono uppercase transition-colors focus:outline-none" />
+                                    </div>
+
+                                    <div className="space-y-1.5 md:col-span-1">
+                                        <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">DEADLINE TIMEFRAME</label>
+                                        <input type="datetime-local" value={actionDeadline} onChange={(e) => setActionDeadline(e.target.value)} className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none" />
+                                    </div>
+
+                                    <div className="space-y-1.5 md:col-span-1">
+                                        <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">DELIVERY FORMAT</label>
+                                        <select value={actionType} onChange={(e) => setActionType(e.target.value as "external" | "form")} className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none appearance-none">
+                                            <option value="external">EXTERNAL TASK (CHECKBOX)</option>
+                                            <option value="form">LINKED DIRECTIVE (FORM)</option>
+                                        </select>
+                                    </div>
+
+                                    {actionType === "form" && (
+                                        <div className="space-y-1.5 col-span-1 md:col-span-2">
+                                            <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">TARGET URL</label>
+                                            <input type="url" value={actionLink} onChange={(e) => setActionLink(e.target.value)} placeholder="https://forms.gle/..." className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none" />
+                                        </div>
+                                    )}
+
+                                    <div className="space-y-1.5 col-span-1 md:col-span-2">
+                                        <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">ADDITIONAL BRIEFING</label>
+                                        <textarea value={actionDesc} onChange={(e) => setActionDesc(e.target.value)} placeholder="Provide further context or instructions..." rows={3} className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none resize-none" />
+                                    </div>
+
+                                    <div className="col-span-1 md:col-span-2 pt-2 flex items-center justify-end">
+                                        <button
+                                            onClick={handleCreateActionItem}
+                                            disabled={actionSending || !actionTitle.trim() || !actionDesc.trim() || !actionDeadline || (actionType === "form" && !actionLink)}
+                                            className="hud-panel bg-primary text-primary-foreground px-8 py-3.5 text-xs font-mono font-bold uppercase tracking-widest hover:brightness-110 transition-all glow-border disabled:opacity-50 flex items-center gap-3"
+                                        >
+                                            {actionSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                                            {actionSending ? "INITIALIZING..." : "PUBLISH DIRECTIVE"}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>

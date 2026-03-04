@@ -64,5 +64,11 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin();
     }
+
+    match /actionItems/{itemId} {
+      allow read: if isSignedIn();
+      allow update: if isSignedIn(); // members can mark as completed
+      allow create, delete: if isAdmin(); // only admins can create tasks
+    }
   }
 }

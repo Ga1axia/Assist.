@@ -111,6 +111,42 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ═══ ABOUT US SECTION ═══ */}
+      <section className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-14 sm:py-20 text-center">
+        <div className="inline-flex items-center gap-2 text-xs font-mono text-primary tracking-widest uppercase mb-4 animate-fade-in">
+          <span className="w-8 h-px bg-primary/50" />
+          OUR STORY
+          <span className="w-8 h-px bg-primary/50" />
+        </div>
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter mb-8 animate-slide-up">
+          Babson <span className="gradient-text-cyber">CODE</span>
+        </h2>
+
+        <div className="hud-panel bg-card/60 border border-border/40 p-6 sm:p-10 text-left space-y-6 text-sm sm:text-base text-muted-foreground leading-relaxed font-mono scanlines animate-slide-up">
+          <p>
+            <span className="text-primary font-bold">&gt;</span> CODE (Community of Developers & Entrepreneurs) was founded in Fall 2015 by a group of students passionate about the intersection of technology and business. Since then, we're grateful to have done some pretty cool things:
+          </p>
+          <ul className="space-y-4 pl-4 border-l-2 border-primary/20 text-sm">
+            <li className="flex gap-3 items-start"><span className="text-primary glow-text mt-1 text-xs">✓</span><span>We've grown to hundreds of members</span></li>
+            <li className="flex gap-3 items-start"><span className="text-primary glow-text mt-1 text-xs">✓</span><span>We've hosted a bunch of fun and informative events</span></li>
+            <li className="flex gap-3 items-start"><span className="text-primary glow-text mt-1 text-xs">✓</span><span>We cooperated with Olin School of Engineering to host speaker and networking events</span></li>
+            <li className="flex gap-3 items-start"><span className="text-primary glow-text mt-1 text-xs">✓</span><span>We've done tech consulting with the Blank Center</span></li>
+            <li className="flex gap-3 items-start"><span className="text-primary glow-text mt-1 text-xs">✓</span><span>We've hosted bootcamps for fellow Babson Students</span></li>
+            <li className="flex gap-3 items-start"><span className="text-primary glow-text mt-1 text-xs">✓</span><span>We've attended hackathons around the country and won</span></li>
+            <li className="flex gap-3 items-start"><span className="text-primary glow-text mt-1 text-xs">✓</span><span>And so much more!</span></li>
+          </ul>
+          <p>
+            CODE helps Babson students develop technological acumen to match their entrepreneurial mindsets. We are the go-to campus resource for anything and everything tech, and we're here to help guide you through the intersection of business and technology.
+          </p>
+          <div className="border-t border-border/40 pt-6 mt-6">
+            <p className="text-primary mb-2 text-xs uppercase tracking-widest font-bold">REACH OUT</p>
+            <p className="opacity-80">
+              If there's anything you need, we're here to help. Just contact us at code@babson.edu, connect with us on social media, or see us at one of our events!
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ═══ FEATURES SECTION ═══ */}
       <section className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
         {/* Section Header */}

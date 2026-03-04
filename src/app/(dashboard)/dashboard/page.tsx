@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/contexts/auth-context";
 import { isAdmin } from "@/lib/roles";
-import { useFeed, useProjects, useEvents } from "@/hooks/useFirestore";
+import { useFeed, useProjects, useEvents, useActionItems } from "@/hooks/useFirestore";
 import {
     Activity,
     Clock,
@@ -27,30 +27,29 @@ const typeEmoji: Record<string, string> = {
 };
 
 export default function DashboardPage() {
-    const { profile } = useAuth();
+    const { profile, user } = useAuth();
     const { data: feedItems, loading: feedLoading } = useFeed();
-    const { data: projects, loading: projectsLoading } = useProjects();
     const { data: events, loading: eventsLoading } = useEvents();
+    const { data: actionItems, loading: actionItemsLoading, completeActionItem } = useActionItems();
 
     const userIsAdmin = isAdmin(profile?.role);
-    const loading = feedLoading || projectsLoading || eventsLoading;
+    const loading = feedLoading || eventsLoading || actionItemsLoading;
 
     // Show more activity items since we have full height now
     const recentActivity = feedItems.slice(0, 8);
 
-    // Active Projects (treating as Deadlines)
-    const activeProjects = projects
-        .filter((p) => p.status !== "complete")
-        .slice(0, 4);
+    // Active Action Items (Untruncated, we'll slice in render if needed, or just allow scroll)
+    const activeDeadlines = actionItems.slice(0, 10);
 
     // Upcoming Events
     const upcomingEvents = events.slice(0, 4);
 
-    // Generate Week Matrix (Current Week Sun-Sat)
+    // Generate Week Matrix (Current Week Mon-Sun)
     const today = new Date();
-    const currentDayOfWeek = today.getDay(); // 0 is Sunday, 6 is Saturday
+    // getDay() returns 0 for Sunday, 1 for Monday. Convert to 0 for Monday, 6 for Sunday.
+    const currentDayOfWeek = (today.getDay() + 6) % 7;
 
-    // Get the start of the week (Sunday)
+    // Get the start of the week (Monday)
     const startOfWeek = new Date(today);
     startOfWeek.setDate(today.getDate() - currentDayOfWeek);
 
@@ -109,29 +108,69 @@ export default function DashboardPage() {
                         </div>
 
                         <div className="p-3 sm:p-4 flex-1 overflow-y-auto custom-scroll relative z-10">
-                            {projectsLoading ? (
+                            {actionItemsLoading ? (
                                 <div className="flex justify-center py-6"><Loader2 className="w-5 h-5 animate-spin text-warning" /></div>
-                            ) : activeProjects.length === 0 ? (
-                                <p className="text-[10px] font-mono text-muted-foreground tracking-widest uppercase text-center py-6">NO ACTIVE DEADLINES.</p>
+                            ) : activeDeadlines.length === 0 ? (
+                                <p className="text-[10px] font-mono text-muted-foreground tracking-widest uppercase text-center py-6">NO ACTIVE DIRECTIVES.</p>
                             ) : (
-                                <div className="space-y-2.5">
-                                    {activeProjects.map((project) => (
-                                        <Link key={project.id} href={`/projects/${project.id}`} className="group/item flex flex-col gap-1.5 p-2.5 hud-panel-sm bg-background/40 hover:bg-accent/40 border border-border/40 hover:border-warning/40 transition-colors">
-                                            <div className="flex items-center gap-2 min-w-0">
-                                                <CheckCircle2 className="w-3.5 h-3.5 text-warning/50 group-hover/item:text-warning transition-colors flex-shrink-0" />
-                                                <p className="text-xs font-bold font-mono tracking-tight uppercase truncate">{project.name}</p>
+                                <div className="space-y-3">
+                                    {activeDeadlines.map((item) => {
+                                        const isCompleted = user?.uid ? item.completedBy.includes(user.uid) : false;
+
+                                        return (
+                                            <div key={item.id} className={cn("group/item flex flex-col gap-2 p-3 hud-panel-sm transition-colors border", isCompleted ? "bg-success/5 border-success/30" : "bg-background/40 hover:bg-accent/40 border-border/40 hover:border-warning/40")}>
+                                                <div className="flex items-start justify-between min-w-0 gap-2">
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className={cn("text-xs font-bold font-mono tracking-tight uppercase truncate transition-colors", isCompleted ? "text-success" : "text-foreground group-hover/item:text-warning")}>
+                                                            {item.title}
+                                                        </p>
+                                                        <div className="flex items-center gap-2 mt-1">
+                                                            <Clock className={cn("w-3 h-3", isCompleted ? "text-success/70" : "text-warning/70")} />
+                                                            <p className={cn("text-[10px] font-mono uppercase tracking-widest truncate", isCompleted ? "text-success/70" : "text-muted-foreground")}>
+                                                                DUE: {new Date(item.deadline).toLocaleString()}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Completion Checkbox Area */}
+                                                    <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                                                        <button
+                                                            onClick={async () => {
+                                                                if (user?.uid) {
+                                                                    await completeActionItem(item.id, user.uid, isCompleted);
+                                                                }
+                                                            }}
+                                                            className={cn("w-6 h-6 hud-corners flex items-center justify-center border transition-all cursor-pointer shadow-sm", isCompleted ? "bg-success text-success-foreground border-success glow-border shadow-[0_0_10px_rgba(34,197,94,0.3)]" : "bg-card border-border/50 text-transparent hover:border-warning hover:bg-warning/10")}
+                                                        >
+                                                            <CheckCircle2 className={cn("w-4 h-4", isCompleted ? "text-inherit" : "hidden")} />
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <p className="text-[10px] font-mono text-muted-foreground leading-relaxed line-clamp-2 mt-1 border-l-2 border-border/50 pl-2">
+                                                    {item.description}
+                                                </p>
+
+                                                {item.type === "form" && item.link && (
+                                                    <div className="mt-2 pt-2 border-t border-border/40 flex justify-between items-center">
+                                                        <a
+                                                            href={item.link}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-[9px] font-mono font-bold uppercase tracking-widest text-primary hover:text-primary/80 bg-primary/10 hover:bg-primary/20 transition-colors px-3 py-1.5 border border-primary/30 flex items-center gap-2"
+                                                        >
+                                                            ACCESS DIRECTIVE <Sparkles className="w-3 h-3" />
+                                                        </a>
+                                                        {isCompleted && (
+                                                            <span className="text-[9px] font-mono text-success uppercase tracking-widest font-bold bg-success/10 px-2 py-1 border border-success/20">
+                                                                VERIFIED
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                )}
                                             </div>
-                                            <div className="flex items-center justify-between mt-0.5">
-                                                <p className="text-[9px] font-mono text-muted-foreground uppercase tracking-widest">PENDING</p>
-                                                <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 bg-warning/10 text-warning border border-warning/20">
-                                                    {project.milestoneProgress}%
-                                                </span>
-                                            </div>
-                                            <div className="h-0.5 w-full bg-border/50 mt-1 overflow-hidden">
-                                                <div className="h-full bg-warning transition-all glow-border" style={{ width: `${project.milestoneProgress}%` }} />
-                                            </div>
-                                        </Link>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             )}
                         </div>
@@ -248,23 +287,31 @@ export default function DashboardPage() {
                                     <div
                                         key={i}
                                         className={cn(
-                                            "flex items-center justify-between px-4 py-2 text-xs font-mono transition-colors",
+                                            "flex items-center justify-between px-3 py-1.5 sm:py-2 text-xs font-mono transition-colors group/day",
                                             day.isToday
                                                 ? "bg-primary/20 border border-primary text-primary font-bold glow-border hud-corners shadow-[0_0_10px_rgba(203,247,2,0.2)]"
                                                 : "bg-background/50 border border-border/40 hover:border-primary/50"
                                         )}
                                     >
-                                        <span className={cn("tracking-widest uppercase", day.isToday ? "text-primary" : "text-muted-foreground")}>{day.dayName}</span>
-                                        <span className="text-sm">{day.dayNum}</span>
-                                        <div className="flex items-center gap-1">
-                                            {/* Render dots for events on this day if any */}
+                                        <div className="flex items-center gap-1 shrink-0">
+                                            <span className={cn("tracking-widest uppercase", day.isToday ? "text-primary" : "text-muted-foreground")}>
+                                                {day.dayName.substring(0, 3)}-{day.dayNum}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5 overflow-hidden justify-end">
+                                            {/* Render blocks for events on this day if any */}
                                             {events.filter(e => {
-                                                // very basic primitive check
-                                                return e.date && e.date.includes(day.dayNum.toString()) && e.date.includes(currentMonth.split(' ')[0].substring(0, 3));
-                                            }).slice(0, 3).map((_, idx) => (
-                                                <div key={idx} className={cn("w-1.5 h-1.5 rounded-full", day.isToday ? "bg-primary" : "bg-chart-2")} />
+                                                if (!e.date) return false;
+                                                const [year, month, dNum] = e.date.split("-").map(Number);
+                                                return dNum === day.dayNum &&
+                                                    month - 1 === day.date.getMonth() &&
+                                                    year === day.date.getFullYear();
+                                            }).slice(0, 2).map((evt, idx) => (
+                                                <div key={idx} className={cn("px-1.5 py-0.5 text-[8px] uppercase tracking-wider truncate border", day.isToday ? "bg-primary/20 border-primary/50 text-primary" : "bg-chart-2/10 border-chart-2/30 text-chart-2")}>
+                                                    {evt.title}
+                                                </div>
                                             ))}
-                                            <span className={cn("text-[9px] opacity-0 group-hover:opacity-100 transition-opacity ml-2", day.isToday ? "text-primary" : "text-muted-foreground/50")}>[SECURE]</span>
+                                            <span className={cn("text-[8px] opacity-0 group-hover/day:opacity-100 transition-opacity flex-shrink-0 ml-1", day.isToday ? "text-primary" : "text-muted-foreground/50")}>[SECURE]</span>
                                         </div>
                                     </div>
                                 ))}

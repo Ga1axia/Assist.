@@ -42,6 +42,8 @@ const defaultEvent = {
     featured: false,
     virtualLink: "",
     isVirtual: false,
+    isRecurring: false,
+    recurrenceWeeks: 4,
 };
 
 export default function EventsPage() {
@@ -74,19 +76,37 @@ export default function EventsPage() {
                 ? `Virtual: ${newEvent.virtualLink}`
                 : newEvent.location;
 
-            await createEvent({
-                title: newEvent.title,
-                description: newEvent.description,
-                date: newEvent.date,
-                time: timeStr,
-                location: locationStr,
-                type: newEvent.type,
-                status: "upcoming",
-                maxAttendees: newEvent.maxAttendees ? parseInt(newEvent.maxAttendees) : null,
-                tags: newEvent.tags.split(",").map((t) => t.trim()).filter(Boolean),
-                featured: newEvent.featured,
-                createdBy: profile?.uid || "",
-            });
+            const baseDate = new Date(newEvent.date);
+            // Must fix the timezone offset issue when parsing YYYY-MM-DD
+            baseDate.setMinutes(baseDate.getMinutes() + baseDate.getTimezoneOffset());
+
+            const weeksToGenerate = newEvent.isRecurring ? newEvent.recurrenceWeeks : 1;
+
+            for (let i = 0; i < weeksToGenerate; i++) {
+                const targetDate = new Date(baseDate);
+                targetDate.setDate(targetDate.getDate() + (i * 7));
+
+                // Format back to YYYY-MM-DD
+                const year = targetDate.getFullYear();
+                const month = String(targetDate.getMonth() + 1).padStart(2, '0');
+                const day = String(targetDate.getDate()).padStart(2, '0');
+                const formattedDate = `${year}-${month}-${day}`;
+
+                await createEvent({
+                    title: newEvent.title,
+                    description: newEvent.description,
+                    date: formattedDate,
+                    time: timeStr,
+                    location: locationStr,
+                    type: newEvent.type,
+                    status: "upcoming",
+                    maxAttendees: newEvent.maxAttendees ? parseInt(newEvent.maxAttendees) : null,
+                    tags: newEvent.tags.split(",").map((t) => t.trim()).filter(Boolean),
+                    featured: newEvent.featured,
+                    createdBy: profile?.uid || "",
+                });
+            }
+
             setNewEvent(defaultEvent);
             setShowCreate(false);
         } catch (err) {
@@ -107,7 +127,7 @@ export default function EventsPage() {
         }
     };
 
-    const update = (field: string, value: string | boolean) =>
+    const update = (field: string, value: string | boolean | number) =>
         setNewEvent((prev) => ({ ...prev, [field]: value }));
 
     return (
@@ -409,39 +429,79 @@ export default function EventsPage() {
                                     <input type="text" value={newEvent.location} onChange={(e) => update("location", e.target.value)} placeholder="e.g. OLIN 102" className="w-full px-4 py-2.5 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono uppercase transition-colors focus:outline-none" />
                                 )}
                             </div>
+                        </div>
 
-                            {/* Tags */}
+                        {/* Tags */}
+                        <div className="p-4 hud-corners bg-background/40 border border-border/50">
+                            <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+                                <Hash className="w-3.5 h-3.5" /> TAGS <span className="opacity-50">(CSV)</span>
+                            </label>
+                            <input type="text" value={newEvent.tags} onChange={(e) => update("tags", e.target.value)} placeholder="e.g. REACT, FRONTEND" className="w-full px-4 py-2.5 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono uppercase transition-colors focus:outline-none" />
+                            {newEvent.tags && (
+                                <div className="flex flex-wrap gap-1.5 mt-3">
+                                    {newEvent.tags.split(",").map((t) => t.trim()).filter(Boolean).map((tag) => (
+                                        <span key={tag} className="text-[9px] font-mono px-2 py-0.5 border border-primary/30 bg-primary/10 text-primary uppercase">{tag}</span>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Recurrence & Featured Toggles */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Recurring Toggle */}
                             <div className="p-4 hud-corners bg-background/40 border border-border/50">
-                                <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
-                                    <Hash className="w-3.5 h-3.5" /> TAGS <span className="opacity-50">(CSV)</span>
-                                </label>
-                                <input type="text" value={newEvent.tags} onChange={(e) => update("tags", e.target.value)} placeholder="e.g. REACT, FRONTEND" className="w-full px-4 py-2.5 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono uppercase transition-colors focus:outline-none" />
-                                {newEvent.tags && (
-                                    <div className="flex flex-wrap gap-1.5 mt-3">
-                                        {newEvent.tags.split(",").map((t) => t.trim()).filter(Boolean).map((tag) => (
-                                            <span key={tag} className="text-[9px] font-mono px-2 py-0.5 border border-primary/30 bg-primary/10 text-primary uppercase">{tag}</span>
-                                        ))}
+                                <div className="flex items-center justify-between mb-3 border-b border-border/40 pb-2">
+                                    <div className="flex items-center gap-2">
+                                        <CalendarDays className="w-4 h-4 text-primary" />
+                                        <div>
+                                            <p className="text-[10px] font-mono font-bold text-foreground uppercase tracking-widest">RECURRING EVENT</p>
+                                            <p className="text-[9px] font-mono text-muted-foreground uppercase">Duplicate weekly.</p>
+                                        </div>
                                     </div>
-                                )}
+                                    <button
+                                        type="button"
+                                        onClick={() => update("isRecurring", !newEvent.isRecurring)}
+                                        className={cn("w-10 h-5 border transition-all relative hud-panel-sm", newEvent.isRecurring ? "bg-primary/20 border-primary" : "bg-background/50 border-border/50")}
+                                    >
+                                        <span className={cn("absolute top-[1px] w-4 h-4 bg-primary transition-all", newEvent.isRecurring ? "left-[18px] glow-border shadow-[0_0_8px_rgba(203,247,2,1)]" : "left-0.5 bg-muted-foreground")} />
+                                    </button>
+                                </div>
+
+                                <div className={cn("transition-all duration-300 overflow-hidden", newEvent.isRecurring ? "max-h-20 opacity-100 mt-2" : "max-h-0 opacity-0")}>
+                                    <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest mb-1.5 flex items-center justify-between">
+                                        <span>RECURRENCE RANGE (WEEKS)</span>
+                                        <span className="text-primary">{newEvent.recurrenceWeeks} WKS</span>
+                                    </label>
+                                    <input
+                                        type="range"
+                                        min="2"
+                                        max="16"
+                                        value={newEvent.recurrenceWeeks}
+                                        onChange={(e) => update("recurrenceWeeks", parseInt(e.target.value))}
+                                        className="w-full accent-primary"
+                                    />
+                                </div>
                             </div>
 
                             {/* Featured Toggle */}
                             <div className="flex items-center justify-between bg-primary/5 border border-primary/20 p-4 hud-panel-sm relative group overflow-hidden">
                                 <div className="absolute top-0 right-0 w-8 h-8 pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(203,247,2,0.2) 0%, transparent 70%)' }} />
-                                <div className="flex items-center gap-3">
-                                    <Sparkles className="w-5 h-5 text-primary animate-pulse" />
-                                    <div>
-                                        <p className="text-sm font-bold font-mono tracking-tight uppercase text-primary">FEATURED EVENT</p>
-                                        <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Pin to global dashboard feed.</p>
+                                <div className="flex items-center gap-3 relative z-10 w-full justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <Sparkles className="w-5 h-5 text-primary animate-pulse" />
+                                        <div>
+                                            <p className="text-[10px] font-mono font-bold text-primary uppercase tracking-widest leading-tight">FEATURED EVENT</p>
+                                            <p className="text-[9px] font-mono text-muted-foreground uppercase leading-tight mt-0.5 whitespace-nowrap">Pin to global dashboard feed.</p>
+                                        </div>
                                     </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => update("featured", !newEvent.featured)}
+                                        className={cn("w-10 h-5 border transition-all relative hud-panel-sm shrink-0", newEvent.featured ? "bg-primary/20 border-primary" : "bg-background/50 border-border/50")}
+                                    >
+                                        <span className={cn("absolute top-[1px] w-4 h-4 bg-primary transition-all", newEvent.featured ? "left-[18px] glow-border shadow-[0_0_8px_rgba(203,247,2,1)]" : "left-0.5 bg-muted-foreground")} />
+                                    </button>
                                 </div>
-                                <button
-                                    type="button"
-                                    onClick={() => update("featured", !newEvent.featured)}
-                                    className={cn("w-12 h-6 border transition-all relative hud-panel-sm", newEvent.featured ? "bg-primary/20 border-primary" : "bg-background/50 border-border/50")}
-                                >
-                                    <span className={cn("absolute top-0.5 w-4 h-4 bg-primary transition-all", newEvent.featured ? "left-7 glow-border shadow-[0_0_8px_rgba(203,247,2,1)]" : "left-0.5 bg-muted-foreground")} />
-                                </button>
                             </div>
                         </div>
 
@@ -459,7 +519,8 @@ export default function EventsPage() {
                         </div>
                     </div>
                 </div>
-            )}
-        </div>
+            )
+            }
+        </div >
     );
 }

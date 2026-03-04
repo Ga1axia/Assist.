@@ -444,6 +444,48 @@ export function useFAQ() {
 }
 
 // ──────────────────────────────────────
+// Action Items (Upcoming Deadlines)
+// ──────────────────────────────────────
+export interface ActionItem {
+    id: string;
+    title: string;
+    description: string;
+    deadline: string;
+    type: "form" | "external";
+    link: string | null;
+    completedBy: string[];
+    createdAt: string;
+    createdBy: string;
+}
+
+export function useActionItems() {
+    const result = useCollection<ActionItem>(
+        "actionItems",
+        [orderBy("createdAt", "desc")],
+        (raw, id) => ({
+            id,
+            title: raw.title || "",
+            description: raw.description || "",
+            deadline: raw.deadline || "",
+            type: raw.type || "external",
+            link: raw.link || null,
+            completedBy: raw.completedBy || [],
+            createdAt: formatTimestamp(raw.createdAt),
+            createdBy: raw.createdBy || "",
+        })
+    );
+
+    const completeActionItem = async (itemId: string, userId: string, currentlyCompleted: boolean) => {
+        const itemRef = doc(db, "actionItems", itemId);
+        await updateDoc(itemRef, {
+            completedBy: currentlyCompleted ? arrayRemove(userId) : arrayUnion(userId)
+        });
+    };
+
+    return { ...result, completeActionItem };
+}
+
+// ──────────────────────────────────────
 // Dashboard Stats (aggregated counts)
 // ──────────────────────────────────────
 export function useDashboardStats() {
