@@ -32,12 +32,13 @@ type AdminTab = "announcements" | "actionItems" | "startups" | "applications" | 
 
 export default function AdminPage() {
     const { profile, user } = useAuth();
-    const { data: inquiries, loading: inquiriesLoading, replyToInquiry, publishToFaq } = useInquiries();
-    const { data: resources, loading: resourcesLoading, approveResource, rejectResource } = useResources(false);
-    const { data: projects, loading: projectsLoading } = useProjects();
-    const { data: members, loading: membersLoading } = useMembers();
-    const { data: actionItems, loading: actionItemsLoading } = useActionItems();
-    const { data: startups, loading: startupsLoading } = useStartups();
+    const userIsAdmin = isAdmin(profile?.role);
+    const { data: inquiries, loading: inquiriesLoading, replyToInquiry, publishToFaq } = useInquiries(userIsAdmin);
+    const { data: resources, loading: resourcesLoading, approveResource, rejectResource } = useResources(false, userIsAdmin);
+    const { data: projects, loading: projectsLoading } = useProjects(userIsAdmin);
+    const { data: members, loading: membersLoading } = useMembers(userIsAdmin);
+    const { data: actionItems, loading: actionItemsLoading } = useActionItems(userIsAdmin);
+    const { data: startups, loading: startupsLoading } = useStartups(userIsAdmin);
 
     const [activeTab, setActiveTab] = useState<AdminTab>("announcements");
     const [replyText, setReplyText] = useState("");
@@ -67,7 +68,6 @@ export default function AdminPage() {
     // Applications state
     const [selectedRoles, setSelectedRoles] = useState<Record<string, string>>({});
 
-    const userIsAdmin = isAdmin(profile?.role);
     const loading = inquiriesLoading || resourcesLoading || projectsLoading || membersLoading || actionItemsLoading || startupsLoading;
 
     const pendingInquiries = inquiries.filter((i) => i.status === "pending");
@@ -150,7 +150,10 @@ export default function AdminPage() {
         try {
             const res = await fetch("/api/action-items", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-user-uid": user?.uid || ""
+                },
                 body: JSON.stringify({
                     title: actionTitle,
                     description: actionDesc,

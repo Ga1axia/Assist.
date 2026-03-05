@@ -28,13 +28,19 @@ import { db } from "@/lib/firebase";
 function useCollection<T extends { id: string }>(
     collectionName: string,
     constraints: QueryConstraint[] = [],
-    transform?: (doc: DocumentData, id: string) => T
+    transform?: (doc: DocumentData, id: string) => T,
+    enabled: boolean = true
 ) {
     const [data, setData] = useState<T[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
+        if (!enabled) {
+            setLoading(false);
+            return;
+        }
+        setLoading(true);
         const q = query(collection(db, collectionName), ...constraints);
         const unsubscribe = onSnapshot(
             q,
@@ -55,7 +61,7 @@ function useCollection<T extends { id: string }>(
         );
         return () => unsubscribe();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [collectionName]);
+    }, [collectionName, enabled]);
 
     return { data, loading, error };
 }
@@ -109,7 +115,7 @@ export interface FeedItem {
     _createdAt: unknown; // raw timestamp for sorting
 }
 
-export function useFeed() {
+export function useFeed(enabled: boolean = true) {
     const result = useCollection<FeedItem>(
         "activityFeed",
         [orderBy("createdAt", "desc"), limit(50)],
@@ -125,7 +131,8 @@ export function useFeed() {
             pinnedBy: raw.pinnedBy || null,
             createdAt: timeAgo(raw.createdAt),
             _createdAt: raw.createdAt,
-        })
+        }),
+        enabled
     );
 
     const togglePin = async (itemId: string, currentlyPinned: boolean, userId: string) => {
@@ -158,7 +165,7 @@ export interface EventItem {
     createdAt: string;
 }
 
-export function useEvents() {
+export function useEvents(enabled: boolean = true) {
     const result = useCollection<EventItem>(
         "events",
         [orderBy("createdAt", "desc")],
@@ -177,7 +184,8 @@ export function useEvents() {
             featured: raw.featured || false,
             createdBy: raw.createdBy || "",
             createdAt: formatTimestamp(raw.createdAt),
-        })
+        }),
+        enabled
     );
 
     const createEvent = async (event: Omit<EventItem, "id" | "createdAt" | "attendees">) => {
@@ -224,7 +232,7 @@ export interface MemberItem {
     openToMentorship: boolean;
 }
 
-export function useMembers() {
+export function useMembers(enabled: boolean = true) {
     return useCollection<MemberItem>(
         "users",
         [orderBy("createdAt", "desc")],
@@ -246,7 +254,8 @@ export function useMembers() {
             bio: raw.bio || null,
             skills: raw.skills || [],
             openToMentorship: raw.openToMentorship || false,
-        })
+        }),
+        enabled
     );
 }
 
@@ -268,7 +277,7 @@ export interface ResourceItem {
     approved: boolean;
 }
 
-export function useResources(onlyApproved = true) {
+export function useResources(onlyApproved = true, enabled = true) {
     const result = useCollection<ResourceItem>(
         "resources",
         [orderBy("createdAt", "desc")],
@@ -285,7 +294,8 @@ export function useResources(onlyApproved = true) {
             date: formatTimestamp(raw.createdAt),
             fileUrl: raw.fileUrl || null,
             approved: raw.approved ?? false,
-        })
+        }),
+        enabled
     );
 
     // Filter client-side to avoid composite index requirement
@@ -330,7 +340,7 @@ export interface ProjectItem {
     clientVisible: boolean;
 }
 
-export function useProjects() {
+export function useProjects(enabled: boolean = true) {
     const result = useCollection<ProjectItem>(
         "projects",
         [orderBy("createdAt", "desc")],
@@ -348,7 +358,8 @@ export function useProjects() {
             updatedAt: timeAgo(raw.updatedAt) || timeAgo(raw.createdAt),
             createdAt: formatTimestamp(raw.createdAt),
             clientVisible: raw.clientVisible ?? true,
-        })
+        }),
+        enabled
     );
 
     const createProject = async (project: Partial<ProjectItem>) => {
@@ -385,7 +396,7 @@ export interface InquiryItem {
     repliedBy: string | null;
 }
 
-export function useInquiries() {
+export function useInquiries(enabled: boolean = true) {
     const result = useCollection<InquiryItem>(
         "inquiries",
         [orderBy("createdAt", "desc")],
@@ -398,7 +409,8 @@ export function useInquiries() {
             askedBy: raw.askedBy || "Anonymous",
             reply: raw.reply || null,
             repliedBy: raw.repliedBy || null,
-        })
+        }),
+        enabled
     );
 
     const replyToInquiry = async (inquiryId: string, reply: string, repliedBy: string) => {
@@ -434,7 +446,7 @@ export interface FAQItem {
     createdAt: string;
 }
 
-export function useFAQ() {
+export function useFAQ(enabled: boolean = true) {
     return useCollection<FAQItem>(
         "faq",
         [orderBy("createdAt", "desc")],
@@ -443,7 +455,8 @@ export function useFAQ() {
             question: raw.question || "",
             answer: raw.answer || "",
             createdAt: formatTimestamp(raw.createdAt),
-        })
+        }),
+        enabled
     );
 }
 
@@ -462,7 +475,7 @@ export interface ActionItem {
     createdBy: string;
 }
 
-export function useActionItems() {
+export function useActionItems(enabled: boolean = true) {
     const result = useCollection<ActionItem>(
         "actionItems",
         [orderBy("createdAt", "desc")],
@@ -476,7 +489,8 @@ export function useActionItems() {
             completedBy: raw.completedBy || [],
             createdAt: formatTimestamp(raw.createdAt),
             createdBy: raw.createdBy || "",
-        })
+        }),
+        enabled
     );
 
     const completeActionItem = async (itemId: string, userId: string, currentlyCompleted: boolean) => {
@@ -502,7 +516,7 @@ export interface StartupItem {
     createdAt: string;
 }
 
-export function useStartups() {
+export function useStartups(enabled: boolean = true) {
     return useCollection<StartupItem>(
         "startups",
         [orderBy("createdAt", "desc")],
@@ -514,7 +528,8 @@ export function useStartups() {
             foundedYear: raw.foundedYear || "",
             website: raw.website || null,
             createdAt: formatTimestamp(raw.createdAt),
-        })
+        }),
+        enabled
     );
 }
 

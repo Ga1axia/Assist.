@@ -100,7 +100,7 @@ ERR_CONNECTION_REFUSED
             </div>
 
             {/* Chaotic Title */}
-            <h1 className="text-6xl sm:text-7xl md:text-[9rem] font-black tracking-tighter leading-[0.8] mb-8 relative mix-blend-difference z-20 hover:-translate-x-2 hover:translate-y-1 hover:skew-x-2 hover:skew-y-1 transition-none cursor-crosshair">
+            <h1 className="text-6xl sm:text-7xl md:text-[9rem] font-black tracking-tighter leading-[0.8] mb-8 relative mix-blend-difference z-20 transform -translate-x-2 translate-y-1 skew-x-2 skew-y-1 hover:-translate-x-4 hover:translate-y-2 hover:skew-x-3 hover:skew-y-2 transition-transform duration-300 cursor-crosshair">
               <span className="block text-transparent bg-clip-text bg-foreground glitch-text" data-text="WELCOME" style={{ WebkitTextStroke: '2px var(--primary)' }}>WELCOME</span>
               <span className="block text-foreground glitch-text mt-[-10px] md:mt-[-20px] ml-[20px] md:ml-[40px]" data-text="TO">TO</span>
               <span className="block text-primary glitch-text mt-[-10px] md:mt-[-20px] ml-[40px] md:ml-[80px] brutalist-text-shadow bg-background px-4 py-2 w-fit" data-text="CODE.">CODE.</span>
