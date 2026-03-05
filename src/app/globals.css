@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -221,6 +222,14 @@
   --tracking-wide: calc(var(--tracking-normal) + 0.025em);
   --tracking-wider: calc(var(--tracking-normal) + 0.05em);
   --tracking-widest: calc(var(--tracking-normal) + 0.1em);
+
+  --animate-marquee: marquee 20s linear infinite;
+
+  @keyframes marquee {
+    to {
+      transform: translateX(-100%);
+    }
+  }
 }
 
 @layer base {
@@ -297,6 +306,161 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* ── Cyberpunk Glitch Effects ── */
+
+@keyframes glitch-anim-1 {
+  0% {
+    clip-path: inset(20% 0 80% 0);
+    transform: translate(-2px, 1px);
+  }
+
+  20% {
+    clip-path: inset(60% 0 10% 0);
+    transform: translate(2px, -1px);
+  }
+
+  40% {
+    clip-path: inset(40% 0 50% 0);
+    transform: translate(-2px, 2px);
+  }
+
+  60% {
+    clip-path: inset(80% 0 5% 0);
+    transform: translate(2px, -2px);
+  }
+
+  80% {
+    clip-path: inset(10% 0 70% 0);
+    transform: translate(-1px, 1px);
+  }
+
+  100% {
+    clip-path: inset(30% 0 50% 0);
+    transform: translate(1px, -1px);
+  }
+}
+
+@keyframes glitch-anim-2 {
+  0% {
+    clip-path: inset(10% 0 60% 0);
+    transform: translate(2px, -1px);
+  }
+
+  20% {
+    clip-path: inset(30% 0 20% 0);
+    transform: translate(-2px, 2px);
+  }
+
+  40% {
+    clip-path: inset(70% 0 10% 0);
+    transform: translate(2px, 1px);
+  }
+
+  60% {
+    clip-path: inset(20% 0 50% 0);
+    transform: translate(-1px, -2px);
+  }
+
+  80% {
+    clip-path: inset(50% 0 30% 0);
+    transform: translate(1px, 2px);
+  }
+
+  100% {
+    clip-path: inset(5% 0 80% 0);
+    transform: translate(-2px, -1px);
+  }
+}
+
+@keyframes rgb-split {
+  0% {
+    text-shadow: -2px 0 red, 2px 0 cyan;
+  }
+
+  25% {
+    text-shadow: 2px 0 red, -2px 0 cyan;
+  }
+
+  50% {
+    text-shadow: -1px 0 red, 1px 0 cyan;
+  }
+
+  75% {
+    text-shadow: 1px 0 red, -1px 0 cyan;
+  }
+
+  100% {
+    text-shadow: -2px 0 red, 2px 0 cyan;
+  }
+}
+
+@keyframes flicker {
+
+  0%,
+  19.999%,
+  22%,
+  62.999%,
+  64%,
+  64.999%,
+  70%,
+  100% {
+    opacity: 1;
+  }
+
+  20%,
+  21.999%,
+  63%,
+  63.999%,
+  65%,
+  69.999% {
+    opacity: 0.33;
+  }
+}
+
+.glitch-text {
+  position: relative;
+  display: inline-block;
+  animation: rgb-split 3s infinite alternate;
+}
+
+.glitch-text::before,
+.glitch-text::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--background);
+}
+
+.glitch-text::before {
+  left: 2px;
+  text-shadow: -1px 0 red;
+  animation: glitch-anim-1 2s infinite linear alternate-reverse;
+}
+
+.glitch-text::after {
+  left: -2px;
+  text-shadow: -1px 0 cyan;
+  animation: glitch-anim-2 3s infinite linear alternate-reverse;
+}
+
+.brutalist-block {
+  border: 4px solid var(--primary);
+  box-shadow: 8px 8px 0px var(--primary);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.brutalist-block:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 6px 6px 0px var(--primary);
+}
+
+.brutalist-text-shadow {
+  text-shadow: 4px 4px 0px var(--primary);
 }
 
 @keyframes pulse-glow {

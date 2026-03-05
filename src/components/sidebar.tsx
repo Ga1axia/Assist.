@@ -82,18 +82,18 @@ export function Sidebar() {
             <div className="absolute inset-0 grid-bg opacity-30 pointer-events-none" />
 
             {/* Header */}
-            <div className="p-5 flex items-center gap-3 relative z-10 border-b border-sidebar-border/50 bg-sidebar/50 backdrop-blur-sm">
-                <div className="w-8 h-8 hud-panel-sm bg-primary/10 border border-primary/30 flex items-center justify-center flex-shrink-0 relative">
+            <Link href="/" className="p-5 flex items-center gap-3 relative z-10 border-b border-sidebar-border/50 bg-sidebar/50 backdrop-blur-sm group transition-colors hover:bg-sidebar-accent/50 cursor-pointer text-current no-underline">
+                <div className="w-8 h-8 hud-panel-sm bg-primary/10 border border-primary/30 flex items-center justify-center flex-shrink-0 relative group-hover:bg-primary/20 transition-colors">
                     <div className="absolute inset-0 glow-border opacity-50" />
                     <Code2 className="w-4 h-4 text-primary" />
                 </div>
                 {!collapsed && (
                     <div className="flex items-center gap-1.5 min-w-0">
-                        <span className="font-black text-sm tracking-tight uppercase">CODE_OS</span>
-                        <span className="text-[10px] font-mono text-primary uppercase tracking-widest">SYS</span>
+                        <span className="font-black text-xl tracking-tight uppercase">CODE</span>
+                        <span className="text-[10px] font-mono text-primary uppercase tracking-widest hidden group-hover:inline-block transition-all">//SYS</span>
                     </div>
                 )}
-            </div>
+            </Link>
 
             {/* Main Nav */}
             <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto custom-scroll relative z-10">

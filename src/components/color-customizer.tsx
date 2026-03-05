@@ -60,51 +60,52 @@ export function ColorCustomizer() {
             {/* Floating trigger button */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="fixed bottom-5 right-5 z-50 p-3 rounded-full bg-card border border-border shadow-lg hover:shadow-xl transition-all group"
+                className="fixed bottom-5 right-5 z-50 px-4 py-2 flex items-center gap-2 rounded-none bg-card border border-primary/50 shadow-[4px_4px_0px_var(--primary)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all group font-mono text-xs text-primary uppercase tracking-widest"
                 aria-label="Customize theme"
             >
-                <Palette className="w-5 h-5 text-primary group-hover:rotate-12 transition-transform" />
+                <Palette className="w-4 h-4 text-primary group-hover:rotate-12 transition-transform" />
+                <span>Theme_Config</span>
             </button>
 
             {/* Panel */}
             {isOpen && (
                 <>
                     <div className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
-                    <div className="fixed bottom-20 right-5 z-50 w-72 bg-card border border-border rounded-xl shadow-2xl overflow-hidden animate-slide-up">
+                    <div className="fixed bottom-16 right-5 z-50 w-80 bg-card border-2 border-primary rounded-none shadow-[8px_8px_0px_var(--primary)] overflow-hidden animate-slide-up brutalist-block">
                         {/* Header */}
-                        <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-                            <h3 className="text-sm font-semibold flex items-center gap-2">
+                        <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-primary/10">
+                            <h3 className="text-sm font-bold font-mono tracking-widest flex items-center gap-2 uppercase text-primary">
                                 <Palette className="w-4 h-4 text-primary" />
-                                Theme Accent
+                                SYS_THEME
                             </h3>
-                            <button onClick={() => setIsOpen(false)} className="p-1 rounded-md hover:bg-accent transition-colors">
-                                <X className="w-4 h-4 text-muted-foreground" />
+                            <button onClick={() => setIsOpen(false)} className="p-1 rounded-none border border-transparent hover:border-primary hover:bg-primary/20 transition-colors">
+                                <X className="w-4 h-4 text-primary" />
                             </button>
                         </div>
 
                         {/* Color grid */}
                         <div className="p-4">
-                            <p className="text-xs text-muted-foreground mb-3">Pick an accent color for the app</p>
+                            <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground mb-4">Select system accent protocol</p>
                             <div className="grid grid-cols-4 gap-2">
                                 {ACCENT_PRESETS.map((preset) => (
                                     <button
                                         key={preset.name}
                                         onClick={() => selectAccent(preset.value)}
                                         className={cn(
-                                            "flex flex-col items-center gap-1.5 p-2 rounded-lg transition-all hover:bg-accent",
-                                            currentAccent === preset.value && "ring-2 ring-foreground/20 bg-accent"
+                                            "flex flex-col items-center gap-1.5 p-2 rounded-none border border-transparent transition-all hover:bg-primary/10 hover:border-primary/50",
+                                            currentAccent === preset.value && "border-primary bg-primary/10 shadow-[2px_2px_0px_var(--primary)]"
                                         )}
                                         title={preset.name}
                                     >
                                         <div
-                                            className="w-8 h-8 rounded-full border-2 border-border shadow-sm flex items-center justify-center"
+                                            className="w-full h-8 rounded-none border border-border flex items-center justify-center transition-transform hover:scale-105"
                                             style={{ backgroundColor: preset.hex }}
                                         >
                                             {currentAccent === preset.value && (
                                                 <Check className="w-4 h-4 text-black" />
                                             )}
                                         </div>
-                                        <span className="text-[10px] text-muted-foreground font-medium">{preset.name}</span>
+                                        <span className="text-[10px] text-muted-foreground font-mono uppercase tracking-wider font-semibold">{preset.name}</span>
                                     </button>
                                 ))}
                             </div>

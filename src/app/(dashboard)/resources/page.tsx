@@ -3,18 +3,7 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { useResources } from "@/hooks/useFirestore";
-import {
-    BookOpen,
-    Search,
-    Upload,
-    Eye,
-    Calendar,
-    X,
-    FileText,
-    Video,
-    Link2,
-    Loader2,
-} from "lucide-react";
+import { Search, Filter, Plus, FileText, Video, Link as LinkIcon, BookOpen, AlertCircle, ChevronDown, Check, Upload, X, Eye, Calendar, Sparkles, Download, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -23,7 +12,7 @@ const typeIcons: Record<string, React.ReactNode> = {
     tutorial: <BookOpen className="w-5 h-5" />,
     video: <Video className="w-5 h-5" />,
     document: <FileText className="w-5 h-5" />,
-    link: <Link2 className="w-5 h-5" />,
+    link: <LinkIcon className="w-5 h-5" />,
 };
 
 export default function ResourcesPage() {
@@ -33,7 +22,7 @@ export default function ResourcesPage() {
     const [tierFilter, setTierFilter] = useState("all");
     const [phaseFilter, setPhaseFilter] = useState("all");
     const [showUploadModal, setShowUploadModal] = useState(false);
-    const [newResource, setNewResource] = useState({ title: "", description: "", phase: "beginner", type: "guide", tier: "community", topics: "" });
+    const [newResource, setNewResource] = useState({ title: "", description: "", phase: "beginner", type: "guide", tier: "community", topics: "", fileUrl: "" });
 
     const filteredResources = resources.filter((r) => {
         if (tierFilter !== "all" && r.tier !== tierFilter) return false;
@@ -50,11 +39,12 @@ export default function ResourcesPage() {
             phase: newResource.phase,
             type: newResource.type,
             tier: newResource.tier,
-            topics: newResource.topics.split(",").map((t) => t.trim()).filter(Boolean),
+            topics: newResource.topics ? newResource.topics.split(",").map((t) => t.trim()).filter(Boolean) : [],
+            fileUrl: newResource.fileUrl,
             uploadedBy: profile?.displayName || "Unknown",
             uploadedById: profile?.uid || "",
         });
-        setNewResource({ title: "", description: "", phase: "beginner", type: "guide", tier: "community", topics: "" });
+        setNewResource({ title: "", description: "", phase: "beginner", type: "guide", tier: "community", topics: "", fileUrl: "" });
         setShowUploadModal(false);
     };
 
@@ -181,6 +171,20 @@ export default function ResourcesPage() {
                                 <span className="flex items-center gap-1.5"><Eye className="w-3.5 h-3.5" /> {resource.views} QUERIES</span>
                                 <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> {resource.date}</span>
                             </div>
+
+                            {resource.fileUrl && (
+                                <Link
+                                    href={resource.fileUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="mt-4 flex items-center justify-center gap-2 p-3 hud-panel bg-primary text-primary-foreground text-xs font-black uppercase tracking-widest hover:brightness-110 hover:shadow-[0_0_15px_rgba(203,247,2,0.5)] transition-all z-20 group/btn"
+                                >
+                                    {resource.type === 'link' ? <LinkIcon className="w-4 h-4" /> : <Download className="w-4 h-4" />}
+                                    <span className="group-hover/btn:animate-pulse">
+                                        {resource.type === 'link' ? "OPEN EXTERNAL LINK" : "DOWNLOAD DATA"}
+                                    </span>
+                                </Link>
+                            )}
                         </div>
                     ))}
                 </div>

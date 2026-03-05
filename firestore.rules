@@ -49,7 +49,7 @@ service cloud.firestore {
     }
 
     match /projects/{projectId} {
-      allow read: if isSignedIn();
+      allow read: if true;
       allow create, update: if isSignedIn();
       allow delete: if isAdmin();
     }
@@ -69,6 +69,11 @@ service cloud.firestore {
       allow read: if isSignedIn();
       allow update: if isSignedIn(); // members can mark as completed
       allow create, delete: if isAdmin(); // only admins can create tasks
+    }
+
+    match /startups/{startupId} {
+      allow read: if true;
+      allow write: if isAdmin();
     }
   }
 }

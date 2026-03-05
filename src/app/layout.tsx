@@ -31,6 +31,9 @@ export default function RootLayout({
             <ColorCustomizer />
           </AuthProvider>
         </ThemeProvider>
+
+        {/* Spline 3D Viewer Script */}
+        <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.67/build/spline-viewer.js" async></script>
       </body>
     </html>
   );

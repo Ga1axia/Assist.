@@ -4,23 +4,42 @@ import Link from "next/link";
 import { useTheme } from "next-themes";
 import { useOptionalAuth } from "@/contexts/auth-context";
 import { Code2, Sun, Moon, LayoutDashboard, LogOut, User } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export function PublicNav() {
     const { theme, setTheme } = useTheme();
     const { user, profile, signOut } = useOptionalAuth();
     const [showDropdown, setShowDropdown] = useState(false);
+    const [isScrolled, setIsScrolled] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 50) {
+                setIsScrolled(true);
+            } else {
+                setIsScrolled(false);
+            }
+        };
+
+        window.addEventListener("scroll", handleScroll);
+        // Trigger once on mount to handle initial scroll position
+        handleScroll();
+
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
     return (
-        <nav className="border-b border-border/50 glass sticky top-0 z-50 scanlines">
+        <nav
+            className={`border-b border-border/50 glass fixed top-0 w-full z-50 scanlines transition-all duration-500 ease-in-out ${isScrolled ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
+                }`}
+        >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2 sm:py-3 flex items-center justify-between relative z-10">
                 <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
                     <div className="w-8 h-8 sm:w-10 sm:h-10 hud-corners bg-primary/10 border border-primary/50 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                         <Code2 className="w-4 h-4 sm:w-5 sm:h-5 text-primary group-hover:scale-110 transition-transform" />
                     </div>
                     <div>
-                        <span className="font-black text-sm sm:text-base tracking-tighter uppercase leading-none block group-hover:text-primary transition-colors">CODE</span>
-                        <span className="text-primary/60 text-[10px] sm:text-xs font-mono font-bold tracking-widest uppercase block leading-tight">OS_V1.0</span>
+                        <span className="font-black text-xl sm:text-2xl tracking-tighter uppercase leading-none block group-hover:text-primary transition-colors">CODE<span className="text-primary text-xl">.</span></span>
                     </div>
                 </Link>
 

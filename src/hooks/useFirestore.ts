@@ -322,10 +322,11 @@ export interface ProjectItem {
     teamMembers: { uid: string; role: string; name?: string }[];
     githubUrl: string | null;
     liveUrl: string | null;
-    milestoneProgress: number;
+    coverImage: string | null;
+    gallery: string[];
+    content: string;
     updatedAt: string;
     createdAt: string;
-    notes: string[];
     clientVisible: boolean;
 }
 
@@ -341,10 +342,11 @@ export function useProjects() {
             teamMembers: raw.teamMembers || [],
             githubUrl: raw.githubUrl || null,
             liveUrl: raw.liveUrl || null,
-            milestoneProgress: raw.milestoneProgress || 0,
+            coverImage: raw.coverImage || null,
+            gallery: raw.gallery || [],
+            content: raw.content || "",
             updatedAt: timeAgo(raw.updatedAt) || timeAgo(raw.createdAt),
             createdAt: formatTimestamp(raw.createdAt),
-            notes: raw.notes || [],
             clientVisible: raw.clientVisible ?? true,
         })
     );
@@ -352,9 +354,7 @@ export function useProjects() {
     const createProject = async (project: Partial<ProjectItem>) => {
         await addDoc(collection(db, "projects"), {
             ...project,
-            milestoneProgress: 0,
-            status: "ideation",
-            notes: [],
+            status: project.status || "published",
             clientVisible: true,
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp(),
