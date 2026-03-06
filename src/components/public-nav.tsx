@@ -29,10 +29,7 @@ export function PublicNav() {
     }, []);
 
     return (
-        <nav
-            className={`border-b glass fixed top-0 w-full z-50 scanlines transition-all duration-500 ease-in-out ${isScrolled ? "bg-background/80 border-border/50 backdrop-blur-md" : "bg-transparent border-transparent"
-                }`}
-        >
+        <nav className={`border-b glass fixed top-0 w-full z-[100] scanlines transition-all duration-500 ease-in-out ${isScrolled ? "bg-background/80 border-border/50 backdrop-blur-md translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"}`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2 sm:py-3 flex items-center justify-between relative z-10">
                 <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
                     <div className="w-8 h-8 sm:w-10 sm:h-10 hud-corners bg-primary/10 border border-primary/50 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
