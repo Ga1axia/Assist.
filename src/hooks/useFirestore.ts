@@ -158,6 +158,8 @@ export interface EventItem {
     type: string;
     status: string;
     attendees: string[];
+    /** Admin-recorded attendance (non-alumni present). */
+    attendance: string[];
     maxAttendees: number | null;
     tags: string[];
     featured: boolean;
@@ -179,6 +181,7 @@ export function useEvents(enabled: boolean = true) {
             type: raw.type || "meeting",
             status: raw.status || "upcoming",
             attendees: raw.attendees || [],
+            attendance: raw.attendance || [],
             maxAttendees: raw.maxAttendees || null,
             tags: raw.tags || [],
             featured: raw.featured || false,
@@ -188,10 +191,11 @@ export function useEvents(enabled: boolean = true) {
         enabled
     );
 
-    const createEvent = async (event: Omit<EventItem, "id" | "createdAt" | "attendees">) => {
+    const createEvent = async (event: Omit<EventItem, "id" | "createdAt" | "attendees" | "attendance">) => {
         await addDoc(collection(db, "events"), {
             ...event,
             attendees: [],
+            attendance: [],
             createdAt: serverTimestamp(),
         });
     };
@@ -208,7 +212,14 @@ export function useEvents(enabled: boolean = true) {
         });
     };
 
-    return { ...result, createEvent, rsvp, cancelRsvp };
+    /** Set admin-recorded attendance (non-alumni). */
+    const setEventAttendance = async (eventId: string, attendanceIds: string[]) => {
+        await updateDoc(doc(db, "events", eventId), {
+            attendance: attendanceIds,
+        });
+    };
+
+    return { ...result, createEvent, rsvp, cancelRsvp, setEventAttendance };
 }
 
 // ──────────────────────────────────────

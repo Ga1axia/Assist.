@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useAuth } from "@/contexts/auth-context";
-import { useEvents } from "@/hooks/useFirestore";
+import { useEvents, useMembers } from "@/hooks/useFirestore";
 import {
     CalendarDays,
     Clock,
@@ -15,6 +15,8 @@ import {
     Hash,
     Globe,
     Sparkles,
+    Search,
+    ClipboardCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isAdmin } from "@/lib/roles";
@@ -48,13 +50,24 @@ const defaultEvent = {
 
 export default function EventsPage() {
     const { profile } = useAuth();
-    const { data: events, loading, createEvent, rsvp, cancelRsvp } = useEvents();
+    const { data: events, loading, createEvent, rsvp, cancelRsvp, setEventAttendance } = useEvents();
+    const { data: members, loading: membersLoading } = useMembers();
     const [filter, setFilter] = useState<"all" | "upcoming" | "past">("all");
     const [typeFilter, setTypeFilter] = useState<string>("all");
     const [showCreate, setShowCreate] = useState(false);
     const [creating, setCreating] = useState(false);
     const [newEvent, setNewEvent] = useState(defaultEvent);
+    const [attendanceEventId, setAttendanceEventId] = useState<string | null>(null);
+    const [attendanceSearch, setAttendanceSearch] = useState("");
+    const [attendanceSaving, setAttendanceSaving] = useState(false);
     const userIsAdmin = isAdmin(profile?.role);
+
+    const nonAlumniMembers = useMemo(() => members.filter((m) => m.role !== "alumni"), [members]);
+    const attendanceFilteredMembers = useMemo(() => {
+        if (!attendanceSearch.trim()) return nonAlumniMembers;
+        const q = attendanceSearch.toLowerCase().trim();
+        return nonAlumniMembers.filter((m) => m.name.toLowerCase().includes(q) || m.email.toLowerCase().includes(q));
+    }, [nonAlumniMembers, attendanceSearch]);
 
     const filtered = events
         .filter((e) => filter === "all" || e.status === filter || (filter === "upcoming" && e.status === "ongoing"))
@@ -124,6 +137,20 @@ export default function EventsPage() {
             await cancelRsvp(eventId, profile.uid);
         } else {
             await rsvp(eventId, profile.uid);
+        }
+    };
+
+    const toggleAttendance = async (eventId: string, userId: string) => {
+        const event = events.find((e) => e.id === eventId);
+        if (!event || attendanceSaving) return;
+        const next = event.attendance.includes(userId)
+            ? event.attendance.filter((id) => id !== userId)
+            : [...event.attendance, userId];
+        setAttendanceSaving(true);
+        try {
+            await setEventAttendance(eventId, next);
+        } finally {
+            setAttendanceSaving(false);
         }
     };
 
@@ -318,6 +345,72 @@ export default function EventsPage() {
                                     >
                                         {isAttending ? "CANCEL RSVP" : isFull ? "FULL" : "RSVP"}
                                     </button>
+                                )}
+
+                                {/* Admin: take non-alumni attendance */}
+                                {userIsAdmin && (
+                                    <div className="mt-4 pt-4 border-t border-border/40 relative z-10">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setAttendanceEventId((prev) => (prev === event.id ? null : event.id));
+                                                if (attendanceEventId !== event.id) setAttendanceSearch("");
+                                            }}
+                                            className="flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors"
+                                        >
+                                            <ClipboardCheck className="w-3.5 h-3.5" />
+                                            ATTENDANCE ({event.attendance?.length ?? 0})
+                                            {attendanceEventId === event.id ? " ▼" : " ▶"}
+                                        </button>
+                                        {attendanceEventId === event.id && (
+                                            <div className="mt-3 space-y-3" onClick={(e) => e.stopPropagation()}>
+                                                <div className="relative">
+                                                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                                                    <input
+                                                        type="text"
+                                                        value={attendanceSearch}
+                                                        onChange={(e) => setAttendanceSearch(e.target.value)}
+                                                        placeholder="Search non-alumni..."
+                                                        className="w-full pl-8 pr-3 py-2 hud-panel-sm bg-background/50 border border-border/50 focus:border-primary/50 text-xs font-mono focus:outline-none"
+                                                    />
+                                                </div>
+                                                <div className="max-h-[24vh] overflow-y-auto pr-1 custom-scroll">
+                                                    {membersLoading ? (
+                                                        <div className="flex items-center justify-center py-4 gap-2">
+                                                            <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
+                                                            <span className="text-[9px] font-mono uppercase">Loading...</span>
+                                                        </div>
+                                                    ) : attendanceFilteredMembers.length === 0 ? (
+                                                        <p className="text-[9px] font-mono text-muted-foreground uppercase py-2 text-center">
+                                                            {attendanceSearch.trim() ? "No matches." : "No non-alumni members."}
+                                                        </p>
+                                                    ) : (
+                                                        <div className="flex flex-wrap gap-1.5">
+                                                            {attendanceFilteredMembers.map((mem) => {
+                                                                const present = (event.attendance ?? []).includes(mem.id);
+                                                                return (
+                                                                    <button
+                                                                        key={mem.id}
+                                                                        type="button"
+                                                                        onClick={() => toggleAttendance(event.id, mem.id)}
+                                                                        disabled={attendanceSaving}
+                                                                        className={cn(
+                                                                            "px-2.5 py-1 hud-panel-sm text-[10px] font-mono transition-all border",
+                                                                            present
+                                                                                ? "bg-primary/10 text-primary border-primary"
+                                                                                : "bg-card/40 border-border/40 text-muted-foreground hover:bg-accent hover:border-border"
+                                                                        )}
+                                                                    >
+                                                                        {mem.name}
+                                                                    </button>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                 )}
                             </div>
                         );
