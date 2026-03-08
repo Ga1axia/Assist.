@@ -25,7 +25,7 @@ export async function GET(req: Request) {
             .get();
         const totalResources = resourcesSnapshot.size;
 
-        const message = `Good morning CODE! 🌟 Here's your weekly digest:
+        const message = `Good morning from The Generator! 🌟 Here's your weekly digest:
 
 📊 Active Projects: ${activeProjects}
 📚 Total Resources: ${totalResources}

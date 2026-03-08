@@ -1,0 +1,41 @@
+
+> code-os@0.1.0 dev
+> next dev
+
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://155.48.178.254:3000
+- Environments: .env.local, .env
+
+✓ Starting...
+✓ Ready in 8.8s
+○ Compiling / ...
+ HEAD / 200 in 37.6s (compile: 31.6s, render: 6.0s)
+ GET / 200 in 44s (compile: 38.9s, render: 5.5s)
+ GET /dashboard 200 in 1088ms (compile: 1050ms, render: 38ms)
+ GET / 200 in 124ms (compile: 6ms, render: 118ms)
+ GET / 200 in 109ms (compile: 35ms, render: 74ms)
+ GET /dashboard 200 in 23ms (compile: 5ms, render: 18ms)
+ GET /projects 200 in 541ms (compile: 522ms, render: 19ms)
+ GET /resources 200 in 327ms (compile: 316ms, render: 11ms)
+ GET /resources 200 in 17ms (compile: 3ms, render: 14ms)
+ GET /feed 200 in 232ms (compile: 211ms, render: 21ms)
+ GET /resources 200 in 13ms (compile: 3ms, render: 10ms)
+ GET /events 200 in 249ms (compile: 240ms, render: 9ms)
+ GET /members 200 in 253ms (compile: 244ms, render: 10ms)
+ GET /members 200 in 19ms (compile: 1952µs, render: 18ms)
+ GET /network 200 in 222ms (compile: 210ms, render: 11ms)
+ GET / 200 in 14ms (compile: 3ms, render: 11ms)
+ GET /dashboard 200 in 48ms (compile: 6ms, render: 42ms)
+✓ Compiled in 994ms
+ GET / 200 in 590ms (compile: 216ms, render: 374ms)
+ GET / 200 in 344ms (compile: 294ms, render: 50ms)
+ GET / 200 in 28ms (compile: 3ms, render: 25ms)
+ GET / 200 in 351ms (compile: 4ms, render: 346ms)
+✓ Compiled in 130ms
+✓ Compiled in 258ms
+ GET / 200 in 953ms (compile: 391ms, render: 562ms)
+ GET / 200 in 461ms (compile: 40ms, render: 421ms)
+ GET /dashboard 200 in 4.3s (compile: 713ms, render: 3.5s)
+ GET /dashboard 200 in 9.5s (compile: 73ms, render: 9.4s)
+ GET / 200 in 246ms (compile: 106ms, render: 140ms)

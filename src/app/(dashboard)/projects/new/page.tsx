@@ -66,7 +66,7 @@ export default function NewProjectPage() {
                         SUBMIT <span className="gradient-text text-transparent bg-clip-text">NEW PROJECT</span>
                     </h1>
                     <p className="text-muted-foreground text-sm font-mono mt-2">
-                        Add a completed or in-progress project to the CODE public directory.
+                        Add a completed or in-progress project to The Generator public directory.
                     </p>
                 </div>
             </div>

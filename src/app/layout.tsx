@@ -1,15 +1,27 @@
 import type { Metadata } from "next";
-import { GeistSans } from "geist/font/sans";
+import { Oswald, Lora } from "next/font/google";
+
+const oswald = Oswald({
+  subsets: ["latin"],
+  variable: "--font-oswald",
+  weight: ["400", "500", "700"],
+});
+
+const lora = Lora({
+  subsets: ["latin"],
+  variable: "--font-lora",
+  style: ["normal", "italic"],
+});
 import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/contexts/auth-context";
-import { ColorCustomizer } from "@/components/color-customizer";
+import Image from "next/image";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "CODE OS — Club Management Platform",
+  title: "The Generator — Interdisciplinary AI Lab",
   description:
-    "Babson CODE: Community of Developers and Entrepreneurs. A comprehensive club management platform for governance, project tracking, and collaboration.",
-  keywords: ["CODE", "Babson", "club management", "developers", "entrepreneurs"],
+    "The Generator is Babson College's Interdisciplinary AI Lab and entrepreneurship hub. We empower students and associates through workshops, mentorship, and hands-on experiences.",
+  keywords: ["The Generator", "Babson", "AI Lab", "entrepreneurship", "innovators"],
 };
 
 export default function RootLayout({
@@ -19,22 +31,30 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${GeistSans.variable} font-sans antialiased`}>
+      <body className={`${oswald.variable} ${lora.variable} font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >
-          <AuthProvider>
-            {children}
-            <ColorCustomizer />
-          </AuthProvider>
-        </ThemeProvider>
+          {/* Global application background - GeneratorBG with blur */}
+          <div className="fixed inset-0 z-[-1] bg-background">
+            <Image
+              src="/images/generator-bg.png"
+              alt="Generator Background"
+              fill
+              priority
+              className="object-cover blur-[6px] sm:blur-[8px]"
+            />
+          </div>
 
-        {/* Spline 3D Viewer Script */}
-        <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.67/build/spline-viewer.js" async></script>
-      </body>
+          <div className="relative z-0 min-h-screen">
+            <AuthProvider>
+              {children}
+            </AuthProvider>
+          </div>
+        </ThemeProvider>      </body>
     </html>
   );
 }

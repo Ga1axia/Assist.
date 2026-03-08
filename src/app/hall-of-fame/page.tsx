@@ -39,7 +39,7 @@ export default function HallOfFamePage() {
                 <div className="text-center mb-12 sm:mb-16 animate-fade-in">
                     <div className="inline-flex items-center gap-2 hud-panel-sm bg-background/50 border border-primary/30 text-primary px-4 py-1.5 text-xs font-mono tracking-widest uppercase mb-6 shadow-sm">
                         <Database className="w-3.5 h-3.5" />
-                        CODE Project Archive
+                        The Generator Project Archive
                     </div>
                     <h1 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tighter uppercase">
                         Hall Of <span className="gradient-text-cyber animate-flicker">Fame</span>
@@ -163,7 +163,7 @@ export default function HallOfFamePage() {
                                 )}
                                 {selectedProjectData.githubUrl && (
                                     <a href={selectedProjectData.githubUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-5 py-2.5 hud-panel-sm bg-background/50 text-xs font-bold uppercase tracking-widest border border-border/60 hover:border-primary/50 hover:text-primary transition-all">
-                                        <GitBranch className="w-3.5 h-3.5" /> SOURCE CODE
+                                        <GitBranch className="w-3.5 h-3.5" /> SOURCE REPO
                                     </a>
                                 )}
                             </div>

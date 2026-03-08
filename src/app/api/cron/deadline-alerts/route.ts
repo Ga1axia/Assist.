@@ -35,7 +35,7 @@ Project: ${project.name}
 Milestone: ${milestone.name}
 Due: Tomorrow
 
-Link: https://code-os.vercel.app/projects/${doc.id}`;
+Link: https://the-generator.vercel.app/projects/${doc.id}`;
 
                         // Send to team members
                         for (const member of project.teamMembers || []) {

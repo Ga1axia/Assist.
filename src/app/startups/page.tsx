@@ -29,7 +29,7 @@ export default function StartupsGalleryPage() {
                 <div className="text-center mb-12 sm:mb-16 animate-fade-in">
                     <div className="inline-flex items-center gap-2 hud-panel-sm bg-background/50 border border-primary/30 text-primary px-4 py-1.5 text-xs font-mono tracking-widest uppercase mb-6 shadow-sm">
                         <Database className="w-3.5 h-3.5" />
-                        CODE Alumni Startups
+                        The Generator Alumni Startups
                     </div>
                     <h1 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tighter uppercase">
                         Startup <span className="gradient-text-cyber animate-flicker">Gallery</span>
@@ -37,7 +37,7 @@ export default function StartupsGalleryPage() {
                     <div className="mt-6 flex justify-center">
                         <div className="hud-panel border border-border/50 bg-card/60 px-6 py-3 scanlines">
                             <p className="relative z-10 text-muted-foreground text-sm font-mono tracking-wider">
-                                <span className="text-primary font-bold">&gt;</span> Showcasing companies built by CODE alumni.
+                                <span className="text-primary font-bold">&gt;</span> Showcasing companies built by The Generator alumni.
                             </p>
                         </div>
                     </div>

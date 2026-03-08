@@ -143,7 +143,7 @@ export default function OnboardingPage() {
                 actorName: displayName || "New Member",
                 targetId: null,
                 targetName: null,
-                description: `joined CODE`,
+                description: `joined The Generator`,
                 pinned: false,
                 pinnedBy: null,
                 createdAt: serverTimestamp(),
@@ -429,7 +429,7 @@ export default function OnboardingPage() {
                 <div className="inline-flex items-center justify-center p-3 hud-panel-sm bg-card border border-border/50 mb-3 shadow-sm">
                     <Code2 className="w-6 h-6 text-primary" />
                 </div>
-                <div className="text-xs font-mono text-primary tracking-widest uppercase">CODE_OS Initialization</div>
+                <div className="text-xs font-mono text-primary tracking-widest uppercase">THE GENERATOR Initialization</div>
             </div>
 
             <div className="w-full max-w-lg relative z-10">

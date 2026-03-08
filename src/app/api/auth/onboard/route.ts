@@ -90,7 +90,7 @@ export async function POST(req: Request) {
             actorName: userData.displayName || "New Member",
             targetId: null,
             targetName: null,
-            description: `${userData.displayName || "New Member"} joined CODE`,
+            description: `${userData.displayName || "New Member"} joined The Generator`,
             pinned: false,
             pinnedBy: null,
             createdAt: new Date(),

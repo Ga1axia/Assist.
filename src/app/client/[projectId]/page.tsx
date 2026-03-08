@@ -20,7 +20,7 @@ const mockClientProject = {
     status: "In Progress",
     lastUpdate: "March 2, 2026",
     description:
-        "A real-time weather dashboard with interactive maps and forecasts, built by CODE for Seven Hills Foundation.",
+        "A real-time weather dashboard with interactive maps and forecasts, built by The Generator for Seven Hills Foundation.",
     milestones: [
         { name: "Project Setup", status: "complete" },
         { name: "UI Design", status: "complete" },
@@ -46,7 +46,7 @@ export default function ClientPortalPage() {
                             <Code2 className="w-4 h-4 text-primary-foreground" />
                         </div>
                         <div>
-                            <span className="font-bold">CODE</span>
+                            <span className="font-bold">THE GENERATOR</span>
                             <span className="text-muted-foreground text-xs ml-1.5">Client Portal</span>
                         </div>
                     </div>

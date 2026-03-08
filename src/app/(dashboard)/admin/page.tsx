@@ -234,10 +234,10 @@ export default function AdminPage() {
                 <div>
                     <div className="flex items-center gap-2 text-[10px] font-mono text-primary/80 uppercase tracking-widest mb-1.5">
                         <Shield className="w-3.5 h-3.5" />
-                        CODE ADMIN
+                        THE GENERATOR ADMIN
                     </div>
                     <h1 className="text-3xl md:text-4xl font-black tracking-tighter uppercase relative group inline-block">
-                        CODE <span className="gradient-text-cyber">OPERATIONS</span>
+                        THE GENERATOR <span className="gradient-text-cyber">OPERATIONS</span>
                         <div className="absolute -top-1 -right-3 w-2 h-2 rounded-full bg-primary animate-pulse" />
                     </h1>
                 </div>

@@ -59,11 +59,11 @@ export default function LoginPage() {
                         <Code2 className="w-12 h-12 text-primary" />
                     </div>
                     <h1 className="text-4xl font-black tracking-tighter mb-4">
-                        <span className="gradient-text-cyber animate-flicker">CODE_OS</span> TERMINAL
+                        <span className="gradient-text-cyber animate-flicker">THE GENERATOR</span> TERMINAL
                     </h1>
                     <div className="relative hud-panel-sm bg-card/60 border border-border/50 p-6 scanlines mt-6">
                         <p className="relative z-10 text-muted-foreground text-sm font-mono leading-relaxed">
-                            <span className="text-primary font-bold">&gt;</span> The operating system for Babson&apos;s Community of Developers and Entrepreneurs. Login required for access.
+                            <span className="text-primary font-bold">&gt;</span> The operating system for The Generator. Login required for access.
                         </p>
                     </div>
 
@@ -101,7 +101,7 @@ export default function LoginPage() {
                             <Code2 className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                            <span className="font-black tracking-tight">CODE_OS</span>
+                            <span className="font-black tracking-tight">THE GENERATOR</span>
                             <span className="text-primary text-xs ml-2 font-mono tracking-widest">SYS</span>
                         </div>
                     </div>

@@ -46,7 +46,7 @@ export default function FAQPage() {
                     </h1>
                     <div className="hud-panel-sm border border-border/50 bg-card/60 px-6 py-3 scanlines mx-auto max-w-lg">
                         <p className="relative z-10 text-muted-foreground text-sm font-mono tracking-wider">
-                            <span className="text-primary font-bold">&gt;</span> Querying knowledge base for common inquiries regarding CODE operations.
+                            <span className="text-primary font-bold">&gt;</span> Querying knowledge base for common inquiries regarding The Generator operations.
                         </p>
                     </div>
                 </div>

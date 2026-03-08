@@ -49,7 +49,7 @@ const SEED_DATA = {
     resources: [
         {
             title: "Getting Started with Next.js",
-            description: "Official CODE guide to building apps with Next.js, including routing, data fetching, and deployment.",
+            description: "Official Generator guide to building apps with Next.js, including routing, data fetching, and deployment.",
             type: "guide",
             tier: "official",
             phase: "beginner",
@@ -60,7 +60,7 @@ const SEED_DATA = {
         },
         {
             title: "Git & GitHub Workflow",
-            description: "Step-by-step guide for branches, PRs, and code reviews following CODE conventions.",
+            description: "Step-by-step guide for branches, PRs, and code reviews following The Generator conventions.",
             type: "guide",
             tier: "official",
             phase: "beginner",
@@ -100,7 +100,7 @@ const SEED_DATA = {
             teamMembers: [
                 { uid: "system", role: "lead", name: "Project Lead" },
             ],
-            githubUrl: "https://github.com/codeos/a11y-checker",
+            githubUrl: "https://github.com/the-generator/a11y-checker",
             liveUrl: null,
             milestoneProgress: 45,
             notes: [],
@@ -114,7 +114,7 @@ const SEED_DATA = {
                 { uid: "system", role: "lead", name: "Project Lead" },
                 { uid: "system2", role: "developer", name: "Developer" },
             ],
-            githubUrl: "https://github.com/codeos/volunteer-portal",
+            githubUrl: "https://github.com/the-generator/volunteer-portal",
             liveUrl: "https://volunteer.sevenhills.org",
             milestoneProgress: 100,
             notes: [],
@@ -173,15 +173,15 @@ const SEED_DATA = {
     ],
     faq: [
         {
-            question: "How do I join CODE?",
-            answer: "CODE accepts new members each semester. Reach out to E-Board or attend one of our info sessions to get started.",
+            question: "How do I join The Generator?",
+            answer: "The Generator accepts new members each semester. Reach out to E-Board or attend one of our info sessions to get started.",
         },
         {
             question: "Do I need coding experience to join?",
-            answer: "Not at all! CODE welcomes members of all skill levels. We have resources and workshops for complete beginners.",
+            answer: "Not at all! The Generator welcomes members of all skill levels. We have resources and workshops for complete beginners.",
         },
         {
-            question: "What kind of projects does CODE work on?",
+            question: "What kind of projects does The Generator work on?",
             answer: "We build real-world applications primarily for our partner organization, Seven Hills Foundation. Projects range from web apps to data dashboards.",
         },
     ],
