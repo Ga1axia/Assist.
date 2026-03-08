@@ -35,7 +35,9 @@ export default function OnboardingPage() {
 
     // Form state
     const [displayName, setDisplayName] = useState(profile?.displayName || "");
+    const [birthday, setBirthday] = useState("");
     const [bio, setBio] = useState("");
+    const [funFact, setFunFact] = useState("");
     const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
     const [standoutSkill, setStandoutSkill] = useState("");
     const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
@@ -110,11 +112,13 @@ export default function OnboardingPage() {
                 uid,
                 email: currentUser.email || null,
                 displayName,
+                birthday: birthday || null,
                 photoURL: photoURL || currentUser.photoURL || null,
                 resumeURL,
                 role: "resident",
                 standoutSkill,
                 bio,
+                funFact: funFact.trim() || null,
                 skills: selectedSkills,
                 interests: selectedInterests,
                 onboarded: true,
@@ -174,8 +178,8 @@ export default function OnboardingPage() {
 
     // Step validation
     const stepValid = [
-        // Step 0: Name & Bio
-        displayName.trim().length > 0 && bio.trim().length > 0,
+        // Step 0: Name, Birthday, Bio & Fun Fact
+        displayName.trim().length > 0 && birthday.trim().length > 0 && bio.trim().length > 0 && funFact.trim().length > 0,
         // Step 1: Select skills (at least 1)
         selectedSkills.length >= 1,
         // Step 2: Pick standout skill
@@ -200,8 +204,16 @@ export default function OnboardingPage() {
                         <input type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Player Name" className="w-full px-4 py-3 hud-panel-sm bg-background/50 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none" />
                     </div>
                     <div>
+                        <label className="text-xs font-mono text-muted-foreground uppercase mb-1.5 block">Birthday</label>
+                        <input type="date" value={birthday} onChange={(e) => setBirthday(e.target.value)} className="w-full px-4 py-3 hud-panel-sm bg-background/50 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none" />
+                    </div>
+                    <div>
                         <label className="text-xs font-mono text-muted-foreground uppercase mb-1.5 block">Short Bio</label>
                         <textarea value={bio} onChange={(e) => setBio(e.target.value)} placeholder="Designation, major, year, objectives..." rows={3} className="w-full px-4 py-3 hud-panel-sm bg-background/50 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none resize-none" />
+                    </div>
+                    <div>
+                        <label className="text-xs font-mono text-muted-foreground uppercase mb-1.5 block">Fun Fact</label>
+                        <input type="text" value={funFact} onChange={(e) => setFunFact(e.target.value)} placeholder="One fun fact about you..." className="w-full px-4 py-3 hud-panel-sm bg-background/50 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none" />
                     </div>
                 </div>
             ),
@@ -379,6 +391,8 @@ export default function OnboardingPage() {
                             <div className="text-[10px] font-mono text-primary/80 tracking-widest uppercase mb-0.5">RESIDENT ID_0{Math.floor(Math.random() * 999)}</div>
                             <p className="text-lg font-black tracking-tight truncate uppercase">{displayName}</p>
                             <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mt-1 truncate">{bio}</p>
+                            {birthday && <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mt-0.5">DOB: {new Date(birthday).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</p>}
+                            {funFact && <p className="text-[10px] font-mono text-primary/80 italic mt-1">Fun fact: {funFact}</p>}
                         </div>
                     </div>
 

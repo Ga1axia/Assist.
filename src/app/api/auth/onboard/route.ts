@@ -17,10 +17,12 @@ export async function POST(req: Request) {
         const userDoc = await adminDb.collection("users").doc(uid).get();
         if (userDoc.exists && body.onboarded !== true) {
             // If user exists but this isn't a completion request, update onboarding fields
-            if (body.standoutSkill || body.bio || body.skills || body.interests) {
+            if (body.standoutSkill || body.bio || body.birthday != null || body.funFact != null || body.skills || body.interests) {
                 await adminDb.collection("users").doc(uid).set({
                     standoutSkill: body.standoutSkill || null,
                     bio: body.bio || null,
+                    birthday: body.birthday || null,
+                    funFact: body.funFact || null,
                     skills: body.skills || [],
                     interests: body.interests || [],
                     onboarded: body.onboarded ?? false,
@@ -34,6 +36,8 @@ export async function POST(req: Request) {
             await adminDb.collection("users").doc(uid).set({
                 standoutSkill: body.standoutSkill || null,
                 bio: body.bio || null,
+                birthday: body.birthday || null,
+                funFact: body.funFact || null,
                 skills: body.skills || [],
                 interests: body.interests || [],
                 displayName: body.displayName || null,
@@ -54,6 +58,8 @@ export async function POST(req: Request) {
             status: "pending",
             standoutSkill: body.standoutSkill || null,
             bio: body.bio || null,
+            birthday: body.birthday || null,
+            funFact: body.funFact || null,
             skills: body.skills || [],
             interests: body.interests || [],
             onboarded: body.onboarded ?? false,
