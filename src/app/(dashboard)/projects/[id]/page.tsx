@@ -18,7 +18,7 @@ import {
     LinkIcon,
     CheckSquare,
     Square,
-    Plus,
+    Search,
     Trash2,
     Loader2,
     X,
@@ -42,11 +42,10 @@ export default function ProjectDetailPage() {
     const id = params?.id as string;
     const { profile } = useAuth();
     const { data: projects, loading, addProjectTask, updateProjectTask, removeProjectTask, updateProject } = useProjects();
-    const { data: members } = useMembers();
+    const { data: members, loading: membersLoading } = useMembers();
     const [newTaskTitle, setNewTaskTitle] = useState("");
     const [taskSubmitting, setTaskSubmitting] = useState(false);
     const [memberSearch, setMemberSearch] = useState("");
-    const [showMemberPicker, setShowMemberPicker] = useState(false);
     const [teamUpdating, setTeamUpdating] = useState(false);
 
     const project = projects.find((p) => p.id === id);
@@ -54,17 +53,18 @@ export default function ProjectDetailPage() {
     const tasks = project?.tasks ?? [];
 
     const addedUids = useMemo(() => new Set(project?.teamMembers?.map((m) => m.uid) ?? []), [project?.teamMembers]);
-    const availableMembers = useMemo(() => members.filter((m) => !addedUids.has(m.id)), [members, addedUids]);
-    const filteredAvailable = useMemo(
-        () =>
-            !memberSearch.trim()
-                ? availableMembers.slice(0, 8)
-                : availableMembers.filter(
-                    (m) =>
-                        m.name.toLowerCase().includes(memberSearch.toLowerCase()) ||
-                        m.email.toLowerCase().includes(memberSearch.toLowerCase())
-                ).slice(0, 8),
-        [availableMembers, memberSearch]
+    const nonAlumniMembers = useMemo(() => members.filter((m) => m.role !== "alumni"), [members]);
+    const filteredMemberList = useMemo(
+        () => {
+            if (!memberSearch.trim()) return nonAlumniMembers;
+            const q = memberSearch.toLowerCase().trim();
+            return nonAlumniMembers.filter(
+                (m) =>
+                    m.name.toLowerCase().includes(q) ||
+                    m.email.toLowerCase().includes(q)
+            );
+        },
+        [nonAlumniMembers, memberSearch]
     );
 
     const addProjectMember = async (uid: string, name: string, role: string = "member") => {
@@ -73,8 +73,6 @@ export default function ProjectDetailPage() {
         try {
             const next = [...project.teamMembers, { uid, role, name }];
             await updateProject(project.id, { teamMembers: next });
-            setMemberSearch("");
-            setShowMemberPicker(false);
         } finally {
             setTeamUpdating(false);
         }
@@ -280,47 +278,46 @@ export default function ProjectDetailPage() {
                                 </div>
                             ))}
                             {isTeamMember && (
-                                <div className="relative pt-2">
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowMemberPicker((v) => !v)}
-                                        disabled={teamUpdating}
-                                        className="flex items-center gap-2 px-3 py-2 hud-panel-sm border border-dashed border-primary/50 text-primary text-[10px] font-mono uppercase tracking-wider hover:bg-primary/10 transition-colors disabled:opacity-50"
-                                    >
-                                        <Plus className="w-3.5 h-3.5" /> ADD MEMBER
-                                    </button>
-                                    {showMemberPicker && (
-                                        <>
-                                            <div className="absolute left-0 right-0 top-full mt-2 z-20 hud-panel-sm bg-card border border-border/50 p-2 max-h-56 overflow-y-auto">
-                                                <input
-                                                    type="text"
-                                                    value={memberSearch}
-                                                    onChange={(e) => setMemberSearch(e.target.value)}
-                                                    placeholder="Search by name or email..."
-                                                    className="w-full px-3 py-2 mb-2 hud-panel-sm bg-background/50 border border-border/50 text-xs font-mono focus:outline-none focus:border-primary/50"
-                                                />
-                                                {filteredAvailable.length === 0 ? (
-                                                    <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest py-2 text-center">No members to add.</p>
-                                                ) : (
-                                                    <ul className="space-y-1">
-                                                        {filteredAvailable.map((mem) => (
-                                                            <li key={mem.id}>
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() => addProjectMember(mem.id, mem.name)}
-                                                                    className="w-full flex items-center justify-between px-3 py-2 text-left hud-panel-sm bg-background/40 border border-transparent hover:border-primary/50 hover:bg-primary/5 transition-colors text-xs"
-                                                                >
-                                                                    <span className="font-mono font-bold uppercase truncate">{mem.name}</span>
-                                                                    <span className="text-[9px] font-mono text-muted-foreground truncate max-w-[120px]">{mem.email}</span>
-                                                                </button>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                )}
+                                <div className="pt-4 space-y-3 border-t border-border/40 mt-3">
+                                    <div className="relative">
+                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                        <input
+                                            type="text"
+                                            value={memberSearch}
+                                            onChange={(e) => setMemberSearch(e.target.value)}
+                                            placeholder="Search by name or email..."
+                                            className="w-full pl-10 pr-4 py-2 hud-panel-sm bg-background/50 border border-border/50 focus:border-primary/50 text-xs font-mono transition-colors focus:outline-none"
+                                        />
+                                    </div>
+                                    <div className="max-h-[28vh] overflow-y-auto pr-1 custom-scroll">
+                                        {membersLoading ? (
+                                            <div className="flex items-center justify-center py-6 gap-2">
+                                                <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                                                <span className="text-[10px] font-mono text-muted-foreground uppercase">Loading...</span>
                                             </div>
-                                            <div className="fixed inset-0 z-10" onClick={() => setShowMemberPicker(false)} aria-hidden="true" />
-                                        </>
-                                    )}
+                                        ) : (() => {
+                                            const toShow = filteredMemberList.filter((m) => !addedUids.has(m.id));
+                                            return toShow.length === 0 ? (
+                                                <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest py-3 text-center">
+                                                    {memberSearch.trim() ? "No matching members." : "No other non-alumni members to add."}
+                                                </p>
+                                            ) : (
+                                                <div className="flex flex-wrap gap-2">
+                                                    {toShow.map((mem) => (
+                                                        <button
+                                                            key={mem.id}
+                                                            type="button"
+                                                            onClick={() => addProjectMember(mem.id, mem.name)}
+                                                            disabled={teamUpdating}
+                                                            className="px-3 py-1.5 hud-panel-sm text-xs font-mono transition-all border bg-card/40 border-border/40 text-muted-foreground hover:bg-accent hover:border-border disabled:opacity-50"
+                                                        >
+                                                            {mem.name}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            );
+                                        })()}
+                                    </div>
                                 </div>
                             )}
                         </div>
