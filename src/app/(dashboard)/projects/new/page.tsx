@@ -30,19 +30,34 @@ export default function NewProjectPage() {
     const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
     const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
     const galleryInputRef = useRef<HTMLInputElement>(null);
+    const [coverDragActive, setCoverDragActive] = useState(false);
+    const [galleryDragActive, setGalleryDragActive] = useState(false);
 
     const handleCoverFile = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file && file.type.startsWith("image/")) {
-            setCoverImageFile(file);
-            setForm((f) => ({ ...f, coverImage: "" }));
-            const reader = new FileReader();
-            reader.onloadend = () => setCoverImagePreview(reader.result as string);
-            reader.readAsDataURL(file);
-        }
+        if (file) processCoverFile(file);
+        e.target.value = "";
     };
     const handleGalleryFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || []);
+        if (files.length) processGalleryFiles(files);
+        e.target.value = "";
+    };
+    const removeGalleryImage = (index: number) => {
+        setGalleryFiles((p) => p.filter((_, i) => i !== index));
+        setGalleryPreviews((p) => p.filter((_, i) => i !== index));
+    };
+
+    const processCoverFile = (file: File) => {
+        if (!file.type.startsWith("image/")) return;
+        setCoverImageFile(file);
+        setForm((f) => ({ ...f, coverImage: "" }));
+        const reader = new FileReader();
+        reader.onloadend = () => setCoverImagePreview(reader.result as string);
+        reader.readAsDataURL(file);
+    };
+
+    const processGalleryFiles = (files: File[]) => {
         const images = files.filter((f) => f.type.startsWith("image/"));
         setGalleryFiles((prev) => [...prev, ...images]);
         images.forEach((file) => {
@@ -50,10 +65,6 @@ export default function NewProjectPage() {
             reader.onloadend = () => setGalleryPreviews((p) => [...p, reader.result as string]);
             reader.readAsDataURL(file);
         });
-    };
-    const removeGalleryImage = (index: number) => {
-        setGalleryFiles((p) => p.filter((_, i) => i !== index));
-        setGalleryPreviews((p) => p.filter((_, i) => i !== index));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -167,8 +178,28 @@ export default function NewProjectPage() {
                             <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest mb-1.5 flex items-center gap-2">
                                 <ImageIcon className="w-3 h-3 text-primary" /> COVER IMAGE
                             </label>
-                            <p className="text-[10px] font-mono text-muted-foreground mb-2">Upload an image or paste a URL.</p>
-                            <div className="flex flex-wrap gap-3">
+                            <p className="text-[10px] font-mono text-muted-foreground mb-2">Drag and drop an image, click to upload, or paste a URL.</p>
+                            <div
+                                role="button"
+                                tabIndex={0}
+                                onClick={() => coverInputRef.current?.click()}
+                                onKeyDown={(e) => e.key === "Enter" && coverInputRef.current?.click()}
+                                onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setCoverDragActive(true); }}
+                                onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setCoverDragActive(false); }}
+                                onDrop={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setCoverDragActive(false);
+                                    const file = e.dataTransfer.files?.[0];
+                                    if (file) processCoverFile(file);
+                                }}
+                                className={cn(
+                                    "relative flex flex-col items-center justify-center gap-2 rounded-none border-2 border-dashed p-8 min-h-[140px] transition-colors cursor-pointer",
+                                    coverDragActive
+                                        ? "border-primary bg-primary/10 text-primary"
+                                        : "border-border/50 bg-background/30 hover:border-primary/50 hover:bg-primary/5 text-muted-foreground hover:text-primary"
+                                )}
+                            >
                                 <input
                                     ref={coverInputRef}
                                     type="file"
@@ -176,13 +207,13 @@ export default function NewProjectPage() {
                                     onChange={handleCoverFile}
                                     className="hidden"
                                 />
-                                <button
-                                    type="button"
-                                    onClick={() => coverInputRef.current?.click()}
-                                    className="flex items-center gap-2 px-4 py-3 hud-panel-sm bg-background/50 border border-dashed border-primary/50 text-primary text-sm font-mono uppercase tracking-wider hover:bg-primary/10 transition-colors"
-                                >
-                                    <Upload className="w-4 h-4" /> UPLOAD IMAGE
-                                </button>
+                                <Upload className={cn("w-10 h-10", coverDragActive && "scale-110")} />
+                                <span className="text-xs font-mono font-bold uppercase tracking-widest">
+                                    {coverDragActive ? "DROP COVER IMAGE" : "DRAG & DROP OR CLICK TO UPLOAD"}
+                                </span>
+                                <span className="text-[10px] font-mono opacity-80">JPG, PNG, WEBP</span>
+                            </div>
+                            <div className="flex flex-wrap gap-3 mt-3">
                                 <input
                                     type="url"
                                     value={form.coverImage}
@@ -218,6 +249,7 @@ export default function NewProjectPage() {
                             <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest mb-1.5 flex items-center gap-2">
                                 GALLERY IMAGES (OPTIONAL)
                             </label>
+                            <p className="text-[10px] font-mono text-muted-foreground mb-2">Drag and drop or click to add multiple images.</p>
                             <input
                                 ref={galleryInputRef}
                                 type="file"
@@ -226,13 +258,32 @@ export default function NewProjectPage() {
                                 onChange={handleGalleryFiles}
                                 className="hidden"
                             />
-                            <button
-                                type="button"
+                            <div
+                                role="button"
+                                tabIndex={0}
                                 onClick={() => galleryInputRef.current?.click()}
-                                className="flex items-center gap-2 px-4 py-2.5 hud-panel-sm bg-background/50 border border-border/50 text-muted-foreground text-sm font-mono uppercase tracking-wider hover:border-primary/50 hover:text-primary transition-colors"
+                                onKeyDown={(e) => e.key === "Enter" && galleryInputRef.current?.click()}
+                                onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setGalleryDragActive(true); }}
+                                onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setGalleryDragActive(false); }}
+                                onDrop={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setGalleryDragActive(false);
+                                    const files = Array.from(e.dataTransfer.files || []);
+                                    if (files.length) processGalleryFiles(files);
+                                }}
+                                className={cn(
+                                    "flex flex-col items-center justify-center gap-2 rounded-none border-2 border-dashed p-6 min-h-[100px] transition-colors cursor-pointer",
+                                    galleryDragActive
+                                        ? "border-primary bg-primary/10 text-primary"
+                                        : "border-border/50 bg-background/30 hover:border-primary/50 hover:bg-primary/5 text-muted-foreground hover:text-primary"
+                                )}
                             >
-                                <Upload className="w-3.5 h-3.5" /> ADD GALLERY IMAGES
-                            </button>
+                                <Upload className={cn("w-8 h-8", galleryDragActive && "scale-110")} />
+                                <span className="text-[10px] font-mono font-bold uppercase tracking-widest">
+                                    {galleryDragActive ? "DROP IMAGES" : "DRAG & DROP OR CLICK TO ADD GALLERY IMAGES"}
+                                </span>
+                            </div>
                             {galleryPreviews.length > 0 && (
                                 <div className="flex flex-wrap gap-2 mt-3">
                                     {galleryPreviews.map((src, i) => (
