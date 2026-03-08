@@ -14,6 +14,7 @@ const lora = Lora({
 });
 import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/contexts/auth-context";
+import { BackgroundOverlay } from "@/components/background-overlay";
 import Image from "next/image";
 import "./globals.css";
 
@@ -49,7 +50,10 @@ export default function RootLayout({
             />
           </div>
 
-          <div className="relative z-0 min-h-screen">
+          {/* Darker overlay on all pages except landing */}
+          <BackgroundOverlay />
+
+          <div className="relative z-10 min-h-screen">
             <AuthProvider>
               {children}
             </AuthProvider>

@@ -419,31 +419,27 @@ export default function OnboardingPage() {
     const canProceed = stepValid[step];
 
     return (
-        <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 relative overflow-hidden">
-            {/* Background elements */}
-            <div className="pointer-events-none fixed inset-0 grid-bg opacity-30" />
-            <div className="pointer-events-none fixed -top-40 -left-40 w-[600px] h-[600px] rounded-full blur-[150px] bg-primary/10" />
-
+        <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
             {/* Top branding */}
             <div className="relative z-10 w-full max-w-lg mb-8 text-center animate-fade-in">
-                <div className="inline-flex items-center justify-center p-3 hud-panel-sm bg-card border border-border/50 mb-3 shadow-sm">
-                    <Code2 className="w-6 h-6 text-primary" />
+                <div className="inline-flex items-center justify-center p-3 rounded-xl bg-[#006644]/50 border border-[#c7d28a]/40 mb-3 shadow-sm">
+                    <Code2 className="w-6 h-6 text-[#c7d28a]" />
                 </div>
-                <div className="text-xs font-mono text-primary tracking-widest uppercase">THE GENERATOR Initialization</div>
+                <div className="text-xs font-mono text-[#c7d28a] tracking-widest uppercase">THE GENERATOR Initialization</div>
             </div>
 
             <div className="w-full max-w-lg relative z-10">
                 {/* Progress bar */}
                 <div className="flex items-center gap-1.5 mb-6">
                     {steps.map((_, i) => (
-                        <div key={i} className="h-1.5 flex-1 bg-border overflow-hidden rounded-sm">
-                            {i <= step && <div className="h-full bg-primary w-full animate-fade-in" />}
+                        <div key={i} className="h-1.5 flex-1 bg-[#006644]/50 overflow-hidden rounded-full">
+                            {i <= step && <div className="h-full bg-[#c7d28a] w-full animate-fade-in rounded-full" />}
                         </div>
                     ))}
                 </div>
 
                 {/* Main panel */}
-                <div className="hud-panel bg-card/80 border border-border/50 p-6 sm:p-8 shadow-xl scanlines relative min-h-[450px] flex flex-col">
+                <div className="rounded-2xl bg-card/70 border border-[#006644]/50 p-6 sm:p-8 shadow-xl backdrop-blur-sm relative min-h-[450px] flex flex-col">
                     <div className="relative z-10 flex-1 flex flex-col">
                         <div className="mb-6">
                             <h1 className="text-xl sm:text-2xl font-black tracking-tighter mb-1 uppercase bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent">{currentStep.title}</h1>
@@ -455,18 +451,18 @@ export default function OnboardingPage() {
                         </div>
 
                         {/* Navigation Footer */}
-                        <div className="flex items-center justify-between mt-8 pt-5 border-t border-border/50">
-                            <button onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0} className={cn("flex items-center gap-1.5 px-4 py-2 text-xs font-mono font-bold tracking-widest uppercase transition-all", step === 0 ? "opacity-30 cursor-not-allowed" : "text-muted-foreground hover:text-foreground hover:bg-accent hud-panel-sm")}>
+                        <div className="flex items-center justify-between mt-8 pt-5 border-t border-[#006644]/40">
+                            <button onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0} className={cn("flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-mono font-bold tracking-widest uppercase transition-all", step === 0 ? "opacity-30 cursor-not-allowed" : "text-muted-foreground hover:text-[#c7d28a] hover:bg-[#c7d28a]/15")}>
                                 <ChevronLeft className="w-3.5 h-3.5" /> REVERT
                             </button>
 
                             {isLast ? (
-                                <button onClick={handleFinish} disabled={submitting} className="flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground text-xs font-mono font-bold uppercase tracking-widest transition-all glow-border-strong hover:brightness-110 disabled:opacity-50 hud-panel transition-all">
+                                <button onClick={handleFinish} disabled={submitting} className="generator-button flex items-center gap-2 px-6 py-2.5 text-xs font-mono font-bold uppercase tracking-widest transition-all disabled:opacity-50">
                                     {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Terminal className="w-4 h-4" />}
                                     {submitting ? "SUBMITTING" : "SUBMIT APPLICATION"}
                                 </button>
                             ) : (
-                                <button onClick={() => setStep(Math.min(steps.length - 1, step + 1))} disabled={!canProceed} className={cn("flex items-center gap-1.5 px-6 py-2.5 text-xs font-mono font-bold uppercase tracking-widest transition-all hud-panel", canProceed ? "bg-primary text-primary-foreground glow-border hover:brightness-110" : "bg-card border border-border/50 text-muted-foreground cursor-not-allowed")}>
+                                <button onClick={() => setStep(Math.min(steps.length - 1, step + 1))} disabled={!canProceed} className={cn("flex items-center gap-1.5 px-6 py-2.5 text-xs font-mono font-bold uppercase tracking-widest transition-all rounded-full", canProceed ? "generator-button" : "bg-card border border-[#006644]/50 text-muted-foreground cursor-not-allowed")}>
                                     PROCEED <ChevronRight className="w-3.5 h-3.5" />
                                 </button>
                             )}

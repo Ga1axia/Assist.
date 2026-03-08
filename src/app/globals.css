@@ -57,15 +57,18 @@
   --chart-4: #4ade80;
   --chart-5: #a3e635;
 
-  /* Sidebar */
-  --sidebar: #14482c;
-  --sidebar-foreground: #e2e8f0;
-  --sidebar-primary: #cbf702;
-  --sidebar-primary-foreground: #185635;
-  --sidebar-accent: #1f6b42;
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: #1f6b42;
-  --sidebar-ring: #cbf702;
+  /* Sidebar - Generator branding */
+  --sidebar: #006644;
+  --sidebar-foreground: #f4f6ec;
+  --sidebar-primary: #c7d28a;
+  --sidebar-primary-foreground: #006644;
+  --sidebar-accent: rgba(199, 210, 138, 0.15);
+  --sidebar-accent-foreground: #c7d28a;
+  --sidebar-border: rgba(199, 210, 138, 0.2);
+  --sidebar-ring: #c7d28a;
+  /* Generator brand */
+  --generator-light: #c7d28a;
+  --generator-dark: #006644;
 
   /* Typography */
   --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;

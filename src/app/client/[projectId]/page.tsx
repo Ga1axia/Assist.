@@ -37,22 +37,22 @@ export default function ClientPortalPage() {
     const [submitted, setSubmitted] = useState(false);
 
     return (
-        <div className="min-h-screen bg-background">
-            {/* Nav */}
-            <nav className="border-b border-border glass sticky top-0 z-10">
+        <div className="min-h-screen">
+            {/* Nav - Generator branding */}
+            <nav className="border-b border-[#c7d28a]/20 sticky top-0 z-10 bg-[#006644]/95 backdrop-blur-sm">
                 <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
-                        <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
-                            <Code2 className="w-4 h-4 text-primary-foreground" />
+                        <div className="w-9 h-9 rounded-lg bg-[#c7d28a] flex items-center justify-center">
+                            <Code2 className="w-4 h-4 text-[#006644]" />
                         </div>
                         <div>
-                            <span className="font-bold">THE GENERATOR</span>
-                            <span className="text-muted-foreground text-xs ml-1.5">Client Portal</span>
+                            <span className="font-bold text-[#c7d28a]">THE GENERATOR</span>
+                            <span className="text-[#c7d28a]/80 text-xs ml-1.5">Client Portal</span>
                         </div>
                     </div>
                     <button
                         onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                        className="p-2 rounded-lg hover:bg-secondary transition-colors"
+                        className="p-2 rounded-lg hover:bg-[#c7d28a]/20 text-[#c7d28a] transition-colors"
                     >
                         <Sun className="w-4 h-4 hidden dark:block" />
                         <Moon className="w-4 h-4 dark:hidden" />
@@ -64,15 +64,12 @@ export default function ClientPortalPage() {
                 {/* Header */}
                 <div className="mb-8">
                     <div className="flex items-center gap-3 flex-wrap">
-                        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+                        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
                             {mockClientProject.name}
                         </h1>
                         <span
                             className={cn(
-                                "text-xs px-3 py-1 rounded-full font-semibold",
-                                mockClientProject.status === "Complete"
-                                    ? "bg-success/10 text-success"
-                                    : "bg-primary/10 text-primary"
+                                "text-xs px-3 py-1 rounded-full font-semibold generator-pill generator-pill-dark"
                             )}
                         >
                             {mockClientProject.status}
@@ -84,26 +81,26 @@ export default function ClientPortalPage() {
                 </div>
 
                 {/* Progress Summary */}
-                <div className="bg-card border border-border rounded-xl p-6 mb-6">
-                    <h2 className="font-semibold text-lg mb-3">Project Overview</h2>
+                <div className="bg-card/60 border border-[#006644]/40 rounded-xl p-6 mb-6 backdrop-blur-sm">
+                    <h2 className="font-semibold text-lg mb-3 text-[#c7d28a]">Project Overview</h2>
                     <p className="text-sm text-muted-foreground leading-relaxed">
                         {mockClientProject.description}
                     </p>
                 </div>
 
                 {/* Milestones */}
-                <div className="bg-card border border-border rounded-xl p-6 mb-6">
-                    <h2 className="font-semibold text-lg mb-5">Key Milestones</h2>
+                <div className="bg-card/60 border border-[#006644]/40 rounded-xl p-6 mb-6 backdrop-blur-sm">
+                    <h2 className="font-semibold text-lg mb-5 text-[#c7d28a]">Key Milestones</h2>
                     <div className="space-y-3">
                         {mockClientProject.milestones.map((milestone, i) => (
                             <div
                                 key={i}
-                                className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30"
+                                className="flex items-center gap-3 p-3 rounded-xl bg-[#006644]/20 border border-[#c7d28a]/20"
                             >
                                 {milestone.status === "complete" ? (
                                     <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0" />
                                 ) : milestone.status === "in_progress" ? (
-                                    <div className="w-5 h-5 rounded-full border-2 border-primary border-t-transparent animate-spin flex-shrink-0" />
+                                    <div className="w-5 h-5 rounded-full border-2 border-[#c7d28a] border-t-transparent animate-spin flex-shrink-0" />
                                 ) : (
                                     <Circle className="w-5 h-5 text-muted-foreground flex-shrink-0" />
                                 )}
@@ -119,7 +116,7 @@ export default function ClientPortalPage() {
                                     className={cn(
                                         "text-xs px-2 py-0.5 rounded-full font-medium capitalize",
                                         milestone.status === "complete" && "bg-success/10 text-success",
-                                        milestone.status === "in_progress" && "bg-primary/10 text-primary",
+                                        milestone.status === "in_progress" && "bg-[#c7d28a]/20 text-[#c7d28a]",
                                         milestone.status === "pending" && "bg-secondary text-muted-foreground"
                                     )}
                                 >
@@ -132,13 +129,13 @@ export default function ClientPortalPage() {
 
                 {/* Demo Link */}
                 {mockClientProject.demoUrl && (
-                    <div className="bg-card border border-border rounded-xl p-6 mb-6">
-                        <h2 className="font-semibold text-lg mb-3">Demo</h2>
+                    <div className="bg-card/60 border border-[#006644]/40 rounded-xl p-6 mb-6 backdrop-blur-sm">
+                        <h2 className="font-semibold text-lg mb-3 text-[#c7d28a]">Demo</h2>
                         <a
                             href={mockClientProject.demoUrl}
                             target="_blank"
                             rel="noreferrer"
-                            className="flex items-center gap-2 text-primary hover:underline text-sm"
+                            className="generator-link flex items-center gap-2 text-[#c7d28a] hover:underline text-sm"
                         >
                             <ExternalLink className="w-4 h-4" />
                             View Live Demo
@@ -147,8 +144,8 @@ export default function ClientPortalPage() {
                 )}
 
                 {/* Feedback Form */}
-                <div className="bg-card border border-border rounded-xl p-6">
-                    <h2 className="font-semibold text-lg mb-3">Share Feedback</h2>
+                <div className="bg-card/60 border border-[#006644]/40 rounded-xl p-6 backdrop-blur-sm">
+                    <h2 className="font-semibold text-lg mb-3 text-[#c7d28a]">Share Feedback</h2>
                     <p className="text-sm text-muted-foreground mb-4">
                         Help us improve! Your feedback will be shared with the project team.
                     </p>
@@ -164,12 +161,12 @@ export default function ClientPortalPage() {
                                 value={feedback}
                                 onChange={(e) => setFeedback(e.target.value)}
                                 placeholder="Share your thoughts, suggestions, or concerns..."
-                                className="w-full px-4 py-3 rounded-xl input-field text-sm resize-none"
+                                className="w-full px-4 py-3 rounded-xl bg-[#093b26]/50 border border-[#006644]/50 focus:border-[#c7d28a]/60 text-sm resize-none text-foreground focus:outline-none"
                             />
                             <button
                                 onClick={() => setSubmitted(true)}
                                 disabled={!feedback.trim()}
-                                className="bg-primary text-primary-foreground px-5 py-2.5 rounded-xl text-sm font-semibold hover:brightness-110 transition-all shadow-lg shadow-primary/20 disabled:opacity-50 flex items-center gap-2"
+                                className="generator-button px-5 py-2.5 text-sm font-semibold disabled:opacity-50 flex items-center gap-2"
                             >
                                 <Send className="w-4 h-4" />
                                 Submit Feedback
