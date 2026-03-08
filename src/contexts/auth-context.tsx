@@ -15,18 +15,26 @@ import { auth, db } from "@/lib/firebase";
 
 export type UserRole = "resident" | "associate" | "marketing" | "events" | "finance" | "vice-president" | "president" | "community-manager" | "alumni";
 
+export interface EngagementMetrics {
+    attendanceRate?: number;
+    projectsCompleted?: number;
+    uploadsCount?: number;
+    pitchesSubmitted?: number;
+}
+
 interface UserProfile {
     uid: string;
     email: string | null;
     displayName: string | null;
     photoURL: string | null;
     role: UserRole;
-    status: "pending" | "approved" | "rejected";
+    status: "pending" | "approved" | "rejected" | "removed";
     standoutSkill: string | null;
     skills?: string[];
     onboarded?: boolean;
     openToMentorship?: boolean;
     linkedin?: string | null;
+    engagementMetrics?: EngagementMetrics;
 }
 
 interface AuthContextType {
@@ -59,10 +67,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
                     if (userDoc.exists()) {
                         const data = userDoc.data();
+                        const metrics = data.engagementMetrics;
+                        const onboardingName = data.displayName && String(data.displayName).trim();
                         setProfile({
                             uid: firebaseUser.uid,
                             email: firebaseUser.email,
-                            displayName: data.displayName || firebaseUser.displayName,
+                            displayName: onboardingName || firebaseUser.displayName || null,
                             photoURL: data.photoURL || firebaseUser.photoURL,
                             role: (data.role as UserRole) || "resident",
                             status: data.status || (data.onboarded ? "approved" : "pending"), // Handle legacy users
@@ -71,6 +81,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                             onboarded: data.onboarded === true,
                             openToMentorship: data.openToMentorship || false,
                             linkedin: data.linkedin || data.alumni?.linkedinUrl || null,
+                            engagementMetrics: metrics ? {
+                                attendanceRate: metrics.attendanceRate ?? 0,
+                                projectsCompleted: metrics.projectsCompleted ?? (Array.isArray(data.projects) ? data.projects.length : 0),
+                                uploadsCount: metrics.uploadsCount ?? 0,
+                                pitchesSubmitted: metrics.pitchesSubmitted ?? 0,
+                            } : undefined,
                         });
                         setNeedsOnboarding(data.onboarded !== true);
                     } else {
@@ -103,6 +119,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                             onboarded: false,
                             openToMentorship: false,
                             linkedin: null,
+                            engagementMetrics: undefined,
                         });
                         setNeedsOnboarding(true);
                     }
@@ -118,6 +135,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         skills: [],
                         openToMentorship: false,
                         linkedin: null,
+                        engagementMetrics: undefined,
                     });
                 }
             } else {
@@ -156,10 +174,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const userDoc = await getDoc(doc(db, "users", currentUser.uid));
             if (userDoc.exists()) {
                 const data = userDoc.data();
+                const onboardingName = data.displayName && String(data.displayName).trim();
                 setProfile({
                     uid: currentUser.uid,
                     email: currentUser.email,
-                    displayName: data.displayName || currentUser.displayName,
+                    displayName: onboardingName || currentUser.displayName || null,
                     photoURL: data.photoURL || currentUser.photoURL,
                     role: data.role || "member",
                     status: data.status || (data.onboarded ? "approved" : "pending"),

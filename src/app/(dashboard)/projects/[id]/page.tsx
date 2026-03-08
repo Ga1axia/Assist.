@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { useAuth } from "@/contexts/auth-context";
 import { useProjects } from "@/hooks/useFirestore";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -14,6 +16,11 @@ import {
     Image as ImageIcon,
     Clock,
     LinkIcon,
+    CheckSquare,
+    Square,
+    Plus,
+    Trash2,
+    Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -30,10 +37,14 @@ const statusColors: Record<string, string> = {
 export default function ProjectDetailPage() {
     const params = useParams();
     const id = params?.id as string;
-    const { data: projects, loading } = useProjects();
+    const { profile } = useAuth();
+    const { data: projects, loading, addProjectTask, updateProjectTask, removeProjectTask } = useProjects();
+    const [newTaskTitle, setNewTaskTitle] = useState("");
+    const [taskSubmitting, setTaskSubmitting] = useState(false);
 
-    // Find specific project
     const project = projects.find((p) => p.id === id);
+    const isTeamMember = project && profile && project.teamMembers.some((m) => m.uid === profile.uid);
+    const tasks = project?.tasks ?? [];
 
     if (loading) {
         return (
@@ -184,6 +195,91 @@ export default function ProjectDetailPage() {
                                     </div>
                                 </div>
                             ))}
+                        </div>
+                    </div>
+
+                    {/* Tasks */}
+                    <div className="hud-panel bg-card/60 border border-border/40 p-6 scanlines relative group">
+                        <h2 className="font-bold font-mono tracking-tight uppercase mb-4 flex items-center gap-2 pb-3 border-b border-border/40">
+                            <CheckSquare className="w-5 h-5 text-primary" />
+                            TASKS
+                            {tasks.length > 0 && (
+                                <span className="text-[10px] font-mono text-muted-foreground font-normal">
+                                    {tasks.filter((t) => t.completed).length}/{tasks.length}
+                                </span>
+                            )}
+                        </h2>
+                        <div className="space-y-3 relative z-10">
+                            {tasks.length === 0 && !isTeamMember && (
+                                <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">No tasks yet.</p>
+                            )}
+                            {tasks.map((task) => (
+                                <div
+                                    key={task.id}
+                                    className={cn(
+                                        "flex items-center gap-3 p-3 hud-panel-sm bg-background/50 border border-border/40 group/task hover:border-primary/30 transition-colors",
+                                        task.completed && "opacity-70"
+                                    )}
+                                >
+                                    {isTeamMember ? (
+                                        <button
+                                            type="button"
+                                            onClick={() => updateProjectTask(project.id, task.id, { completed: !task.completed })}
+                                            className="shrink-0 text-primary hover:brightness-110 transition-opacity"
+                                        >
+                                            {task.completed ? <CheckSquare className="w-4 h-4 fill-primary" /> : <Square className="w-4 h-4" />}
+                                        </button>
+                                    ) : (
+                                        <span className="shrink-0 text-muted-foreground">
+                                            {task.completed ? <CheckSquare className="w-4 h-4 fill-primary/50" /> : <Square className="w-4 h-4 opacity-50" />}
+                                        </span>
+                                    )}
+                                    <span className={cn("flex-1 text-sm font-mono uppercase tracking-tight", task.completed && "line-through text-muted-foreground")}>
+                                        {task.title}
+                                    </span>
+                                    {isTeamMember && (
+                                        <button
+                                            type="button"
+                                            onClick={() => removeProjectTask(project.id, task.id)}
+                                            className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover/task:opacity-100"
+                                        >
+                                            <Trash2 className="w-3.5 h-3.5" />
+                                        </button>
+                                    )}
+                                </div>
+                            ))}
+                            {isTeamMember && (
+                                <form
+                                    className="flex gap-2"
+                                    onSubmit={async (e) => {
+                                        e.preventDefault();
+                                        if (!newTaskTitle.trim() || taskSubmitting) return;
+                                        setTaskSubmitting(true);
+                                        try {
+                                            await addProjectTask(project.id, newTaskTitle);
+                                            setNewTaskTitle("");
+                                        } finally {
+                                            setTaskSubmitting(false);
+                                        }
+                                    }}
+                                >
+                                    <input
+                                        type="text"
+                                        value={newTaskTitle}
+                                        onChange={(e) => setNewTaskTitle(e.target.value)}
+                                        placeholder="Add a task..."
+                                        className="flex-1 px-3 py-2 hud-panel-sm bg-background/50 border border-border/50 focus:border-primary/50 text-xs font-mono uppercase tracking-wider focus:outline-none"
+                                        disabled={taskSubmitting}
+                                    />
+                                    <button
+                                        type="submit"
+                                        disabled={!newTaskTitle.trim() || taskSubmitting}
+                                        className="p-2 hud-panel-sm bg-primary text-primary-foreground hover:brightness-110 disabled:opacity-50 transition-all"
+                                    >
+                                        {taskSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                                    </button>
+                                </form>
+                            )}
                         </div>
                     </div>
 

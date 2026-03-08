@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import { useAuth } from "@/contexts/auth-context";
-import { isAdmin } from "@/lib/roles";
+import { isAdmin, isPresident } from "@/lib/roles";
 import { getRoleLabel, ALL_ROLES, ADMIN_ROLES } from "@/lib/roles";
 import { useMembers } from "@/hooks/useFirestore";
+import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import {
     Users,
     Search,
@@ -20,6 +22,7 @@ import {
     Terminal,
     X,
     Check,
+    UserMinus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -41,8 +44,11 @@ export default function MembersPage() {
     const [search, setSearch] = useState("");
     const [roleFilter, setRoleFilter] = useState<string>("all");
     const [selectedMember, setSelectedMember] = useState<any | null>(null);
+    const [removingId, setRemovingId] = useState<string | null>(null);
+    const [removeConfirm, setRemoveConfirm] = useState<string | null>(null);
 
     const userIsAdmin = isAdmin(profile?.role);
+    const userIsPresident = isPresident(profile?.role);
 
     const filtered = members
         .filter((m) => roleFilter === "all" || m.role === roleFilter || (roleFilter === "eboard" && ADMIN_ROLES.includes(m.role as any)))
@@ -320,6 +326,55 @@ export default function MembersPage() {
                                         <a href={selectedMember.linkedin} target="_blank" rel="noopener noreferrer" className="mt-4 flex flex-col items-center justify-center p-3 hud-panel-sm bg-background border border-border/50 hover:bg-primary/10 hover:border-primary/50 hover:text-primary transition-colors text-xs font-bold font-mono uppercase tracking-widest text-muted-foreground text-center gap-1">
                                             <ExternalLink className="w-4 h-4" /> VISIT PROFESSIONAL NETWORK
                                         </a>
+                                    )}
+
+                                    {userIsPresident && selectedMember.id !== profile?.uid && selectedMember.role !== "president" && (
+                                        <div className="mt-6 pt-4 border-t border-border/40">
+                                            {removeConfirm !== selectedMember.id ? (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setRemoveConfirm(selectedMember.id)}
+                                                    className="w-full flex items-center justify-center gap-2 px-4 py-3 hud-panel-sm border border-destructive/50 bg-destructive/10 text-destructive text-xs font-mono font-bold uppercase tracking-widest hover:bg-destructive/20 transition-colors"
+                                                >
+                                                    <UserMinus className="w-4 h-4" /> REMOVE MEMBER
+                                                </button>
+                                            ) : (
+                                                <div className="space-y-2">
+                                                    <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest text-center">Remove {selectedMember.name} from the directory? They will lose dashboard access.</p>
+                                                    <div className="flex gap-2">
+                                                        <button
+                                                            type="button"
+                                                            onClick={async () => {
+                                                                if (!selectedMember?.id) return;
+                                                                setRemovingId(selectedMember.id);
+                                                                try {
+                                                                    await updateDoc(doc(db, "users", selectedMember.id), { status: "removed", updatedAt: serverTimestamp() });
+                                                                    setSelectedMember(null);
+                                                                    setRemoveConfirm(null);
+                                                                } catch (err) {
+                                                                    console.error("Remove member error:", err);
+                                                                } finally {
+                                                                    setRemovingId(null);
+                                                                }
+                                                            }}
+                                                            disabled={removingId === selectedMember.id}
+                                                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 hud-panel-sm bg-destructive text-destructive-foreground text-[10px] font-mono font-bold uppercase tracking-widest hover:brightness-110 disabled:opacity-50"
+                                                        >
+                                                            {removingId === selectedMember.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UserMinus className="w-3.5 h-3.5" />}
+                                                            {removingId === selectedMember.id ? "REMOVING..." : "CONFIRM REMOVE"}
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setRemoveConfirm(null)}
+                                                            disabled={removingId === selectedMember.id}
+                                                            className="px-4 py-2.5 hud-panel-sm border border-border/50 text-muted-foreground text-[10px] font-mono font-bold uppercase tracking-widest hover:bg-accent hover:text-foreground disabled:opacity-50"
+                                                        >
+                                                            CANCEL
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
                                     )}
                                 </div>
                             </div>

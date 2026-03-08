@@ -20,6 +20,10 @@ export function isAdmin(role: string | undefined): boolean {
     return ADMIN_ROLES.includes(role as UserRole);
 }
 
+export function isPresident(role: string | undefined): boolean {
+    return role === "president";
+}
+
 export function getRoleLabel(role: string): string {
     const found = ALL_ROLES.find((r) => r.value === role);
     return found?.label || role;

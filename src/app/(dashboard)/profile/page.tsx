@@ -26,9 +26,11 @@ import { cn } from "@/lib/utils";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { SKILL_CATEGORIES } from "@/lib/skills";
+import { useProjects } from "@/hooks/useFirestore";
 
 export default function ProfilePage() {
     const { profile, refreshProfile } = useAuth();
+    const { data: allProjects } = useProjects();
     const [standoutSkill, setStandoutSkill] = useState(profile?.standoutSkill || "");
     const [skills, setSkills] = useState<string[]>(profile?.skills || []);
     const [editing, setEditing] = useState(false);
@@ -88,18 +90,31 @@ export default function ProfilePage() {
         {} as Record<string, string[]>
     );
 
+    const em = profile?.engagementMetrics;
+    const attendance = em?.attendanceRate ?? 0;
+    const projectsCount = em?.projectsCompleted ?? 0;
+    const uploadsCount = em?.uploadsCount ?? 0;
+    const pitchesCount = em?.pitchesSubmitted ?? 0;
+
     const engagementMetrics = [
-        { label: "SYNC RATE", value: "92%", icon: <Calendar className="w-4 h-4" />, color: "text-chart-1", border: "border-chart-1/40", bg: "bg-chart-1/5" },
-        { label: "MISSIONS", value: "3", icon: <FolderKanban className="w-4 h-4" />, color: "text-primary", border: "border-primary/40", bg: "bg-primary/5" },
-        { label: "DATA UPL.", value: "7", icon: <BookOpen className="w-4 h-4" />, color: "text-chart-2", border: "border-chart-2/40", bg: "bg-chart-2/5" },
-        { label: "PROPOSALS", value: "2", icon: <Target className="w-4 h-4" />, color: "text-chart-5", border: "border-chart-5/40", bg: "bg-chart-5/5" },
+        { label: "SYNC RATE", value: `${attendance}%`, icon: <Calendar className="w-4 h-4" />, color: "text-chart-1", border: "border-chart-1/40", bg: "bg-chart-1/5" },
+        { label: "MISSIONS", value: String(projectsCount), icon: <FolderKanban className="w-4 h-4" />, color: "text-primary", border: "border-primary/40", bg: "bg-primary/5" },
+        { label: "DATA UPL.", value: String(uploadsCount), icon: <BookOpen className="w-4 h-4" />, color: "text-chart-2", border: "border-chart-2/40", bg: "bg-chart-2/5" },
+        { label: "PROPOSALS", value: String(pitchesCount), icon: <Target className="w-4 h-4" />, color: "text-chart-5", border: "border-chart-5/40", bg: "bg-chart-5/5" },
     ];
 
-    const projectHistory = [
-        { name: "WEATHER DASHBOARD", role: "DEVELOPER", status: "SECURED" },
-        { name: "COMMUNITY PORTAL", role: "LEAD", status: "ACTIVE" },
-        { name: "DATA VIZ TOOL", role: "DESIGNER", status: "PRE-DEV" },
-    ];
+    const projectHistory = (profile?.uid && allProjects
+        ? allProjects.filter((p) => p.teamMembers?.some((m: { uid: string }) => m.uid === profile.uid))
+        : []
+    ).map((p) => {
+        const status = p.status?.toLowerCase();
+        const statusLabel = status === "complete" ? "SECURED" : status === "active" || status === "published" ? "ACTIVE" : "PRE-DEV";
+        return {
+            name: p.name,
+            role: p.teamMembers?.find((m: { uid: string }) => m.uid === profile?.uid)?.role?.toUpperCase() ?? "MEMBER",
+            status: statusLabel,
+        };
+    });
 
     return (
         <div className="flex flex-col min-h-[calc(100vh-4rem)] animate-fade-in space-y-6 relative z-10 max-w-5xl mx-auto">
@@ -355,7 +370,10 @@ export default function ProfilePage() {
                     </h2>
 
                     <div className="space-y-4 relative z-10">
-                        {projectHistory.map((project, i) => (
+                        {projectHistory.length === 0 ? (
+                            <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest py-4 text-center border border-border/40 hud-panel-sm">NO MISSIONS LOGGED YET.</p>
+                        ) : (
+                        projectHistory.map((project, i) => (
                             <div
                                 key={i}
                                 className="flex flex-col sm:flex-row sm:items-center justify-between p-4 hud-panel-sm bg-background/50 border border-border/40 hover:border-primary/40 transition-colors group gap-4"
@@ -380,7 +398,8 @@ export default function ProfilePage() {
                                     {project.status}
                                 </span>
                             </div>
-                        ))}
+                        ))
+                        )}
                     </div>
                 </div>
 

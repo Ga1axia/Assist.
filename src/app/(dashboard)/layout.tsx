@@ -31,6 +31,20 @@ export default function DashboardLayout({
         );
     }
 
+    if (profile?.status === "removed") {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-screen bg-background relative overflow-hidden p-6">
+                <div className="pointer-events-none fixed inset-0 grid-bg opacity-30 z-0" />
+                <div className="relative z-10 hud-panel bg-card/40 border border-destructive/40 scanlines p-8 sm:p-12 text-center max-w-lg mx-auto mt-20">
+                    <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tighter text-destructive mb-2">ACCESS REVOKED</h1>
+                    <p className="text-sm font-mono text-muted-foreground mb-8 leading-relaxed">
+                        Your membership has been removed by the club. You no longer have access to the CODE dashboard.
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
     if (profile?.status === "pending") {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen bg-background relative overflow-hidden p-6">

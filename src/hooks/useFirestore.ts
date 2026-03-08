@@ -233,7 +233,7 @@ export interface MemberItem {
 }
 
 export function useMembers(enabled: boolean = true) {
-    return useCollection<MemberItem>(
+    const result = useCollection<MemberItem>(
         "users",
         [orderBy("createdAt", "desc")],
         (raw, id) => ({
@@ -257,6 +257,7 @@ export function useMembers(enabled: boolean = true) {
         }),
         enabled
     );
+    return { ...result, data: result.data.filter((m) => m.status !== "removed") };
 }
 
 // ──────────────────────────────────────
@@ -324,6 +325,12 @@ export function useResources(onlyApproved = true, enabled = true) {
 // ──────────────────────────────────────
 // Projects
 // ──────────────────────────────────────
+export interface ProjectTask {
+    id: string;
+    title: string;
+    completed: boolean;
+}
+
 export interface ProjectItem {
     id: string;
     name: string;
@@ -335,6 +342,7 @@ export interface ProjectItem {
     coverImage: string | null;
     gallery: string[];
     content: string;
+    tasks: ProjectTask[];
     updatedAt: string;
     createdAt: string;
     clientVisible: boolean;
@@ -355,6 +363,7 @@ export function useProjects(enabled: boolean = true) {
             coverImage: raw.coverImage || null,
             gallery: raw.gallery || [],
             content: raw.content || "",
+            tasks: Array.isArray(raw.tasks) ? raw.tasks : [],
             updatedAt: timeAgo(raw.updatedAt) || timeAgo(raw.createdAt),
             createdAt: formatTimestamp(raw.createdAt),
             clientVisible: raw.clientVisible ?? true,
@@ -363,8 +372,10 @@ export function useProjects(enabled: boolean = true) {
     );
 
     const createProject = async (project: Partial<ProjectItem>) => {
+        const { tasks, ...rest } = project;
         await addDoc(collection(db, "projects"), {
-            ...project,
+            ...rest,
+            tasks: tasks || [],
             status: project.status || "published",
             clientVisible: true,
             createdAt: serverTimestamp(),
@@ -379,7 +390,41 @@ export function useProjects(enabled: boolean = true) {
         });
     };
 
-    return { ...result, createProject, updateProject };
+    const addProjectTask = async (projectId: string, title: string) => {
+        const project = result.data.find((p) => p.id === projectId);
+        const currentTasks = project?.tasks || [];
+        const newTask: ProjectTask = {
+            id: `task_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
+            title: title.trim(),
+            completed: false,
+        };
+        await updateDoc(doc(db, "projects", projectId), {
+            tasks: [...currentTasks, newTask],
+            updatedAt: serverTimestamp(),
+        });
+    };
+
+    const updateProjectTask = async (projectId: string, taskId: string, updates: Partial<ProjectTask>) => {
+        const project = result.data.find((p) => p.id === projectId);
+        const tasks = (project?.tasks || []).map((t) =>
+            t.id === taskId ? { ...t, ...updates } : t
+        );
+        await updateDoc(doc(db, "projects", projectId), {
+            tasks,
+            updatedAt: serverTimestamp(),
+        });
+    };
+
+    const removeProjectTask = async (projectId: string, taskId: string) => {
+        const project = result.data.find((p) => p.id === projectId);
+        const tasks = (project?.tasks || []).filter((t) => t.id !== taskId);
+        await updateDoc(doc(db, "projects", projectId), {
+            tasks,
+            updatedAt: serverTimestamp(),
+        });
+    };
+
+    return { ...result, createProject, updateProject, addProjectTask, updateProjectTask, removeProjectTask };
 }
 
 // ──────────────────────────────────────

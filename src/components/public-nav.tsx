@@ -75,7 +75,7 @@ export function PublicNav() {
                                     </div>
                                 )}
                                 <span className="text-[10px] sm:text-xs font-mono font-bold uppercase tracking-widest hidden sm:inline max-w-[120px] truncate group-hover:text-primary transition-colors mt-0.5">
-                                    {profile?.displayName || user.email?.split("@")[0] || "MEMBER"}
+                                    {profile?.displayName || "MEMBER"}
                                 </span>
                             </button>
 

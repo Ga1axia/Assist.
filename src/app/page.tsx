@@ -17,12 +17,13 @@ import {
 import { PublicNav } from "@/components/public-nav";
 import { BootSequence } from "@/components/boot-sequence";
 import { useOptionalAuth } from "@/contexts/auth-context";
-import { useProjects } from "@/hooks/useFirestore";
+import { useProjects, useDashboardStats } from "@/hooks/useFirestore";
 import Image from "next/image";
 
 export default function LandingPage() {
   const { user } = useOptionalAuth();
   const { data: projects, loading: projectsLoading } = useProjects();
+  const { stats: dashboardStats, loading: statsLoading } = useDashboardStats();
   const featuredProject = projects?.[0];
 
   const features = [
@@ -35,10 +36,10 @@ export default function LandingPage() {
   ];
 
   const stats = [
-    { label: "ACTIVE_USERS", value: "30+", unit: "members" },
-    { label: "PROJECTS_SHIPPED", value: "12", unit: "deployed" },
-    { label: "RESOURCES_DB", value: "50+", unit: "indexed" },
-    { label: "PRIMARY_CLIENT", value: "SHF", unit: "Seven Hills" },
+    { label: "ACTIVE_USERS", value: statsLoading ? "—" : String(dashboardStats.totalMembers), unit: "members" },
+    { label: "PROJECTS_SHIPPED", value: statsLoading ? "—" : String(dashboardStats.totalProjects), unit: "deployed" },
+    { label: "RESOURCES_DB", value: statsLoading ? "—" : String(dashboardStats.totalResources), unit: "indexed" },
+    { label: "ACTIVE_PROJECTS", value: statsLoading ? "—" : String(dashboardStats.activeProjects), unit: "in progress" },
   ];
 
   return (
@@ -117,6 +118,17 @@ ERR_CONNECTION_REFUSED
                 <span className="w-2 h-2 bg-chart-1 rounded-none animate-ping"></span>
                 <span className="w-2 h-2 bg-chart-2 rounded-none"></span>
               </div>
+            </div>
+
+            {/* Live stats from DB */}
+            <div className="flex flex-wrap gap-3 mt-6">
+              {stats.map((s) => (
+                <div key={s.label} className="px-3 py-1.5 border border-primary/30 bg-background/80 font-mono text-[10px] uppercase tracking-widest">
+                  <span className="text-primary font-black">{s.value}</span>
+                  <span className="text-muted-foreground ml-1">{s.unit}</span>
+                  <span className="text-muted-foreground/60 ml-1">// {s.label}</span>
+                </div>
+              ))}
             </div>
 
             {/* CTA Buttons - Removed View Archives, Dashboard button is now built into the HUD on the right */}
