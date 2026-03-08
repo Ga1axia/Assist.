@@ -1,19 +1,24 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
-import { useProjects } from "@/hooks/useFirestore";
+import { useProjects, useMembers } from "@/hooks/useFirestore";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "@/lib/firebase";
-import { ArrowLeft, Rocket, Terminal, Image as ImageIcon, LinkIcon, GitBranch, AlignLeft, Loader2, Upload, X } from "lucide-react";
+import { ArrowLeft, Rocket, Terminal, Image as ImageIcon, LinkIcon, GitBranch, AlignLeft, Loader2, Upload, X, Users, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+const TEAM_ROLES = ["lead", "developer", "designer", "member"] as const;
+
+type TeamMemberEntry = { uid: string; role: string; name?: string };
 
 export default function NewProjectPage() {
     const { profile } = useAuth();
     const router = useRouter();
     const { createProject } = useProjects();
+    const { data: members } = useMembers();
     const [submitting, setSubmitting] = useState(false);
     const coverInputRef = useRef<HTMLInputElement>(null);
 
@@ -25,7 +30,49 @@ export default function NewProjectPage() {
         coverImage: "",
         content: "",
     });
+    const [teamMembers, setTeamMembers] = useState<TeamMemberEntry[]>(() =>
+        profile ? [{ uid: profile.uid, role: "lead", name: profile.displayName || "" }] : []
+    );
+    const [memberSearch, setMemberSearch] = useState("");
+    const [showMemberPicker, setShowMemberPicker] = useState(false);
     const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
+
+    const addedUids = useMemo(() => new Set(teamMembers.map((m) => m.uid)), [teamMembers]);
+    const availableMembers = useMemo(
+        () => members.filter((m) => !addedUids.has(m.id)),
+        [members, addedUids]
+    );
+    const filteredAvailable = useMemo(
+        () =>
+            !memberSearch.trim()
+                ? availableMembers.slice(0, 8)
+                : availableMembers.filter(
+                    (m) =>
+                        m.name.toLowerCase().includes(memberSearch.toLowerCase()) ||
+                        m.email.toLowerCase().includes(memberSearch.toLowerCase())
+                ).slice(0, 8),
+        [availableMembers, memberSearch]
+    );
+
+    const addTeamMember = (uid: string, name: string, role: string = "member") => {
+        if (addedUids.has(uid)) return;
+        setTeamMembers((prev) => [...prev, { uid, role, name }]);
+        setMemberSearch("");
+        setShowMemberPicker(false);
+    };
+    const removeTeamMember = (uid: string) => {
+        setTeamMembers((prev) => prev.filter((m) => m.uid !== uid));
+    };
+    const setMemberRole = (uid: string, role: string) => {
+        setTeamMembers((prev) => prev.map((m) => (m.uid === uid ? { ...m, role } : m)));
+    };
+
+    useEffect(() => {
+        if (profile && teamMembers.length === 0) {
+            setTeamMembers([{ uid: profile.uid, role: "lead", name: profile.displayName || "" }]);
+        }
+    }, [profile]);
+
     const [coverImagePreview, setCoverImagePreview] = useState<string | null>(null);
     const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
     const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
@@ -98,7 +145,7 @@ export default function NewProjectPage() {
                 coverImage: coverUrl,
                 gallery: galleryUrls,
                 content: form.content,
-                teamMembers: [{ uid: profile?.uid || "", role: "lead", name: profile?.displayName || "" }],
+                teamMembers: teamMembers.length > 0 ? teamMembers : [{ uid: profile?.uid || "", role: "lead", name: profile?.displayName || "" }],
             });
 
             router.push("/projects");
@@ -163,6 +210,87 @@ export default function NewProjectPage() {
                                 placeholder="A brief description of what it is and who it's for..."
                                 className="w-full px-4 py-3 hud-panel-sm bg-background/50 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none"
                             />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Team Members */}
+                <div className="hud-panel bg-card/60 border border-border/40 p-6 sm:p-8 scanlines relative">
+                    <div className="flex items-center justify-between mb-6 border-b border-border/40 pb-4 relative z-10">
+                        <h2 className="font-bold text-lg font-mono tracking-tight uppercase flex items-center gap-2">
+                            <Users className="w-5 h-5 text-primary" /> TEAM MEMBERS
+                        </h2>
+                        <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">{teamMembers.length} CONTRIBUTOR{teamMembers.length !== 1 ? "S" : ""}</span>
+                    </div>
+                    <div className="space-y-4 relative z-10">
+                        <div className="flex flex-wrap gap-2">
+                            {teamMembers.map((m) => (
+                                <div
+                                    key={m.uid}
+                                    className="flex items-center gap-2 px-3 py-2 hud-panel-sm bg-background/60 border border-border/50"
+                                >
+                                    <select
+                                        value={m.role}
+                                        onChange={(e) => setMemberRole(m.uid, e.target.value)}
+                                        className="bg-transparent text-[10px] font-mono font-bold uppercase tracking-widest text-primary border-none focus:outline-none cursor-pointer pr-1"
+                                    >
+                                        {TEAM_ROLES.map((r) => (
+                                            <option key={r} value={r}>{r}</option>
+                                        ))}
+                                    </select>
+                                    <span className="text-xs font-mono truncate max-w-[120px]">{m.name || m.uid.slice(0, 8)}</span>
+                                    <button
+                                        type="button"
+                                        onClick={() => removeTeamMember(m.uid)}
+                                        disabled={m.uid === profile?.uid && teamMembers.length === 1}
+                                        className="p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                                        title={m.uid === profile?.uid && teamMembers.length === 1 ? "Keep at least one member (you)" : "Remove"}
+                                    >
+                                        <X className="w-3.5 h-3.5" />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="relative">
+                            <button
+                                type="button"
+                                onClick={() => setShowMemberPicker((v) => !v)}
+                                className="flex items-center gap-2 px-4 py-2.5 hud-panel-sm border border-dashed border-primary/50 text-primary text-xs font-mono uppercase tracking-wider hover:bg-primary/10 transition-colors"
+                            >
+                                <Plus className="w-4 h-4" /> ADD MEMBER
+                            </button>
+                            {showMemberPicker && (
+                                <>
+                                    <div className="absolute left-0 right-0 top-full mt-2 z-20 hud-panel-sm bg-card border border-border/50 p-2 max-h-64 overflow-y-auto">
+                                        <input
+                                            type="text"
+                                            value={memberSearch}
+                                            onChange={(e) => setMemberSearch(e.target.value)}
+                                            placeholder="Search by name or email..."
+                                            className="w-full px-3 py-2 mb-2 hud-panel-sm bg-background/50 border border-border/50 text-sm font-mono focus:outline-none focus:border-primary/50"
+                                        />
+                                        {filteredAvailable.length === 0 ? (
+                                            <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest py-3 text-center">No members to add.</p>
+                                        ) : (
+                                            <ul className="space-y-1">
+                                                {filteredAvailable.map((mem) => (
+                                                    <li key={mem.id}>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => addTeamMember(mem.id, mem.name)}
+                                                            className="w-full flex items-center justify-between px-3 py-2 text-left hud-panel-sm bg-background/40 border border-transparent hover:border-primary/50 hover:bg-primary/5 transition-colors"
+                                                        >
+                                                            <span className="text-xs font-mono font-bold uppercase truncate">{mem.name}</span>
+                                                            <span className="text-[9px] font-mono text-muted-foreground truncate max-w-[140px]">{mem.email}</span>
+                                                        </button>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                    </div>
+                                    <div className="fixed inset-0 z-10" onClick={() => setShowMemberPicker(false)} aria-hidden="true" />
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>

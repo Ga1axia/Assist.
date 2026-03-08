@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useAuth } from "@/contexts/auth-context";
-import { useProjects } from "@/hooks/useFirestore";
+import { useProjects, useMembers } from "@/hooks/useFirestore";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import ReactMarkdown from "react-markdown";
@@ -21,8 +21,11 @@ import {
     Plus,
     Trash2,
     Loader2,
+    X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+const TEAM_ROLES = ["lead", "developer", "designer", "member"] as const;
 
 const statusColors: Record<string, string> = {
     ideation: "bg-chart-2/10 border-chart-2/30 text-chart-2",
@@ -38,13 +41,66 @@ export default function ProjectDetailPage() {
     const params = useParams();
     const id = params?.id as string;
     const { profile } = useAuth();
-    const { data: projects, loading, addProjectTask, updateProjectTask, removeProjectTask } = useProjects();
+    const { data: projects, loading, addProjectTask, updateProjectTask, removeProjectTask, updateProject } = useProjects();
+    const { data: members } = useMembers();
     const [newTaskTitle, setNewTaskTitle] = useState("");
     const [taskSubmitting, setTaskSubmitting] = useState(false);
+    const [memberSearch, setMemberSearch] = useState("");
+    const [showMemberPicker, setShowMemberPicker] = useState(false);
+    const [teamUpdating, setTeamUpdating] = useState(false);
 
     const project = projects.find((p) => p.id === id);
     const isTeamMember = project && profile && project.teamMembers.some((m) => m.uid === profile.uid);
     const tasks = project?.tasks ?? [];
+
+    const addedUids = useMemo(() => new Set(project?.teamMembers?.map((m) => m.uid) ?? []), [project?.teamMembers]);
+    const availableMembers = useMemo(() => members.filter((m) => !addedUids.has(m.id)), [members, addedUids]);
+    const filteredAvailable = useMemo(
+        () =>
+            !memberSearch.trim()
+                ? availableMembers.slice(0, 8)
+                : availableMembers.filter(
+                    (m) =>
+                        m.name.toLowerCase().includes(memberSearch.toLowerCase()) ||
+                        m.email.toLowerCase().includes(memberSearch.toLowerCase())
+                ).slice(0, 8),
+        [availableMembers, memberSearch]
+    );
+
+    const addProjectMember = async (uid: string, name: string, role: string = "member") => {
+        if (!project || addedUids.has(uid) || teamUpdating) return;
+        setTeamUpdating(true);
+        try {
+            const next = [...project.teamMembers, { uid, role, name }];
+            await updateProject(project.id, { teamMembers: next });
+            setMemberSearch("");
+            setShowMemberPicker(false);
+        } finally {
+            setTeamUpdating(false);
+        }
+    };
+    const removeProjectMember = async (uid: string) => {
+        if (!project || teamUpdating) return;
+        if (project.teamMembers.length <= 1) return;
+        if (uid === profile?.uid && project.teamMembers.filter((m) => m.role === "lead").length <= 1) return;
+        setTeamUpdating(true);
+        try {
+            const next = project.teamMembers.filter((m) => m.uid !== uid);
+            await updateProject(project.id, { teamMembers: next });
+        } finally {
+            setTeamUpdating(false);
+        }
+    };
+    const setProjectMemberRole = async (uid: string, role: string) => {
+        if (!project || teamUpdating) return;
+        setTeamUpdating(true);
+        try {
+            const next = project.teamMembers.map((m) => (m.uid === uid ? { ...m, role } : m));
+            await updateProject(project.id, { teamMembers: next });
+        } finally {
+            setTeamUpdating(false);
+        }
+    };
 
     if (loading) {
         return (
@@ -179,22 +235,94 @@ export default function ProjectDetailPage() {
                         </h2>
                         <div className="space-y-3 relative z-10">
                             {project.teamMembers.map((member, i) => (
-                                <div key={i} className="flex items-center justify-between p-3 hud-panel-sm bg-background/50 border border-border/40 group/member hover:border-primary/30 transition-colors">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 hud-corners bg-card flex items-center justify-center text-foreground font-black border border-border/50 text-xs shadow-inner">
+                                <div key={member.uid} className="flex items-center justify-between gap-2 p-3 hud-panel-sm bg-background/50 border border-border/40 group/member hover:border-primary/30 transition-colors">
+                                    <div className="flex items-center gap-3 min-w-0">
+                                        <div className="w-8 h-8 hud-corners bg-card flex items-center justify-center text-foreground font-black border border-border/50 text-xs shadow-inner shrink-0">
                                             {member.name?.substring(0, 2).toUpperCase() || "??"}
                                         </div>
-                                        <div>
-                                            <div className="text-sm font-bold font-mono uppercase tracking-tight group-hover/member:text-primary transition-colors">
+                                        <div className="min-w-0">
+                                            {isTeamMember ? (
+                                                <select
+                                                    value={member.role}
+                                                    onChange={(e) => setProjectMemberRole(member.uid, e.target.value)}
+                                                    disabled={teamUpdating}
+                                                    className="bg-transparent text-[9px] font-mono font-bold uppercase tracking-widest text-primary border-none focus:outline-none cursor-pointer p-0 pr-1"
+                                                >
+                                                    {TEAM_ROLES.map((r) => (
+                                                        <option key={r} value={r}>{r}</option>
+                                                    ))}
+                                                </select>
+                                            ) : (
+                                                <div className="text-[9px] font-mono text-muted-foreground uppercase tracking-widest">
+                                                    ROLE: {member.role}
+                                                </div>
+                                            )}
+                                            <div className="text-sm font-bold font-mono uppercase tracking-tight truncate group-hover/member:text-primary transition-colors">
                                                 {member.name || `USER_${member.uid.slice(0, 4)}`}
-                                            </div>
-                                            <div className="text-[9px] font-mono text-muted-foreground uppercase tracking-widest">
-                                                ROLE: {member.role}
                                             </div>
                                         </div>
                                     </div>
+                                    {isTeamMember && (
+                                        <button
+                                            type="button"
+                                            onClick={() => removeProjectMember(member.uid)}
+                                            disabled={
+                                                teamUpdating ||
+                                                project.teamMembers.length <= 1 ||
+                                                (member.uid === profile?.uid && project.teamMembers.filter((m) => m.role === "lead").length <= 1)
+                                            }
+                                            className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover/member:opacity-100 disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+                                            title="Remove from project"
+                                        >
+                                            <X className="w-3.5 h-3.5" />
+                                        </button>
+                                    )}
                                 </div>
                             ))}
+                            {isTeamMember && (
+                                <div className="relative pt-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowMemberPicker((v) => !v)}
+                                        disabled={teamUpdating}
+                                        className="flex items-center gap-2 px-3 py-2 hud-panel-sm border border-dashed border-primary/50 text-primary text-[10px] font-mono uppercase tracking-wider hover:bg-primary/10 transition-colors disabled:opacity-50"
+                                    >
+                                        <Plus className="w-3.5 h-3.5" /> ADD MEMBER
+                                    </button>
+                                    {showMemberPicker && (
+                                        <>
+                                            <div className="absolute left-0 right-0 top-full mt-2 z-20 hud-panel-sm bg-card border border-border/50 p-2 max-h-56 overflow-y-auto">
+                                                <input
+                                                    type="text"
+                                                    value={memberSearch}
+                                                    onChange={(e) => setMemberSearch(e.target.value)}
+                                                    placeholder="Search by name or email..."
+                                                    className="w-full px-3 py-2 mb-2 hud-panel-sm bg-background/50 border border-border/50 text-xs font-mono focus:outline-none focus:border-primary/50"
+                                                />
+                                                {filteredAvailable.length === 0 ? (
+                                                    <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest py-2 text-center">No members to add.</p>
+                                                ) : (
+                                                    <ul className="space-y-1">
+                                                        {filteredAvailable.map((mem) => (
+                                                            <li key={mem.id}>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => addProjectMember(mem.id, mem.name)}
+                                                                    className="w-full flex items-center justify-between px-3 py-2 text-left hud-panel-sm bg-background/40 border border-transparent hover:border-primary/50 hover:bg-primary/5 transition-colors text-xs"
+                                                                >
+                                                                    <span className="font-mono font-bold uppercase truncate">{mem.name}</span>
+                                                                    <span className="text-[9px] font-mono text-muted-foreground truncate max-w-[120px]">{mem.email}</span>
+                                                                </button>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                )}
+                                            </div>
+                                            <div className="fixed inset-0 z-10" onClick={() => setShowMemberPicker(false)} aria-hidden="true" />
+                                        </>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
 
