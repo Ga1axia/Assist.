@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { LinkifyText } from "@/components/linkify-text";
 
 const typeEmoji: Record<string, string> = {
     milestone_update: "🚀",
@@ -148,7 +149,7 @@ export default function DashboardPage() {
                                                 </div>
 
                                                 <p className="text-[10px] font-mono text-muted-foreground leading-relaxed line-clamp-2 mt-1 border-l-2 border-border/50 pl-2">
-                                                    {item.description}
+                                                    <LinkifyText className="inline">{item.description}</LinkifyText>
                                                 </p>
 
                                                 {item.type === "form" && item.link && (
@@ -247,7 +248,9 @@ export default function DashboardPage() {
                                         <div className="flex-1 min-w-0 pt-0.5">
                                             <p className="text-xs font-mono leading-relaxed">
                                                 <span className="font-bold text-foreground uppercase">{activity.actorName}</span>{' '}
-                                                <span className="text-muted-foreground">{activity.description}</span>
+                                                <span className="text-muted-foreground">
+                                                    <LinkifyText>{activity.description}</LinkifyText>
+                                                </span>
                                                 {activity.targetName && <span className="text-primary font-bold uppercase ml-1">[{activity.targetName}]</span>}
                                             </p>
                                             <div className="flex items-center gap-2 mt-1.5">

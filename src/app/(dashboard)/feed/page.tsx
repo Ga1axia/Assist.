@@ -15,6 +15,7 @@ import {
     Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { LinkifyText } from "@/components/linkify-text";
 
 const typeIcons: Record<string, { icon: React.ReactNode; color: string; border: string }> = {
     milestone_update: { icon: <Rocket className="w-4 h-4" />, color: "text-primary bg-primary/10", border: "border-primary/30" },
@@ -118,7 +119,7 @@ export default function FeedPage() {
                                         </div>
                                         <p className="text-sm font-mono leading-relaxed mt-2 text-muted-foreground">
                                             <span className="text-primary/50 mr-2">&gt;</span>
-                                            {activity.description}
+                                            <LinkifyText>{activity.description}</LinkifyText>
                                             {activity.targetName && (
                                                 <span className="font-bold text-foreground ml-1 uppercase">[{activity.targetName}]</span>
                                             )}
