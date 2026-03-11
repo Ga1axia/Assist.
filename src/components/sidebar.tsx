@@ -95,7 +95,7 @@ export function Sidebar() {
             <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto custom-scroll relative z-10">
                 {!collapsed && (
                     <div className="px-3 mb-3">
-                        <p className="text-[10px] font-mono text-[#c7d28a]/60 uppercase tracking-widest">MAIN_MODULES</p>
+                        <p className="text-[10px] font-mono text-[#c7d28a]/60 uppercase tracking-widest">Menu</p>
                     </div>
                 )}
                 {filteredNav.map((item) => {

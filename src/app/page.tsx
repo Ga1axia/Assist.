@@ -3,13 +3,11 @@
 import Link from "next/link";
 import { ArrowRight, Lightbulb, Compass, Sparkles, Shield } from "lucide-react";
 import { PublicNav } from "@/components/public-nav";
-import { useOptionalAuth } from "@/contexts/auth-context";
 import { useProjects } from "@/hooks/useFirestore";
 import Image from "next/image";
 import { DiagonalSplitSection } from "@/components/diagonal-split";
 
 export default function LandingPage() {
-  const { user } = useOptionalAuth();
   const { data: projects, loading: projectsLoading } = useProjects();
   const featuredProject = projects?.[0];
 
@@ -122,11 +120,11 @@ export default function LandingPage() {
             </p>
 
             <Link
-              href={user ? "/dashboard" : "/login"}
+              href="/dashboard"
               className="generator-button px-10 py-4 text-lg inline-flex items-center gap-3"
             >
               <Shield className="w-5 h-5" />
-              {user ? "Go to Dashboard" : "Sign In & Join"}
+              Go to Dashboard
             </Link>
           </div>
         </div>
@@ -147,7 +145,7 @@ export default function LandingPage() {
             <Link href="/startups" className="generator-link">Startups</Link>
             <Link href="/hall-of-fame" className="generator-link">Hall of Fame</Link>
             <Link href="/faq" className="generator-link">FAQ</Link>
-            <Link href={user ? "/dashboard" : "/login"} className="generator-link">{user ? "Dashboard" : "Sign In"}</Link>
+            <Link href="/dashboard" className="generator-link">Dashboard</Link>
           </div>
           <p className="text-sm font-oswald uppercase tracking-widest text-[#c7d28a]/60">© {new Date().getFullYear()} The Generator</p>
         </div>

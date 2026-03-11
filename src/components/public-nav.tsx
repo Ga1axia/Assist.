@@ -2,14 +2,21 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { useOptionalAuth } from "@/contexts/auth-context";
 import { LayoutDashboard, LogOut, User } from "lucide-react";
 import { useState, useEffect } from "react";
 
+const PAGES_WITH_NAV_ALWAYS_VISIBLE = ["/startups", "/faq", "/hall-of-fame"];
+
 export function PublicNav() {
+    const pathname = usePathname();
     const { user, profile, signOut } = useOptionalAuth();
     const [showDropdown, setShowDropdown] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
+
+    const alwaysShowNav = pathname ? PAGES_WITH_NAV_ALWAYS_VISIBLE.includes(pathname) : false;
+    const navVisible = alwaysShowNav || isScrolled;
 
     useEffect(() => {
         const handleScroll = () => {
@@ -21,7 +28,6 @@ export function PublicNav() {
         };
 
         window.addEventListener("scroll", handleScroll);
-        // Trigger once on mount to handle initial scroll position
         handleScroll();
 
         return () => window.removeEventListener("scroll", handleScroll);
@@ -29,7 +35,7 @@ export function PublicNav() {
 
     return (
         <nav
-            className={`flex h-14 border-b border-[#006644]/30 fixed top-0 w-full z-[100] transition-all duration-500 ease-in-out ${isScrolled ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"}`}
+            className={`flex h-14 border-b border-[#006644]/30 fixed top-0 w-full z-[100] transition-all duration-500 ease-in-out ${navVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"}`}
         >
             {/* Left: light color (#c7d28a) with logo filling full navbar height */}
             <div className="h-full bg-[#c7d28a] flex items-center shrink-0 pl-8 sm:pl-12">
@@ -110,10 +116,10 @@ export function PublicNav() {
                         </div>
                     ) : (
                         <Link
-                            href="/login"
+                            href="/dashboard"
                             className="px-6 py-2 text-sm text-center font-oswald uppercase tracking-widest font-bold border-2 border-white/80 text-white hover:bg-white/10 transition-colors rounded"
                         >
-                            Sign In
+                            Dashboard
                         </Link>
                     )}
             </div>

@@ -12,11 +12,9 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PublicNav } from "@/components/public-nav";
-import { useOptionalAuth } from "@/contexts/auth-context";
 import Link from "next/link";
 
 export default function FAQPage() {
-    const { user } = useOptionalAuth();
     const { data: faqs, loading } = useFAQ();
     const [searchQuery, setSearchQuery] = useState("");
     const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -61,7 +59,7 @@ export default function FAQPage() {
                 {loading && (
                     <div className="flex flex-col items-center justify-center py-20 gap-4">
                         <Loader2 className="w-8 h-8 animate-spin text-[#c7d28a]" />
-                        <span className="text-xs font-mono text-[#c7d28a] tracking-widest uppercase animate-pulse">Accessing Data...</span>
+                        <span className="text-xs font-mono text-[#c7d28a] tracking-widest uppercase animate-pulse">Loading...</span>
                     </div>
                 )}
 
@@ -72,7 +70,7 @@ export default function FAQPage() {
                             <div key={faq.id} className={cn("rounded-xl bg-card/50 border border-[#006644]/40 overflow-hidden transition-all hover:border-[#c7d28a]/40 backdrop-blur-sm")}>
                                 <button onClick={() => setExpandedId(expandedId === faq.id ? null : faq.id)} className="w-full text-left p-4 sm:p-5 flex items-start sm:items-center justify-between gap-4 relative z-10">
                                     <div className="flex items-start gap-4 flex-1">
-                                        <div className="text-[10px] font-mono text-[#c7d28a]/70 uppercase tracking-widest mt-1 sm:mt-0 flex-shrink-0">SYS_Q_0{i + 1}</div>
+                                        <div className="text-[10px] font-mono text-[#c7d28a]/70 uppercase tracking-widest mt-1 sm:mt-0 flex-shrink-0">Q{i + 1}</div>
                                         <h3 className="font-bold text-sm uppercase tracking-tight leading-relaxed text-foreground">{faq.question}</h3>
                                     </div>
                                     <div className="w-8 h-8 rounded-full bg-[#c7d28a]/20 flex items-center justify-center text-[#c7d28a] flex-shrink-0 border border-[#c7d28a]/40">
@@ -112,8 +110,8 @@ export default function FAQPage() {
                     <h3 className="font-black text-xl sm:text-2xl mb-2 uppercase tracking-tight relative z-10 text-[#c7d28a]">Unresolved Query?</h3>
                     <p className="text-xs font-mono text-foreground/80 mb-6 uppercase tracking-wider relative z-10">Submit a direct inquiry to the E-Board.</p>
 
-                    <Link href={user ? "/dashboard" : "/login"} className="generator-button inline-flex items-center justify-center px-8 py-3.5 text-sm font-bold uppercase tracking-widest relative z-10">
-                        OPEN COMM CHANNEL
+                    <Link href="/dashboard" className="generator-button inline-flex items-center justify-center px-8 py-3.5 text-sm font-bold uppercase tracking-widest relative z-10">
+                        Contact us
                     </Link>
                 </div>
             </div>

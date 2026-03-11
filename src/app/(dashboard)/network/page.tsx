@@ -38,7 +38,7 @@ export default function AlumniNetworkPage() {
             <div className="border-b border-border/50 pb-5">
                 <div className="flex items-center gap-2 text-[10px] font-mono text-primary/80 uppercase tracking-widest mb-1.5">
                     <GraduationCap className="w-4 h-4" />
-                    NETWORK DIRECTORY
+                    Network
                 </div>
                 <h1 className="text-3xl md:text-5xl font-black tracking-tighter uppercase">
                     ALUMNI <span className="gradient-text-cyber">NETWORK</span>

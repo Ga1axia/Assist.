@@ -43,7 +43,7 @@ export default function HallOfFamePage() {
                     <div className="mt-6 flex justify-center">
                         <div className="rounded-xl border border-[#006644]/50 bg-card/50 backdrop-blur-sm px-6 py-3">
                             <p className="relative z-10 text-foreground/85 text-sm font-mono tracking-wider">
-                                <span className="text-[#c7d28a] font-bold">&gt;</span> Accessing successful deployments and completed club projects.
+                                <span className="text-[#c7d28a] font-bold">&gt;</span> Browse successful projects and completed work from the club.
                             </p>
                         </div>
                     </div>
@@ -72,7 +72,7 @@ export default function HallOfFamePage() {
                                 <div className="p-6 sm:p-8 md:p-10 flex flex-col justify-center border-b md:border-b-0 md:border-r border-[#006644]/30">
                                     <div className="flex items-center gap-2 mb-4">
                                         <div className="w-2 h-2 rounded-full bg-[#c7d28a] animate-pulse" />
-                                        <span className="text-[10px] font-mono text-[#c7d28a] uppercase tracking-widest">SYS_PRIME // FEATURED</span>
+                                        <span className="text-[10px] font-mono text-[#c7d28a] uppercase tracking-widest">Featured</span>
                                     </div>
                                     <h2 className="text-2xl sm:text-3xl md:text-4xl font-black mb-3 tracking-tight uppercase text-foreground">{featuredProject.name}</h2>
                                     <p className="text-muted-foreground text-sm font-mono leading-relaxed mb-6">{featuredProject.description}</p>
@@ -111,7 +111,7 @@ export default function HallOfFamePage() {
                                         <h3 className="font-bold text-lg mb-2 group-hover:text-[#c7d28a] transition-colors tracking-tight uppercase line-clamp-1 text-foreground">{project.name}</h3>
                                         <p className="text-xs text-muted-foreground font-mono line-clamp-2 mb-4">{project.description}</p>
                                         <div className="flex items-center justify-between text-[10px] font-mono text-muted-foreground uppercase tracking-widest border-t border-[#006644]/30 pt-3">
-                                            <span className="flex items-center gap-1.5"><Users className="w-3 h-3" /> {project.teamMembers.length} UNITS</span>
+                                            <span className="flex items-center gap-1.5"><Users className="w-3 h-3" /> {project.teamMembers.length} members</span>
                                             <span className="flex items-center gap-1.5"><Calendar className="w-3 h-3" /> {project.createdAt}</span>
                                         </div>
                                     </div>
@@ -135,7 +135,7 @@ export default function HallOfFamePage() {
                                     ARCHIVE DATA EXTRACTED
                                 </div>
                                 <h2 className="font-black text-xl sm:text-2xl truncate uppercase tracking-tight text-foreground">{selectedProjectData.name}</h2>
-                                <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest mt-1">LOGGED: {selectedProjectData.createdAt} // PERSONNEL: {selectedProjectData.teamMembers.length}</p>
+                                <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest mt-1">{selectedProjectData.createdAt} · {selectedProjectData.teamMembers.length} members</p>
                             </div>
                             <button onClick={() => setSelectedProject(null)} className="p-2 rounded-lg bg-[#006644]/50 border border-[#c7d28a]/40 hover:border-[#c7d28a] text-[#c7d28a] transition-colors flex-shrink-0">
                                 <X className="w-4 h-4" />

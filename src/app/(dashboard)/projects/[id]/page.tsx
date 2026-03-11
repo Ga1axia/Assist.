@@ -39,7 +39,7 @@ export default function ProjectDetailPage() {
         return (
             <div className="flex flex-col items-center justify-center py-32 gap-4">
                 <Clock className="w-8 h-8 animate-spin text-primary" />
-                <span className="text-xs font-mono text-primary uppercase tracking-widest animate-pulse">DECRYPTING ARCHIVE...</span>
+                <span className="text-xs font-mono text-primary uppercase tracking-widest animate-pulse">Loading...</span>
             </div>
         );
     }
@@ -48,10 +48,10 @@ export default function ProjectDetailPage() {
         return (
             <div className="flex flex-col items-center justify-center py-32 text-center space-y-4">
                 <Terminal className="w-12 h-12 text-destructive mb-2" />
-                <h1 className="text-2xl font-black uppercase tracking-widest text-destructive">DATA_CORRUPTION</h1>
-                <p className="text-muted-foreground font-mono text-sm">The requested project file could not be located in the directory.</p>
+                <h1 className="text-2xl font-black uppercase tracking-widest text-destructive">Project not found</h1>
+                <p className="text-muted-foreground text-sm">This project doesn't exist or you don't have access to it.</p>
                 <Link href="/projects" className="mt-4 px-6 py-3 hud-panel-sm bg-background border border-border/50 hover:bg-primary/10 hover:text-primary transition-colors font-mono text-xs font-bold uppercase tracking-widest">
-                    RETURN TO DIRECTORY
+                    Back to projects
                 </Link>
             </div>
         );
@@ -86,7 +86,7 @@ export default function ProjectDetailPage() {
                 ) : (
                     <div className="w-full h-full bg-background/50 flex flex-col items-center justify-center text-muted-foreground/30 pattern-grid-lg">
                         <ImageIcon className="w-12 h-12 mb-3" />
-                        <span className="text-xs font-mono uppercase tracking-widest font-bold">MISSING VISUAL ASSET</span>
+                        <span className="text-xs font-mono uppercase tracking-widest font-bold">No image</span>
                     </div>
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
@@ -117,7 +117,7 @@ export default function ProjectDetailPage() {
                             ) : (
                                 <div className="text-center py-20 opacity-50">
                                     <Terminal className="w-12 h-12 mx-auto mb-4" />
-                                    <p className="text-xs uppercase tracking-widest font-bold">NO PROJECT LOG AVAILABLE.</p>
+                                    <p className="text-xs uppercase tracking-widest font-bold">No project log yet.</p>
                                 </div>
                             )}
                         </div>
@@ -138,7 +138,7 @@ export default function ProjectDetailPage() {
                                 <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4 hud-panel-sm bg-primary border border-primary text-primary-foreground hover:brightness-110 transition-all group/link glow-border">
                                     <ExternalLink className="w-5 h-5" />
                                     <div className="flex-1">
-                                        <div className="text-xs font-bold font-mono uppercase tracking-widest">LIVE APP DEPLOYMENT</div>
+                                        <div className="text-xs font-bold font-mono uppercase tracking-widest">Live app</div>
                                     </div>
                                     <ArrowLeft className="w-4 h-4 rotate-135 group-hover/link:translate-x-1 group-hover/link:-translate-y-1 transition-transform" />
                                 </a>
@@ -152,7 +152,7 @@ export default function ProjectDetailPage() {
                                 <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4 hud-panel-sm bg-card border border-border/40 hover:border-chart-1/50 hover:bg-chart-1/5 text-muted-foreground hover:text-chart-1 transition-colors group/git">
                                     <GitBranch className="w-5 h-5" />
                                     <div className="flex-1">
-                                        <div className="text-xs font-bold font-mono uppercase tracking-widest">SOURCE_CODE / REPO</div>
+                                        <div className="text-xs font-bold font-mono uppercase tracking-widest">Code / repo</div>
                                     </div>
                                     <ExternalLink className="w-4 h-4 opacity-50 group-hover/git:opacity-100 transition-opacity" />
                                 </a>
@@ -164,7 +164,7 @@ export default function ProjectDetailPage() {
                     <div className="hud-panel-alt bg-card/60 border border-border/40 p-6 scanlines relative group">
                         <h2 className="font-bold font-mono tracking-tight uppercase mb-5 flex items-center gap-2 pb-3 border-b border-border/40">
                             <Users className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                            PROJECT CONTRIBUTORS
+                            Team
                         </h2>
                         <div className="space-y-3 relative z-10">
                             {project.teamMembers.map((member, i) => (
@@ -189,7 +189,7 @@ export default function ProjectDetailPage() {
 
                     {/* Meta */}
                     <div className="hud-panel-sm bg-card/40 border border-border/40 p-4 flex items-center justify-between text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                        <span className="flex items-center gap-1.5"><Calendar className="w-3 h-3 text-primary" /> INITIALIZED</span>
+                        <span className="flex items-center gap-1.5"><Calendar className="w-3 h-3 text-primary" /> In progress</span>
                         <span>{project.createdAt}</span>
                     </div>
                 </div>

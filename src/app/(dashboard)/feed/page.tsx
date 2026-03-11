@@ -43,7 +43,7 @@ export default function FeedPage() {
                         FEED
                     </div>
                     <h1 className="text-2xl md:text-4xl font-black tracking-tighter uppercase">
-                        NETWORK <span className="gradient-text-cyber">ACTIVITY LOG</span>
+                        Activity <span className="gradient-text-cyber">feed</span>
                     </h1>
                 </div>
                 <div className="flex gap-2">
@@ -77,7 +77,7 @@ export default function FeedPage() {
             {loading && (
                 <div className="flex-1 flex flex-col items-center justify-center py-20 gap-4">
                     <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                    <span className="text-xs font-mono text-primary uppercase tracking-widest animate-pulse">SYNCING ACTIVITY DATA...</span>
+                    <span className="text-xs font-mono text-primary uppercase tracking-widest animate-pulse">Loading...</span>
                 </div>
             )}
 

@@ -77,7 +77,7 @@ export default function ProjectsPage() {
             {loading && (
                 <div className="flex flex-col items-center justify-center py-20 gap-3">
                     <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                    <span className="text-xs font-mono text-primary uppercase tracking-widest animate-pulse">QUERYING DIRECTORY...</span>
+                    <span className="text-xs font-mono text-primary uppercase tracking-widest animate-pulse">Loading...</span>
                 </div>
             )}
 
@@ -119,7 +119,7 @@ export default function ProjectsPage() {
 
                                 <div className="flex items-center justify-between text-[10px] font-mono text-muted-foreground uppercase tracking-widest pt-4 border-t border-border/40 mt-auto">
                                     <div className="flex items-center gap-3">
-                                        <span className="flex items-center gap-1.5"><Users className="w-3 h-3" /> {project.teamMembers.length} CONTRIBUTORS</span>
+                                        <span className="flex items-center gap-1.5"><Users className="w-3 h-3" /> {project.teamMembers.length} team members</span>
                                         {project.githubUrl && <span className="flex items-center gap-1.5"><GitBranch className="w-3 h-3 text-chart-1" /> REPO</span>}
                                     </div>
                                     <span className="flex items-center gap-1.5"><Calendar className="w-3 h-3" /> {project.updatedAt}</span>

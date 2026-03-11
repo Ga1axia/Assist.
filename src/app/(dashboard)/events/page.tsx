@@ -182,13 +182,13 @@ export default function EventsPage() {
                                 <span className="text-xs font-bold font-mono tracking-wide">{featured.time}</span>
                             </div>
                             <div className="flex flex-col gap-1">
-                                <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest flex items-center gap-1.5"><MapPin className="w-3 h-3 text-chart-2/70" /> VECTORING</span>
+                                <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest flex items-center gap-1.5"><MapPin className="w-3 h-3 text-chart-2/70" /> Location</span>
                                 <span className="text-xs font-bold font-mono tracking-wide">{featured.location}</span>
                             </div>
                             <div className="flex flex-col gap-1">
-                                <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest flex items-center gap-1.5"><Users className="w-3 h-3 text-chart-4/70" /> CAPACITY</span>
+                                <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest flex items-center gap-1.5"><Users className="w-3 h-3 text-chart-4/70" /> Spots</span>
                                 <span className="text-xs font-bold font-mono tracking-wide">
-                                    {featured.attendees.length}{featured.maxAttendees && `/${featured.maxAttendees}`} UNITS
+                                    {featured.attendees.length}{featured.maxAttendees && `/${featured.maxAttendees}`} people
                                 </span>
                             </div>
                         </div>
@@ -294,7 +294,7 @@ export default function EventsPage() {
                                     <div className="flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
                                         <Users className="w-3.5 h-3.5 border border-border/50 p-0.5" />
                                         {event.attendees.length}{event.maxAttendees && `/${event.maxAttendees}`}
-                                        {isFull && <span className="text-destructive font-bold ml-1 animate-pulse">CAPACITY</span>}
+                                        {isFull && <span className="text-destructive font-bold ml-1 animate-pulse">Full</span>}
                                     </div>
                                     <div className="flex gap-1.5 flex-wrap justify-end">
                                         {event.tags.slice(0, 2).map((tag) => (
@@ -345,7 +345,7 @@ export default function EventsPage() {
                             <div>
                                 <div className="flex items-center gap-2 mb-1">
                                     <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                                    <span className="text-[10px] font-mono text-primary uppercase tracking-widest">E-BOARD ACCESS ONLY</span>
+                                    <span className="text-[10px] font-mono text-primary uppercase tracking-widest">E-Board only</span>
                                 </div>
                                 <h3 className="font-black text-xl uppercase tracking-tight flex items-center gap-2">
                                     <CalendarDays className="w-5 h-5 text-primary" /> NEW EVENT DETAILS
@@ -406,7 +406,7 @@ export default function EventsPage() {
                                     </select>
                                 </div>
                                 <div className="p-4 hud-corners bg-background/40 border border-border/50">
-                                    <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest mb-1.5 flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> MAX CAPACITY</label>
+                                    <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest mb-1.5 flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> Max attendees</label>
                                     <input type="number" min="1" value={newEvent.maxAttendees} onChange={(e) => update("maxAttendees", e.target.value)} placeholder="N/A (UNLIMITED)" className="w-full px-4 py-2.5 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono uppercase transition-colors focus:outline-none" />
                                 </div>
                             </div>
@@ -414,7 +414,7 @@ export default function EventsPage() {
                             {/* Location / Virtual Toggle */}
                             <div className="p-4 hud-corners bg-background/40 border border-border/50">
                                 <div className="flex items-center justify-between mb-2">
-                                    <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> VECTOR / LOC</label>
+                                    <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> Location</label>
                                     <button
                                         type="button"
                                         onClick={() => update("isVirtual", !newEvent.isVirtual)}

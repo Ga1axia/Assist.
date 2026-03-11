@@ -3,9 +3,6 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { doc, setDoc, collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { storage, db } from "@/lib/firebase";
 import {
     Sparkles,
     ChevronRight,
@@ -83,75 +80,8 @@ export default function OnboardingPage() {
     const handleFinish = async () => {
         setSubmitting(true);
         try {
-            const { auth: firebaseAuth } = await import("@/lib/firebase");
-            const currentUser = firebaseAuth.currentUser;
-            if (!currentUser) return;
-            const uid = currentUser.uid;
-
-            // Upload headshot
-            let photoURL: string | null = null;
-            if (headshot) {
-                const headshotStorageRef = ref(storage, `users/${uid}/headshot`);
-                await uploadBytes(headshotStorageRef, headshot);
-                photoURL = await getDownloadURL(headshotStorageRef);
-            }
-
-            // Upload resume
-            let resumeURL: string | null = null;
-            if (resume) {
-                const resumeStorageRef = ref(storage, `users/${uid}/resume`);
-                await uploadBytes(resumeStorageRef, resume);
-                resumeURL = await getDownloadURL(resumeStorageRef);
-            }
-
-            // Write user document directly to Firestore (client-side)
-            const userDocRef = doc(db, "users", uid);
-            await setDoc(userDocRef, {
-                uid,
-                email: currentUser.email || null,
-                displayName,
-                photoURL: photoURL || currentUser.photoURL || null,
-                resumeURL,
-                role: "resident",
-                standoutSkill,
-                bio,
-                skills: selectedSkills,
-                interests: selectedInterests,
-                onboarded: true,
-                joinDate: serverTimestamp(),
-                lastActive: serverTimestamp(),
-                engagementMetrics: {
-                    attendanceRate: 0,
-                    pitchesSubmitted: 0,
-                    uploadsCount: 0,
-                    projectsCompleted: 0,
-                },
-                projects: [],
-                alumni: {
-                    isAlumni: false,
-                    mentorshipEnabled: false,
-                    linkedinUrl: null,
-                },
-                createdAt: serverTimestamp(),
-                updatedAt: serverTimestamp(),
-            }, { merge: true });
-
-            // Create activity feed entry
-            await addDoc(collection(db, "activityFeed"), {
-                type: "member_join",
-                actorId: uid,
-                actorName: displayName || "New Member",
-                targetId: null,
-                targetName: null,
-                description: `joined The Generator`,
-                pinned: false,
-                pinnedBy: null,
-                createdAt: serverTimestamp(),
-            });
-
-            // Refresh auth context so needsOnboarding becomes false
+            // Demo mode: no Firebase — just refresh and go to dashboard
             await refreshProfile();
-
             router.push("/dashboard");
         } catch (err) {
             console.error("Onboarding error:", err);
@@ -208,8 +138,8 @@ export default function OnboardingPage() {
         },
         // ── Step 1: Skills Library ──
         {
-            title: "ACQUIRED SKILLS",
-            subtitle: `Select all registered proficiencies. (${selectedSkills.length} selected)`,
+            title: "Skills",
+            subtitle: `Pick the skills that describe you. (${selectedSkills.length} selected)`,
             content: (
                 <div className="space-y-4">
                     {/* Search */}
@@ -259,8 +189,8 @@ export default function OnboardingPage() {
                 <div className="space-y-3">
                     {selectedSkills.length === 0 ? (
                         <div className="hud-panel-sm border border-destructive/30 bg-destructive/5 p-6 text-center">
-                            <p className="text-xs font-mono text-destructive tracking-widest uppercase">ERROR: No skills registered.</p>
-                            <p className="text-xs font-mono text-muted-foreground mt-2">Return to previous step.</p>
+                            <p className="text-xs font-mono text-destructive tracking-widest uppercase">Please add at least one skill.</p>
+                            <p className="text-xs font-mono text-muted-foreground mt-2">Go back and add some.</p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-2 gap-3">
@@ -321,7 +251,7 @@ export default function OnboardingPage() {
                                     <div className="w-24 h-24 hud-panel-sm p-1 border border-primary/30 bg-background inline-block">
                                         <img src={headshotPreview} alt="Headshot preview" className="w-full h-full object-cover" />
                                     </div>
-                                    <p className="text-[10px] font-mono text-primary uppercase tracking-wider">REINITIALIZE UPLOAD</p>
+                                    <p className="text-[10px] font-mono text-primary uppercase tracking-wider">Choose file again</p>
                                 </div>
                             ) : (
                                 <div className="flex flex-col items-center gap-2">
@@ -336,7 +266,7 @@ export default function OnboardingPage() {
                     {/* Resume */}
                     <div>
                         <div className="flex items-center justify-between mb-2">
-                            <label className="text-xs font-mono text-muted-foreground uppercase">Data Log (Resume)</label>
+                            <label className="text-xs font-mono text-muted-foreground uppercase">Resume</label>
                             {resume && <span className="text-[10px] font-mono text-primary uppercase">UPLOADED</span>}
                         </div>
                         <input type="file" ref={resumeRef} accept=".pdf,.doc,.docx" onChange={handleResume} className="hidden" />
@@ -346,7 +276,7 @@ export default function OnboardingPage() {
                                     <FileText className="w-8 h-8 text-primary" />
                                     <div className="text-left font-mono">
                                         <p className="text-sm font-bold text-primary truncate max-w-[200px]">{resume.name}</p>
-                                        <p className="text-[10px] text-muted-foreground uppercase tracking-widest mt-0.5">{(resume.size / 1024).toFixed(0)} KB · CLICK TO MODIFY</p>
+                                        <p className="text-[10px] text-muted-foreground uppercase tracking-widest mt-0.5">{(resume.size / 1024).toFixed(0)} KB · Click to change</p>
                                     </div>
                                 </div>
                             ) : (
@@ -364,7 +294,7 @@ export default function OnboardingPage() {
         // ── Step 5: Summary ──
         {
             title: "PROFILE VERIFICATION",
-            subtitle: "Review your profile before submitting your application. Access will be granted once your clearance is approved by the E-Board.",
+            subtitle: "Review your profile before submitting. You'll get access once the E-Board approves your application.",
             content: (
                 <div className="py-2 space-y-6">
                     <div className="flex items-center gap-4 hud-panel-sm bg-card/60 border border-border/50 p-4">
@@ -376,7 +306,7 @@ export default function OnboardingPage() {
                             )}
                         </div>
                         <div className="min-w-0">
-                            <div className="text-[10px] font-mono text-primary/80 tracking-widest uppercase mb-0.5">RESIDENT ID_0{Math.floor(Math.random() * 999)}</div>
+                            <div className="text-[10px] font-mono text-primary/80 tracking-widest uppercase mb-0.5">ID{Math.floor(Math.random() * 999)}</div>
                             <p className="text-lg font-black tracking-tight truncate uppercase">{displayName}</p>
                             <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mt-1 truncate">{bio}</p>
                         </div>
@@ -425,7 +355,7 @@ export default function OnboardingPage() {
                 <div className="inline-flex items-center justify-center p-3 rounded-xl bg-[#006644]/50 border border-[#c7d28a]/40 mb-3 shadow-sm">
                     <Code2 className="w-6 h-6 text-[#c7d28a]" />
                 </div>
-                <div className="text-xs font-mono text-[#c7d28a] tracking-widest uppercase">THE GENERATOR Initialization</div>
+                <div className="text-xs font-mono text-[#c7d28a] tracking-widest uppercase">The Generator — Get started</div>
             </div>
 
             <div className="w-full max-w-lg relative z-10">
@@ -472,7 +402,7 @@ export default function OnboardingPage() {
 
                 {/* Step ticker */}
                 <div className="mt-4 flex justify-between items-center text-[10px] font-mono text-muted-foreground/60 uppercase tracking-widest">
-                    <span>SYS_SETUP</span>
+                    <span>Setup</span>
                     <span>SEQ {step + 1}/{steps.length}</span>
                 </div>
             </div>

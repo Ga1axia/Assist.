@@ -60,13 +60,13 @@ export default function NewProjectPage() {
                 <div className="flex-1">
                     <div className="flex items-center gap-2 text-[10px] font-mono text-primary/80 uppercase tracking-widest mb-1.5">
                         <Terminal className="w-3 h-3" />
-                        SYSTEM_OVERRIDE: PORTFOLIO_ENTRY
+                        New project
                     </div>
                     <h1 className="text-2xl md:text-3xl font-black tracking-tighter uppercase">
                         SUBMIT <span className="gradient-text text-transparent bg-clip-text">NEW PROJECT</span>
                     </h1>
                     <p className="text-muted-foreground text-sm font-mono mt-2">
-                        Add a completed or in-progress project to The Generator public directory.
+                        Add a completed or in-progress project to The Generator showcase.
                     </p>
                 </div>
             </div>
@@ -198,7 +198,7 @@ export default function NewProjectPage() {
                         {submitting ? (
                             <>
                                 <Loader2 className="w-4 h-4 animate-spin" />
-                                DEPLOYING DIRECTORY ENTRY...
+                                Saving...
                             </>
                         ) : (
                             <>

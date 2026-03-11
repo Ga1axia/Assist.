@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const sections = [
@@ -27,8 +27,54 @@ const sections = [
   }
 ];
 
+const FLEX_NORMAL = 1;
+const FLEX_HOVER = 1.6;
+
+function getSectionBoundaries(containerWidth: number, currentHoveredId: string | null): [number, number][] {
+  const n = sections.length;
+  const flexValues = sections.map((s) => (s.id === currentHoveredId ? FLEX_HOVER : FLEX_NORMAL));
+  const total = flexValues.reduce((a, b) => a + b, 0);
+  const boundaries: [number, number][] = [];
+  let x = 0;
+  for (let i = 0; i < n; i++) {
+    const w = (containerWidth * flexValues[i]) / total;
+    boundaries.push([x, x + w]);
+    x += w;
+  }
+  return boundaries;
+}
+
+function getSectionIdAtX(containerWidth: number, localX: number, currentHoveredId: string | null): string | null {
+  const boundaries = getSectionBoundaries(containerWidth, currentHoveredId);
+  for (let i = 0; i < boundaries.length; i++) {
+    const [left, right] = boundaries[i];
+    if (localX >= left && localX < right) return sections[i].id;
+  }
+  if (localX >= boundaries[boundaries.length - 1][1]) return sections[sections.length - 1].id;
+  return sections[0].id;
+}
+
 export function DiagonalSplitSection() {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const hoveredIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    hoveredIdRef.current = hoveredId;
+  }, [hoveredId]);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const el = containerRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const localX = e.clientX - rect.left;
+    const id = getSectionIdAtX(rect.width, localX, hoveredIdRef.current);
+    setHoveredId(id);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setHoveredId(null);
+  }, []);
 
   // Use a custom sophisticated spring for buttery-smooth unchuncky physics
   const springTransition: any = {
@@ -40,7 +86,12 @@ export function DiagonalSplitSection() {
 
   return (
     <div className="w-full h-screen min-h-[700px] flex bg-background border-b-[8px] border-primary/20 overflow-hidden">
-      <div className="w-full h-full flex transform scale-[1.01]">
+      <div
+        ref={containerRef}
+        className="w-full h-full flex transform scale-[1.01]"
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+      >
         {sections.map((section, idx) => {
           const isHovered = hoveredId === section.id;
           const isAnyHovered = hoveredId !== null;
@@ -49,8 +100,6 @@ export function DiagonalSplitSection() {
             <motion.div
               layout
               key={section.id}
-              onMouseEnter={() => setHoveredId(section.id)}
-              onMouseLeave={() => setHoveredId(null)}
               initial={false}
               animate={{
                 flex: isHovered ? 1.6 : 1,

@@ -62,10 +62,10 @@ export default function MembersPage() {
             <div className="border-b border-border/50 pb-5">
                 <div className="flex items-center gap-2 text-[10px] font-mono text-primary/80 uppercase tracking-widest mb-1.5">
                     <Users2 className="w-3.5 h-3.5" />
-                    MEMBER DIRECTORY
+                    Members
                 </div>
                 <h1 className="text-2xl md:text-4xl font-black tracking-tighter uppercase">
-                    CLUB <span className="gradient-text-cyber">DIRECTORY</span>
+                    Member <span className="gradient-text-cyber">directory</span>
                 </h1>
                 <div className="text-muted-foreground mt-2 text-xs font-mono uppercase tracking-widest flex items-center gap-2">
                     <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
@@ -283,7 +283,7 @@ export default function MembersPage() {
                                     {selectedMember.skills && selectedMember.skills.length > 0 && (
                                         <div>
                                             <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest mb-2 border-b border-border/30 pb-1 flex items-center gap-2">
-                                                <Terminal className="w-3 h-3 text-primary" /> ACQUIRED SKILLS
+                                                <Terminal className="w-3 h-3 text-primary" /> Skills
                                             </div>
                                             <div className="flex flex-wrap gap-1.5">
                                                 {selectedMember.skills.map((skill: string) => (

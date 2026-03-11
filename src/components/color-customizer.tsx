@@ -76,7 +76,7 @@ export function ColorCustomizer() {
                         <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-primary/10">
                             <h3 className="text-sm font-bold font-mono tracking-widest flex items-center gap-2 uppercase text-primary">
                                 <Palette className="w-4 h-4 text-primary" />
-                                SYS_THEME
+                                Theme
                             </h3>
                             <button onClick={() => setIsOpen(false)} className="p-1 rounded-none border border-transparent hover:border-primary hover:bg-primary/20 transition-colors">
                                 <X className="w-4 h-4 text-primary" />
@@ -85,7 +85,7 @@ export function ColorCustomizer() {
 
                         {/* Color grid */}
                         <div className="p-4">
-                            <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground mb-4">Select system accent protocol</p>
+                            <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground mb-4">Pick an accent color</p>
                             <div className="grid grid-cols-4 gap-2">
                                 {ACCENT_PRESETS.map((preset) => (
                                     <button

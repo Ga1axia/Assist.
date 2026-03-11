@@ -6,8 +6,6 @@ import { useInquiries, useResources, useProjects, useMembers, useActionItems, us
 import { isAdmin } from "@/lib/roles";
 import { getRoleLabel, ALL_ROLES } from "@/lib/roles";
 import { cn } from "@/lib/utils";
-import { collection, addDoc, serverTimestamp, doc, updateDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import {
     MessageSquare,
     Users,
@@ -78,10 +76,10 @@ export default function AdminPage() {
 
     if (!userIsAdmin) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] animate-fade-in relative z-10 hud-panel bg-card/40 border border-destructive/40 scanlines p-8 text-center max-w-lg mx-auto mt-20">
+                    <div className="flex flex-col items-center justify-center min-h-[60vh] animate-fade-in relative z-10 rounded-2xl bg-card/60 border border-destructive/40 p-8 text-center max-w-lg mx-auto mt-20">
                 <Shield className="w-16 h-16 text-destructive mb-6" />
-                <h1 className="text-2xl font-black uppercase tracking-tighter text-destructive mb-2">ACCESS DENIED</h1>
-                <p className="text-sm font-mono text-muted-foreground mb-4">You do not have the required clearance level to access the Command Center.</p>
+                <h1 className="text-2xl font-black uppercase tracking-tighter text-destructive mb-2">Access denied</h1>
+                <p className="text-sm text-muted-foreground mb-4">You don't have permission to view this page.</p>
                 <div className="text-[10px] font-mono text-destructive/80 uppercase tracking-widest border border-destructive/20 bg-destructive/5 px-4 py-2">
                     ERROR CODE: 403_FORBIDDEN
                 </div>
@@ -111,120 +109,49 @@ export default function AdminPage() {
         await publishToFaq(inquiryId, question, reply);
     };
 
-    // ── Announcements ──
+    // ── Announcements (demo: no persistence) ──
     const handleCreateAnnouncement = async () => {
         if (!announcementTitle.trim() || !announcementBody.trim()) return;
         setAnnouncementSending(true);
-        try {
-            await addDoc(collection(db, "activityFeed"), {
-                type: "announcement",
-                actorId: user?.uid || "",
-                actorName: profile?.displayName || "HIGH COMMAND",
-                description: announcementBody,
-                targetId: null,
-                targetName: announcementTitle,
-                pinned: true,
-                pinnedBy: user?.uid || "",
-                createdAt: serverTimestamp(),
-            });
-            await addDoc(collection(db, "announcements"), {
-                title: announcementTitle,
-                body: announcementBody,
-                createdBy: user?.uid || "",
-                createdByName: profile?.displayName || "HIGH COMMAND",
-                createdAt: serverTimestamp(),
-            });
-            setAnnouncementTitle("");
-            setAnnouncementBody("");
-        } catch (err) {
-            console.error("Announcement error:", err);
-        } finally {
-            setAnnouncementSending(false);
-        }
+        await new Promise((r) => setTimeout(r, 600));
+        setAnnouncementTitle("");
+        setAnnouncementBody("");
+        setAnnouncementSending(false);
     };
 
-    // ── Action Items ──
+    // ── Action Items (demo: no persistence) ──
     const handleCreateActionItem = async () => {
         if (!actionTitle.trim() || !actionDesc.trim() || !actionDeadline) return;
         setActionSending(true);
-        try {
-            const res = await fetch("/api/action-items", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "x-user-uid": user?.uid || ""
-                },
-                body: JSON.stringify({
-                    title: actionTitle,
-                    description: actionDesc,
-                    deadline: actionDeadline,
-                    type: actionType,
-                    link: actionType === "form" ? actionLink : null,
-                })
-            });
-            if (res.ok) {
-                setActionTitle("");
-                setActionDesc("");
-                setActionDeadline("");
-                setActionType("external");
-                setActionLink("");
-            } else {
-                console.error("Failed to create action item");
-            }
-        } catch (err) {
-            console.error("Action item error:", err);
-        } finally {
-            setActionSending(false);
-        }
+        await new Promise((r) => setTimeout(r, 600));
+        setActionTitle("");
+        setActionDesc("");
+        setActionDeadline("");
+        setActionType("external");
+        setActionLink("");
+        setActionSending(false);
     };
 
-    // ── Startup Generation ──
+    // ── Startup Generation (demo: no persistence) ──
     const handleCreateStartup = async () => {
         if (!startupName.trim() || !startupDesc.trim() || !startupFounders.trim() || !startupYear.trim()) return;
         setStartupSending(true);
-        try {
-            await addDoc(collection(db, "startups"), {
-                name: startupName.trim(),
-                description: startupDesc.trim(),
-                founders: startupFounders.trim(),
-                foundedYear: startupYear.trim(),
-                website: startupWebsite.trim() || null,
-                createdAt: serverTimestamp(),
-            });
-
-            // Announce to feed
-            await addDoc(collection(db, "activityFeed"), {
-                type: "milestone_update",
-                actorId: profile?.uid || "admin",
-                actorName: "System",
-                targetId: "startups",
-                targetName: startupName,
-                description: `Added "${startupName}" to the Alumni Startups Gallery.`,
-                pinned: false,
-                pinnedBy: null,
-                createdAt: serverTimestamp(),
-            });
-
-            setStartupName("");
-            setStartupDesc("");
-            setStartupFounders("");
-            setStartupYear("");
-            setStartupWebsite("");
-        } catch (err) {
-            console.error("Startup creation error:", err);
-        } finally {
-            setStartupSending(false);
-        }
+        await new Promise((r) => setTimeout(r, 600));
+        setStartupName("");
+        setStartupDesc("");
+        setStartupFounders("");
+        setStartupYear("");
+        setStartupWebsite("");
+        setStartupSending(false);
     };
 
-    // ── Application Handling ──
-    const handleAuthorize = async (id: string) => {
-        const assignedRole = selectedRoles[id] || "member";
-        await updateDoc(doc(db, "users", id), { role: assignedRole, status: "approved" });
+    // ── Application Handling (demo: no persistence) ──
+    const handleAuthorize = async (_id: string) => {
+        await new Promise((r) => setTimeout(r, 300));
     };
 
-    const handleReject = async (id: string) => {
-        await updateDoc(doc(db, "users", id), { status: "rejected" });
+    const handleReject = async (_id: string) => {
+        await new Promise((r) => setTimeout(r, 300));
     };
 
     return (
@@ -232,16 +159,16 @@ export default function AdminPage() {
             {/* Header */}
             <div className="border-b border-border/50 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
-                    <div className="flex items-center gap-2 text-[10px] font-mono text-primary/80 uppercase tracking-widest mb-1.5">
+                    <div className="flex items-center gap-2 text-[10px] font-mono text-[#c7d28a]/80 uppercase tracking-widest mb-1.5">
                         <Shield className="w-3.5 h-3.5" />
                         THE GENERATOR ADMIN
                     </div>
                     <h1 className="text-3xl md:text-4xl font-black tracking-tighter uppercase relative group inline-block">
                         THE GENERATOR <span className="gradient-text-cyber">OPERATIONS</span>
-                        <div className="absolute -top-1 -right-3 w-2 h-2 rounded-full bg-primary animate-pulse" />
+                        <div className="absolute -top-1 -right-3 w-2 h-2 rounded-full bg-[#c7d28a] animate-pulse" />
                     </h1>
                 </div>
-                <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-primary/70 bg-primary/5 px-3 py-1.5 border border-primary/20 flex items-center gap-2 relative overflow-hidden">
+                <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#c7d28a]/80 bg-[#c7d28a]/5 px-3 py-1.5 border border-[#c7d28a]/20 flex items-center gap-2 relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-full h-full bg-[linear-gradient(45deg,transparent_25%,rgba(203,247,2,0.1)_50%,transparent_75%)] bg-[length:4px_4px]" />
                     CLEARANCE: HIGH COMMAND
                 </div>
@@ -256,8 +183,8 @@ export default function AdminPage() {
                         className={cn(
                             "flex items-center gap-2.5 px-5 py-3 hud-panel-sm text-[10px] font-mono font-bold uppercase tracking-widest whitespace-nowrap transition-all border shrink-0",
                             activeTab === tab.key
-                                ? "bg-primary text-primary-foreground border-primary glow-border shadow-[0_0_15px_rgba(203,247,2,0.3)]"
-                                : "bg-card/40 border-border/40 text-muted-foreground hover:bg-accent hover:text-foreground"
+                                ? "bg-[#c7d28a] text-[#006644] border-[#006644]"
+                                : "bg-card/40 border-[#006644]/40 text-muted-foreground hover:bg-[#c7d28a]/15 hover:text-[#c7d28a]"
                         )}
                     >
                         {tab.icon}
@@ -266,8 +193,8 @@ export default function AdminPage() {
                             <span className={cn(
                                 "text-[9px] px-1.5 py-0.5 border",
                                 activeTab === tab.key
-                                    ? "bg-background/20 border-background/40 text-primary-foreground"
-                                    : "bg-primary/10 border-primary/30 text-primary animate-pulse"
+                                    ? "bg-background/20 border-background/40 text-[#006644]"
+                                    : "bg-[#c7d28a]/10 border-[#c7d28a]/40 text-[#c7d28a] animate-pulse"
                             )}>
                                 {tab.count}
                             </span>
@@ -278,8 +205,8 @@ export default function AdminPage() {
 
             {loading && (
                 <div className="flex flex-col items-center justify-center py-24 gap-4 flex-1">
-                    <Loader2 className="w-10 h-10 animate-spin text-primary" />
-                    <span className="text-[10px] font-mono font-bold text-primary uppercase tracking-widest animate-pulse">DECRYPTING COMM SECRETS...</span>
+                    <Loader2 className="w-10 h-10 animate-spin text-[#c7d28a]" />
+                    <span className="text-[10px] font-mono font-bold text-[#c7d28a] uppercase tracking-widest animate-pulse">DECRYPTING COMM SECRETS...</span>
                 </div>
             )}
 
@@ -287,28 +214,28 @@ export default function AdminPage() {
                 <div className="flex-1 space-y-6">
                     {/* ── Announcements Tab ── */}
                     {activeTab === "announcements" && (
-                        <div className="hud-panel bg-card/60 border border-primary/40 p-6 sm:p-8 scanlines relative">
-                            <div className="absolute top-0 right-0 w-32 h-1 bg-gradient-to-r from-transparent to-primary/50" />
-                            <h3 className="font-bold text-lg mb-6 flex items-center gap-3 uppercase tracking-tight relative z-10 text-primary border-b border-primary/20 pb-4">
+                        <div className="rounded-2xl bg-card/60 border border-[#c7d28a]/40 p-6 sm:p-8 relative">
+                            <div className="absolute top-0 right-0 w-32 h-1 rounded-t-2xl bg-gradient-to-r from-transparent to-[#c7d28a]/50" />
+                            <h3 className="font-bold text-lg mb-6 flex items-center gap-3 uppercase tracking-tight relative z-10 text-[#c7d28a] border-b border-[#c7d28a]/20 pb-4">
                                 <Megaphone className="w-5 h-5" /> TRANSMIT GLOBAL BROADCAST
                             </h3>
                             <div className="space-y-5 relative z-10">
                                 <div className="space-y-1.5">
                                     <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">TRANSMISSION HEADER</label>
-                                    <input type="text" value={announcementTitle} onChange={(e) => setAnnouncementTitle(e.target.value)} placeholder="e.g. ALL UNITS STANDBY..." className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono uppercase transition-colors focus:outline-none" />
+                                    <input type="text" value={announcementTitle} onChange={(e) => setAnnouncementTitle(e.target.value)} placeholder="e.g. Weekly reminder..." className="w-full px-4 py-3 rounded-lg bg-[#093b26]/60 border border-[#006644]/50 focus:border-[#c7d28a]/50 text-sm font-mono uppercase transition-colors focus:outline-none text-foreground" />
                                 </div>
                                 <div className="space-y-1.5">
                                     <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">PAYLOAD</label>
-                                    <textarea value={announcementBody} onChange={(e) => setAnnouncementBody(e.target.value)} placeholder="Enter briefing details..." rows={4} className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none resize-none" />
+                                    <textarea value={announcementBody} onChange={(e) => setAnnouncementBody(e.target.value)} placeholder="Enter briefing details..." rows={4} className="w-full px-4 py-3 rounded-lg bg-[#093b26]/60 border border-[#006644]/50 focus:border-[#c7d28a]/50 text-sm font-mono transition-colors focus:outline-none resize-none text-foreground" />
                                 </div>
                                 <div className="pt-2 flex items-center justify-between">
-                                    <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest leading-relaxed max-w-sm border-l-2 border-primary/30 pl-3">
+                                    <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest leading-relaxed max-w-sm border-l-2 border-[#c7d28a]/30 pl-3">
                                         BROADCASTS ARE AUTO-PINNED TO THE GLOBAL TELEMETRY FEED FOR MAXIMUM VISIBILITY.
                                     </p>
                                     <button
                                         onClick={handleCreateAnnouncement}
                                         disabled={announcementSending || !announcementTitle.trim() || !announcementBody.trim()}
-                                        className="hud-panel bg-primary text-primary-foreground px-8 py-3.5 text-xs font-mono font-bold uppercase tracking-widest hover:brightness-110 transition-all glow-border disabled:opacity-50 flex items-center gap-3"
+                                        className="generator-button px-8 py-3.5 text-xs font-mono font-bold uppercase tracking-widest disabled:opacity-50 flex items-center gap-3"
                                     >
                                         {announcementSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                                         {announcementSending ? "TRANSMITTING..." : "EXECUTE BROADCAST"}
@@ -321,51 +248,51 @@ export default function AdminPage() {
                     {/* ── Action Items Tab ── */}
                     {activeTab === "actionItems" && (
                         <div className="space-y-6">
-                            <div className="hud-panel bg-card/60 border border-primary/40 p-6 sm:p-8 scanlines relative">
-                                <div className="absolute top-0 right-0 w-32 h-1 bg-gradient-to-r from-transparent to-primary/50" />
-                                <h3 className="font-bold text-lg mb-6 flex items-center gap-3 uppercase tracking-tight relative z-10 text-primary border-b border-primary/20 pb-4">
+                            <div className="rounded-2xl bg-card/60 border border-[#c7d28a]/40 p-6 sm:p-8 relative">
+                                <div className="absolute top-0 right-0 w-32 h-1 bg-gradient-to-r from-transparent to-[#c7d28a]/50" />
+                                <h3 className="font-bold text-lg mb-6 flex items-center gap-3 uppercase tracking-tight relative z-10 text-[#c7d28a] border-b border-[#c7d28a]/20 pb-4">
                                     <Target className="w-5 h-5" /> CREATE ACTION ITEM (DEADLINE)
                                 </h3>
 
                                 <div className="space-y-5 relative z-10 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
                                     <div className="space-y-1.5 col-span-1 md:col-span-2">
-                                        <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">DIRECTIVE OBJECTIVE</label>
-                                        <input type="text" value={actionTitle} onChange={(e) => setActionTitle(e.target.value)} placeholder="e.g. SUBMIT RESUME FOR SHF..." className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono uppercase transition-colors focus:outline-none" />
+                                        <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">Task or objective</label>
+                                        <input type="text" value={actionTitle} onChange={(e) => setActionTitle(e.target.value)} placeholder="e.g. SUBMIT RESUME FOR SHF..." className="w-full px-4 py-3 rounded-lg bg-[#093b26]/60 border border-[#006644]/50 focus:border-[#c7d28a]/50 text-sm font-mono uppercase transition-colors focus:outline-none" />
                                     </div>
 
                                     <div className="space-y-1.5 md:col-span-1">
                                         <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">DEADLINE TIMEFRAME</label>
-                                        <input type="datetime-local" value={actionDeadline} onChange={(e) => setActionDeadline(e.target.value)} className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none" />
+                                        <input type="datetime-local" value={actionDeadline} onChange={(e) => setActionDeadline(e.target.value)} className="w-full px-4 py-3 rounded-lg bg-[#093b26]/60 border border-[#006644]/50 focus:border-[#c7d28a]/50 text-sm font-mono transition-colors focus:outline-none" />
                                     </div>
 
                                     <div className="space-y-1.5 md:col-span-1">
                                         <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">DELIVERY FORMAT</label>
-                                        <select value={actionType} onChange={(e) => setActionType(e.target.value as "external" | "form")} className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none appearance-none">
+                                        <select value={actionType} onChange={(e) => setActionType(e.target.value as "external" | "form")} className="w-full px-4 py-3 rounded-lg bg-[#093b26]/60 border border-[#006644]/50 focus:border-[#c7d28a]/50 text-sm font-mono transition-colors focus:outline-none appearance-none">
                                             <option value="external">EXTERNAL TASK (CHECKBOX)</option>
-                                            <option value="form">LINKED DIRECTIVE (FORM)</option>
+                                            <option value="form">Form link</option>
                                         </select>
                                     </div>
 
                                     {actionType === "form" && (
                                         <div className="space-y-1.5 col-span-1 md:col-span-2">
                                             <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">TARGET URL</label>
-                                            <input type="url" value={actionLink} onChange={(e) => setActionLink(e.target.value)} placeholder="https://forms.gle/..." className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none" />
+                                            <input type="url" value={actionLink} onChange={(e) => setActionLink(e.target.value)} placeholder="https://forms.gle/..." className="w-full px-4 py-3 rounded-lg bg-[#093b26]/60 border border-[#006644]/50 focus:border-[#c7d28a]/50 text-sm font-mono transition-colors focus:outline-none" />
                                         </div>
                                     )}
 
                                     <div className="space-y-1.5 col-span-1 md:col-span-2">
                                         <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">ADDITIONAL BRIEFING</label>
-                                        <textarea value={actionDesc} onChange={(e) => setActionDesc(e.target.value)} placeholder="Provide further context or instructions..." rows={3} className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none resize-none" />
+                                        <textarea value={actionDesc} onChange={(e) => setActionDesc(e.target.value)} placeholder="Provide further context or instructions..." rows={3} className="w-full px-4 py-3 rounded-lg bg-[#093b26]/60 border border-[#006644]/50 focus:border-[#c7d28a]/50 text-sm font-mono transition-colors focus:outline-none resize-none" />
                                     </div>
 
                                     <div className="col-span-1 md:col-span-2 pt-2 flex items-center justify-end">
                                         <button
                                             onClick={handleCreateActionItem}
                                             disabled={actionSending || !actionTitle.trim() || !actionDesc.trim() || !actionDeadline || (actionType === "form" && !actionLink)}
-                                            className="hud-panel bg-primary text-primary-foreground px-8 py-3.5 text-xs font-mono font-bold uppercase tracking-widest hover:brightness-110 transition-all glow-border disabled:opacity-50 flex items-center gap-3"
+                                            className="generator-button px-8 py-3.5 text-xs font-mono font-bold uppercase tracking-widest disabled:opacity-50 flex items-center gap-3"
                                         >
                                             {actionSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                                            {actionSending ? "INITIALIZING..." : "PUBLISH DIRECTIVE"}
+                                            {actionSending ? "Publishing..." : "Publish"}
                                         </button>
                                     </div>
                                 </div>
@@ -376,46 +303,46 @@ export default function AdminPage() {
                     {/* ── Startups Tab ── */}
                     {activeTab === "startups" && (
                         <div className="space-y-6">
-                            <div className="hud-panel bg-card/60 border border-primary/40 p-6 sm:p-8 scanlines relative">
-                                <div className="absolute top-0 right-0 w-32 h-1 bg-gradient-to-r from-transparent to-primary/50" />
-                                <h3 className="font-bold text-lg mb-6 flex items-center gap-3 uppercase tracking-tight relative z-10 text-primary border-b border-primary/20 pb-4">
-                                    <Rocket className="w-5 h-5" /> INITIALIZE ALUMNI STARTUP
+                            <div className="rounded-2xl bg-card/60 border border-[#c7d28a]/40 p-6 sm:p-8 relative">
+                                <div className="absolute top-0 right-0 w-32 h-1 bg-gradient-to-r from-transparent to-[#c7d28a]/50" />
+                                <h3 className="font-bold text-lg mb-6 flex items-center gap-3 uppercase tracking-tight relative z-10 text-[#c7d28a] border-b border-[#c7d28a]/20 pb-4">
+                                    <Rocket className="w-5 h-5" /> Add alumni startup
                                 </h3>
 
                                 <div className="space-y-5 relative z-10 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
                                     <div className="space-y-1.5 md:col-span-1">
                                         <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">COMPANY DESIGNATION</label>
-                                        <input type="text" value={startupName} onChange={(e) => setStartupName(e.target.value)} placeholder="e.g. OpenAI..." className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono uppercase transition-colors focus:outline-none" />
+                                        <input type="text" value={startupName} onChange={(e) => setStartupName(e.target.value)} placeholder="e.g. OpenAI..." className="w-full px-4 py-3 rounded-lg bg-[#093b26]/60 border border-[#006644]/50 focus:border-[#c7d28a]/50 text-sm font-mono uppercase transition-colors focus:outline-none" />
                                     </div>
 
                                     <div className="space-y-1.5 md:col-span-1">
                                         <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">YEAR ESTABLISHED</label>
-                                        <input type="text" value={startupYear} onChange={(e) => setStartupYear(e.target.value)} placeholder="e.g. 2024..." className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none" />
+                                        <input type="text" value={startupYear} onChange={(e) => setStartupYear(e.target.value)} placeholder="e.g. 2024..." className="w-full px-4 py-3 rounded-lg bg-[#093b26]/60 border border-[#006644]/50 focus:border-[#c7d28a]/50 text-sm font-mono transition-colors focus:outline-none" />
                                     </div>
 
                                     <div className="space-y-1.5 md:col-span-1">
                                         <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">FOUNDING OPERATIVES</label>
-                                        <input type="text" value={startupFounders} onChange={(e) => setStartupFounders(e.target.value)} placeholder="e.g. Alice & Bob..." className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono uppercase transition-colors focus:outline-none" />
+                                        <input type="text" value={startupFounders} onChange={(e) => setStartupFounders(e.target.value)} placeholder="e.g. Alice & Bob..." className="w-full px-4 py-3 rounded-lg bg-[#093b26]/60 border border-[#006644]/50 focus:border-[#c7d28a]/50 text-sm font-mono uppercase transition-colors focus:outline-none" />
                                     </div>
 
                                     <div className="space-y-1.5 md:col-span-1">
                                         <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">EXTERNAL DOMAIN</label>
-                                        <input type="url" value={startupWebsite} onChange={(e) => setStartupWebsite(e.target.value)} placeholder="https://..." className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none" />
+                                        <input type="url" value={startupWebsite} onChange={(e) => setStartupWebsite(e.target.value)} placeholder="https://..." className="w-full px-4 py-3 rounded-lg bg-[#093b26]/60 border border-[#006644]/50 focus:border-[#c7d28a]/50 text-sm font-mono transition-colors focus:outline-none" />
                                     </div>
 
                                     <div className="space-y-1.5 col-span-1 md:col-span-2">
                                         <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">MISSION SYNOPSIS</label>
-                                        <textarea value={startupDesc} onChange={(e) => setStartupDesc(e.target.value)} placeholder="Describe the startup's purpose..." rows={3} className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none resize-none" />
+                                        <textarea value={startupDesc} onChange={(e) => setStartupDesc(e.target.value)} placeholder="Describe the startup's purpose..." rows={3} className="w-full px-4 py-3 rounded-lg bg-[#093b26]/60 border border-[#006644]/50 focus:border-[#c7d28a]/50 text-sm font-mono transition-colors focus:outline-none resize-none" />
                                     </div>
 
                                     <div className="col-span-1 md:col-span-2 pt-2 flex items-center justify-between">
-                                        <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest leading-relaxed max-w-sm border-l-2 border-primary/30 pl-3">
+                                        <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest leading-relaxed max-w-sm border-l-2 border-[#c7d28a]/30 pl-3">
                                             NEW STARTUP DATA WILL BE PUBLISHED IMMEDIATELY TO THE PUBLIC STARTUP GALLERY.
                                         </p>
                                         <button
                                             onClick={handleCreateStartup}
                                             disabled={startupSending || !startupName.trim() || !startupDesc.trim()}
-                                            className="hud-panel bg-primary text-primary-foreground px-8 py-3.5 text-xs font-mono font-bold uppercase tracking-widest hover:brightness-110 transition-all glow-border disabled:opacity-50 flex items-center gap-3"
+                                            className="generator-button px-8 py-3.5 text-xs font-mono font-bold uppercase tracking-widest disabled:opacity-50 flex items-center gap-3"
                                         >
                                             {startupSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                                             {startupSending ? "INITIALIZING..." : "PUBLISH STARTUP"}
@@ -428,14 +355,14 @@ export default function AdminPage() {
                             <div className="hud-panel bg-card/40 border border-border/40 p-6 sm:p-8 scanlines relative mt-6">
                                 <h3 className="font-bold text-sm mb-4 flex items-center gap-2 uppercase tracking-tight relative z-10 text-muted-foreground">
                                     <Rocket className="w-4 h-4" /> EXTANT STARTUPS
-                                    <span className="ml-auto text-[10px] bg-primary/10 text-primary border border-primary/30 px-2 py-0.5">{startups.length} REGISTERED</span>
+                                    <span className="ml-auto text-[10px] bg-[#c7d28a]/10 text-[#c7d28a] border border-[#c7d28a]/30 px-2 py-0.5">{startups.length} REGISTERED</span>
                                 </h3>
                                 {startups.length === 0 ? (
                                     <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest relative z-10">NO DATA LOGS REQUIRE REVIEW.</p>
                                 ) : (
                                     <div className="space-y-3 relative z-10">
                                         {startups.map(startup => (
-                                            <div key={startup.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 hud-panel-sm bg-background/50 border border-border/40 hover:border-primary/40 transition-colors">
+                                            <div key={startup.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 hud-panel-sm bg-background/50 border border-border/40 hover:border-[#c7d28a]/40 transition-colors">
                                                 <div>
                                                     <p className="font-bold font-mono tracking-tight uppercase text-sm">
                                                         {startup.name}
@@ -479,7 +406,7 @@ export default function AdminPage() {
 
                                     {app.bio && (
                                         <p className="text-xs font-mono text-muted-foreground leading-relaxed mb-4 line-clamp-2 relative z-10">
-                                            <span className="text-primary/50 mr-2">&gt;</span>{app.bio}
+                                            <span className="text-[#c7d28a]/50 mr-2">&gt;</span>{app.bio}
                                         </p>
                                     )}
 
@@ -489,7 +416,7 @@ export default function AdminPage() {
                                             <select
                                                 value={selectedRoles[app.id] || "member"}
                                                 onChange={(e) => setSelectedRoles({ ...selectedRoles, [app.id]: e.target.value })}
-                                                className="w-full sm:w-48 text-[10px] font-mono font-bold uppercase tracking-widest px-3 py-2 hud-panel-sm bg-background border border-border/50 text-foreground focus:outline-none focus:border-primary/50 transition-colors cursor-pointer appearance-none"
+                                                className="w-full sm:w-48 text-[10px] font-mono font-bold uppercase tracking-widest px-3 py-2 hud-panel-sm bg-background border border-border/50 text-foreground focus:outline-none focus:border-[#c7d28a]/50 transition-colors cursor-pointer appearance-none"
                                             >
                                                 {ALL_ROLES.map((r) => (
                                                     <option key={r.value} value={r.value}>{r.label}</option>
@@ -523,7 +450,7 @@ export default function AdminPage() {
                                 <div key={inquiry.id} className={cn("group p-5 transition-all relative flex flex-col scanlines", i % 2 === 0 ? 'hud-panel' : 'hud-corners', inquiry.status === "pending" ? "bg-warning/5 border border-warning/30" : "bg-card/60 border border-border/40")}>
                                     <div className="flex items-start justify-between mb-3 relative z-10">
                                         <h3 className="font-bold text-base leading-tight pr-4">{inquiry.question}</h3>
-                                        <span className={cn("text-[9px] font-mono font-bold uppercase tracking-widest px-2.5 py-1 border hud-panel-sm whitespace-nowrap", inquiry.status === "pending" ? "bg-warning/20 border-warning text-warning animate-pulse" : inquiry.status === "answered" ? "bg-success/10 border-success/30 text-success" : "bg-primary/10 border-primary/30 text-primary")}>
+                                        <span className={cn("text-[9px] font-mono font-bold uppercase tracking-widest px-2.5 py-1 border hud-panel-sm whitespace-nowrap", inquiry.status === "pending" ? "bg-warning/20 border-warning text-warning animate-pulse" : inquiry.status === "answered" ? "bg-success/10 border-success/30 text-success" : "bg-[#c7d28a]/10 border-[#c7d28a]/30 text-[#c7d28a]")}>
                                             {inquiry.status}
                                         </span>
                                     </div>
@@ -538,10 +465,10 @@ export default function AdminPage() {
 
                                     {inquiry.reply && (
                                         <div className="bg-background border border-border/50 p-4 mb-4 relative z-10">
-                                            <div className="text-[10px] font-mono font-bold text-primary uppercase tracking-widest mb-2 flex items-center gap-2">
-                                                <div className="w-1 h-1 bg-primary rotate-45" /> RESPONSE COMPILED BY: {inquiry.repliedBy}
+                                            <div className="text-[10px] font-mono font-bold text-[#c7d28a] uppercase tracking-widest mb-2 flex items-center gap-2">
+                                                <div className="w-1 h-1 bg-[#c7d28a] rotate-45" /> RESPONSE COMPILED BY: {inquiry.repliedBy}
                                             </div>
-                                            <p className="text-sm font-mono text-muted-foreground leading-relaxed"><span className="text-primary/50 mr-2">&gt;</span>{inquiry.reply}</p>
+                                            <p className="text-sm font-mono text-muted-foreground leading-relaxed"><span className="text-[#c7d28a]/50 mr-2">&gt;</span>{inquiry.reply}</p>
                                         </div>
                                     )}
 
@@ -549,9 +476,9 @@ export default function AdminPage() {
                                         {inquiry.status === "pending" && (
                                             replyingTo === inquiry.id ? (
                                                 <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-border/40">
-                                                    <input type="text" value={replyText} onChange={(e) => setReplyText(e.target.value)} placeholder="INITIALIZE RESPONSE..." className="flex-1 px-4 py-2.5 hud-panel-sm bg-background border border-border/50 focus:border-primary/50 text-sm font-mono uppercase transition-colors focus:outline-none" />
+                                                    <input type="text" value={replyText} onChange={(e) => setReplyText(e.target.value)} placeholder="Type your reply..." className="flex-1 px-4 py-2.5 hud-panel-sm bg-background border border-border/50 focus:border-[#c7d28a]/50 text-sm font-mono uppercase transition-colors focus:outline-none" />
                                                     <div className="flex gap-2">
-                                                        <button onClick={() => handleReply(inquiry.id)} className="flex-1 sm:flex-none px-6 py-2.5 hud-panel-sm bg-primary text-primary-foreground text-xs font-bold uppercase tracking-widest hover:brightness-110 transition-all glow-border">TRANSMIT</button>
+                                                        <button onClick={() => handleReply(inquiry.id)} className="flex-1 sm:flex-none px-6 py-2.5 hud-panel-sm bg-[#c7d28a] text-[#006644] text-xs font-bold uppercase tracking-widest hover:brightness-110 transition-all glow-border">TRANSMIT</button>
                                                         <button onClick={() => setReplyingTo(null)} className="flex-1 sm:flex-none px-6 py-2.5 hud-panel-sm border border-border/50 text-muted-foreground text-xs font-bold uppercase tracking-widest hover:text-foreground hover:bg-accent transition-colors">CANCEL</button>
                                                     </div>
                                                 </div>
@@ -577,16 +504,16 @@ export default function AdminPage() {
                                     <p className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest relative z-10">NO OUTSTANDING PROPOSALS.</p>
                                 </div>
                             ) : projects.map((project, i) => (
-                                <div key={project.id} className={cn("group p-5 transition-all relative flex flex-col scanlines", i % 2 === 0 ? 'hud-corners' : 'hud-panel', "bg-card/60 border border-border/40 hover:border-primary/40")}>
+                                <div key={project.id} className={cn("group p-5 transition-all relative flex flex-col scanlines", i % 2 === 0 ? 'hud-corners' : 'hud-panel', "bg-card/60 border border-border/40 hover:border-[#c7d28a]/40")}>
                                     <div className="flex items-start justify-between mb-3 relative z-10">
                                         <h3 className="font-bold text-lg uppercase tracking-tight">{project.name}</h3>
                                         <span className={cn("text-[9px] font-mono font-bold uppercase tracking-widest px-2.5 py-1 border hud-panel-sm whitespace-nowrap", project.status === "ideation" ? "bg-warning/20 border-warning text-warning animate-pulse" : "bg-success/10 border-success/30 text-success")}>
                                             {project.status === "ideation" ? "PRE-AWAITING CLEARANCE" : project.status}
                                         </span>
                                     </div>
-                                    <p className="text-sm font-mono text-muted-foreground leading-relaxed mb-4 relative z-10"><span className="text-primary/50 mr-2">&gt;</span>{project.description}</p>
+                                    <p className="text-sm font-mono text-muted-foreground leading-relaxed mb-4 relative z-10"><span className="text-[#c7d28a]/50 mr-2">&gt;</span>{project.description}</p>
                                     <div className="flex items-center gap-4 text-[10px] font-mono text-muted-foreground uppercase tracking-widest relative z-10 bg-background/50 p-2.5 border border-border/40">
-                                        <span className="flex items-center gap-1.5"><Users className="w-3 h-3 text-primary/70" /> {project.teamMembers.length} UNITS</span>
+                                        <span className="flex items-center gap-1.5"><Users className="w-3 h-3 text-[#c7d28a]/70" /> {project.teamMembers.length} members</span>
                                         <div className="w-px h-3 bg-border" />
                                         <span>LAST SYNC: {project.updatedAt}</span>
                                     </div>
@@ -604,14 +531,14 @@ export default function AdminPage() {
                                     <p className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest relative z-10">NO DATA LOGS REQUIRE REVIEW.</p>
                                 </div>
                             ) : resources.map((resource, i) => (
-                                <div key={resource.id} className={cn("group p-5 transition-all relative flex flex-col scanlines", i % 2 === 0 ? 'hud-panel' : 'hud-corners', "bg-card/60 border border-border/40 hover:border-primary/40")}>
+                                <div key={resource.id} className={cn("group p-5 transition-all relative flex flex-col scanlines", i % 2 === 0 ? 'hud-panel' : 'hud-corners', "bg-card/60 border border-border/40 hover:border-[#c7d28a]/40")}>
                                     <div className="flex items-start justify-between mb-3 relative z-10">
                                         <h3 className="font-bold text-base uppercase tracking-tight pr-4">{resource.title}</h3>
                                         <span className={cn("text-[9px] font-mono font-bold uppercase tracking-widest px-2.5 py-1 border hud-panel-sm whitespace-nowrap", resource.approved ? "bg-success/10 border-success/30 text-success" : "bg-warning/20 border-warning text-warning animate-pulse")}>
-                                            {resource.approved ? "VERIFIED" : "AWAITING CLEARANCE"}
+                                            {resource.approved ? "Approved" : "Pending"}
                                         </span>
                                     </div>
-                                    <p className="text-xs font-mono text-muted-foreground leading-relaxed mb-4 line-clamp-2 relative z-10"><span className="text-primary/50 mr-2">&gt;</span>{resource.description}</p>
+                                    <p className="text-xs font-mono text-muted-foreground leading-relaxed mb-4 line-clamp-2 relative z-10"><span className="text-[#c7d28a]/50 mr-2">&gt;</span>{resource.description}</p>
 
                                     <div className="flex flex-wrap items-center gap-3 text-[10px] font-mono text-muted-foreground uppercase tracking-widest mb-4 relative z-10 bg-background/50 p-2 border border-border/40">
                                         <span className="text-foreground shrink-0">SOURCE: {resource.uploadedBy}</span>
@@ -645,7 +572,7 @@ export default function AdminPage() {
                                     <p className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest relative z-10">DB EMPTY.</p>
                                 </div>
                             ) : approvedMembers.map((member, i) => (
-                                <div key={member.id} className={cn("group p-4 transition-all relative flex flex-col sm:flex-row items-center gap-4 scanlines", i % 2 === 0 ? 'hud-panel-sm' : 'hud-corners', "bg-card/60 border border-border/40 hover:border-primary/40")}>
+                                <div key={member.id} className={cn("group p-4 transition-all relative flex flex-col sm:flex-row items-center gap-4 scanlines", i % 2 === 0 ? 'hud-panel-sm' : 'hud-corners', "bg-card/60 border border-border/40 hover:border-[#c7d28a]/40")}>
                                     <div className="w-12 h-12 hud-corners bg-background flex items-center justify-center font-black text-lg border border-border/50 text-muted-foreground shrink-0 relative z-10">
                                         {member.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
                                     </div>
@@ -654,23 +581,23 @@ export default function AdminPage() {
                                         <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 text-[10px] font-mono text-muted-foreground uppercase tracking-widest mt-1">
                                             <span className="truncate">{member.email}</span>
                                             <div className="w-1 h-1 bg-border rotate-45 hidden sm:block" />
-                                            <span className="text-primary/80">{getRoleLabel(member.role)}</span>
+                                            <span className="text-[#c7d28a]/80">{getRoleLabel(member.role)}</span>
                                             <div className="w-1 h-1 bg-border rotate-45 hidden sm:block" />
                                             <span className="truncate">SPEC: {member.standoutSkill}</span>
                                         </div>
                                     </div>
                                     <div className="w-full sm:w-auto relative z-10 mt-3 sm:mt-0 space-y-1.5">
-                                        <div className="text-[8px] font-mono font-bold text-muted-foreground uppercase tracking-widest text-center sm:text-left ml-1">ASSIGN CLEARANCE</div>
+                                        <div className="text-[8px] font-bold text-muted-foreground text-center sm:text-left ml-1">Role</div>
                                         <select
                                             value={member.role}
                                             onChange={async (e) => {
                                                 try {
-                                                    await updateDoc(doc(db, "users", member.id), { role: e.target.value });
+                                                    // Demo mode: no persistence
                                                 } catch (err) {
                                                     console.error("Role update error:", err);
                                                 }
                                             }}
-                                            className="w-full sm:w-40 text-[10px] font-mono font-bold uppercase tracking-widest px-3 py-2 hud-panel-sm bg-background/80 border border-border/50 text-foreground focus:outline-none focus:border-primary/50 transition-colors cursor-pointer appearance-none"
+                                            className="w-full sm:w-40 text-[10px] font-mono font-bold uppercase tracking-widest px-3 py-2 hud-panel-sm bg-background/80 border border-border/50 text-foreground focus:outline-none focus:border-[#c7d28a]/50 transition-colors cursor-pointer appearance-none"
                                         >
                                             {ALL_ROLES.map((r) => (
                                                 <option key={r.value} value={r.value}>{r.label}</option>

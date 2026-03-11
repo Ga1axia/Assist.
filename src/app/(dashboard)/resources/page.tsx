@@ -101,7 +101,7 @@ export default function ResourcesPage() {
                                         : "bg-background/50 border-border/50 text-muted-foreground hover:bg-accent hover:text-foreground"
                                 )}
                             >
-                                {tier === "all" ? "GLOBAL ARCHIVE" : tier === "official" ? "E-BOARD VERIFIED" : "COMMUNITY"}
+                                {tier === "all" ? "All" : tier === "official" ? "Official" : "Community"}
                             </button>
                         ))}
                     </div>
@@ -149,7 +149,7 @@ export default function ResourcesPage() {
                                     {typeIcons[resource.type] || typeIcons.guide}
                                 </div>
                                 <span className={cn("text-[10px] px-3 py-1 hud-panel-sm font-mono font-bold uppercase tracking-widest border", resource.tier === "official" ? "bg-primary border-primary text-primary-foreground glow-border shadow-[0_0_10px_rgba(203,247,2,0.5)]" : "bg-background/60 border-border/50 text-muted-foreground")}>
-                                    {resource.tier === "official" ? "VERIFIED" : "USR_GEN"}
+                                    {resource.tier === "official" ? "Official" : "Community"}
                                 </span>
                             </div>
 
@@ -222,7 +222,7 @@ export default function ResourcesPage() {
                             <div className="p-4 hud-corners bg-background/40 border border-border/50 space-y-4">
                                 <div>
                                     <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">FILE DESIGNATION <span className="text-primary">*</span></label>
-                                    <input type="text" value={newResource.title} onChange={(e) => setNewResource({ ...newResource, title: e.target.value })} placeholder="e.g. REACT COMBAT MANUAL" className="w-full px-4 py-2.5 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono uppercase transition-colors focus:outline-none" />
+                                    <input type="text" value={newResource.title} onChange={(e) => setNewResource({ ...newResource, title: e.target.value })} placeholder="e.g. Workshop guide" className="w-full px-4 py-2.5 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono uppercase transition-colors focus:outline-none" />
                                 </div>
                                 <div>
                                     <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">CONTENTS / ABSTRACT</label>
@@ -263,7 +263,7 @@ export default function ResourcesPage() {
                                 disabled={!newResource.title.trim()}
                                 className="w-full mt-2 py-3.5 hud-panel bg-primary text-primary-foreground text-xs font-mono font-bold uppercase tracking-widest hover:brightness-110 transition-all glow-border focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                             >
-                                <Upload className="w-4 h-4" /> INITIATE UPLOAD SEQUENCE
+                                <Upload className="w-4 h-4" /> Upload
                             </button>
                         </div>
                     </div>

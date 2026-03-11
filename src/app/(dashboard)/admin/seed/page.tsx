@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import { useAuth } from "@/contexts/auth-context";
-import { collection, addDoc, serverTimestamp, doc, setDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import { isAdmin as checkAdmin } from "@/lib/roles";
 import { Loader2, Database, CheckCircle2, AlertTriangle } from "lucide-react";
 
@@ -194,29 +192,14 @@ export default function SeedPage() {
     const [done, setDone] = useState(false);
 
     const handleSeed = async () => {
-        if (!confirm("This will add seed data to your Firestore database. Continue?")) return;
         setSeeding(true);
         setResults([]);
-
-        const newResults: typeof results = [];
-
+        await new Promise((r) => setTimeout(r, 800));
+        const newResults: { collection: string; count: number; status: "success" | "error" }[] = [];
         for (const [collName, items] of Object.entries(SEED_DATA)) {
-            try {
-                for (const item of items) {
-                    await addDoc(collection(db, collName), {
-                        ...item,
-                        createdAt: serverTimestamp(),
-                        updatedAt: serverTimestamp(),
-                    });
-                }
-                newResults.push({ collection: collName, count: items.length, status: "success" });
-            } catch (err) {
-                console.error(`Error seeding ${collName}:`, err);
-                newResults.push({ collection: collName, count: 0, status: "error" });
-            }
-            setResults([...newResults]);
+            newResults.push({ collection: collName, count: items.length, status: "success" });
         }
-
+        setResults(newResults);
         setSeeding(false);
         setDone(true);
     };
@@ -228,13 +211,13 @@ export default function SeedPage() {
             <div>
                 <h1 className="text-2xl font-bold flex items-center gap-3">
                     <Database className="w-7 h-7 text-primary" />
-                    Initialize Database
+                    Load sample data
                 </h1>
-                <p className="text-muted-foreground mt-1 text-sm">Seed your Firestore with sample data for all collections.</p>
+                <p className="text-muted-foreground mt-1 text-sm">App is using dummy data. This action simulates seeding for demo purposes.</p>
             </div>
 
             <div className="bg-card border border-border rounded-xl p-6">
-                <h2 className="font-semibold mb-3">Collections to seed:</h2>
+                <h2 className="font-semibold mb-3">What gets loaded:</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-6">
                     {Object.entries(SEED_DATA).map(([name, items]) => (
                         <div key={name} className="bg-accent rounded-lg px-3 py-2 text-sm">
@@ -266,12 +249,12 @@ export default function SeedPage() {
                     className="flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-xl text-sm font-semibold hover:brightness-110 transition-all disabled:opacity-50"
                 >
                     {seeding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Database className="w-4 h-4" />}
-                    {done ? "Database Seeded ✓" : seeding ? "Seeding..." : "Seed Database"}
+                    {done ? "Done ✓" : seeding ? "Loading..." : "Load sample data"}
                 </button>
 
                 {done && (
                     <p className="mt-3 text-sm text-muted-foreground">
-                        All collections have been initialized! Navigate to other pages to see the data.
+                        Sample data is loaded. Check other pages to see it.
                     </p>
                 )}
             </div>

@@ -1,21 +1,10 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
-import {
-    onAuthStateChanged,
-    signInWithPopup,
-    signInWithEmailAndPassword,
-    createUserWithEmailAndPassword,
-    signOut as firebaseSignOut,
-    GoogleAuthProvider,
-    type User,
-} from "firebase/auth";
-import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
-import { auth, db } from "@/lib/firebase";
+import React, { createContext, useContext, useState } from "react";
 
 export type UserRole = "resident" | "associate" | "marketing" | "events" | "finance" | "vice-president" | "president" | "community-manager" | "alumni";
 
-interface UserProfile {
+export interface UserProfile {
     uid: string;
     email: string | null;
     displayName: string | null;
@@ -29,8 +18,37 @@ interface UserProfile {
     linkedin?: string | null;
 }
 
+// Minimal user shape (no Firebase dependency)
+export interface AppUser {
+    uid: string;
+    email: string | null;
+    displayName: string | null;
+    photoURL: string | null;
+}
+
+const DEMO_UID = "demo-user";
+const demoUser: AppUser = {
+    uid: DEMO_UID,
+    email: "demo@thegenerator.babson.edu",
+    displayName: "Demo Member",
+    photoURL: null,
+};
+const demoProfile: UserProfile = {
+    uid: DEMO_UID,
+    email: demoUser.email,
+    displayName: demoUser.displayName,
+    photoURL: null,
+    role: "resident",
+    status: "approved",
+    standoutSkill: "Full-stack",
+    skills: [],
+    onboarded: true,
+    openToMentorship: false,
+    linkedin: null,
+};
+
 interface AuthContextType {
-    user: User | null;
+    user: AppUser | null;
     profile: UserProfile | null;
     loading: boolean;
     needsOnboarding: boolean;
@@ -39,142 +57,46 @@ interface AuthContextType {
     signUpWithEmail: (email: string, password: string) => Promise<void>;
     signOut: () => Promise<void>;
     refreshProfile: () => Promise<void>;
+    signInAsDemo: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [user, setUser] = useState<User | null>(null);
-    const [profile, setProfile] = useState<UserProfile | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [needsOnboarding, setNeedsOnboarding] = useState(false);
+    // Always assume logged in with demo user so dummy data shows on frontend
+    const [user, setUser] = useState<AppUser | null>(demoUser);
+    const [profile, setProfile] = useState<UserProfile | null>(demoProfile);
+    const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-            setUser(firebaseUser);
-
-            if (firebaseUser) {
-                // Fetch user profile from Firestore
-                try {
-                    const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
-                    if (userDoc.exists()) {
-                        const data = userDoc.data();
-                        setProfile({
-                            uid: firebaseUser.uid,
-                            email: firebaseUser.email,
-                            displayName: data.displayName || firebaseUser.displayName,
-                            photoURL: data.photoURL || firebaseUser.photoURL,
-                            role: (data.role as UserRole) || "resident",
-                            status: data.status || (data.onboarded ? "approved" : "pending"), // Handle legacy users
-                            standoutSkill: data.standoutSkill || null,
-                            skills: data.skills || [],
-                            onboarded: data.onboarded === true,
-                            openToMentorship: data.openToMentorship || false,
-                            linkedin: data.linkedin || data.alumni?.linkedinUrl || null,
-                        });
-                        setNeedsOnboarding(data.onboarded !== true);
-                    } else {
-                        // User exists in Auth but not Firestore yet — create stub doc
-                        try {
-                            await setDoc(doc(db, "users", firebaseUser.uid), {
-                                uid: firebaseUser.uid,
-                                email: firebaseUser.email || null,
-                                displayName: firebaseUser.displayName || null,
-                                photoURL: firebaseUser.photoURL || null,
-                                role: "resident",
-                                status: "pending",
-                                onboarded: false,
-                                createdAt: serverTimestamp(),
-                                updatedAt: serverTimestamp(),
-                            }, { merge: true });
-                        } catch {
-                            // May fail if rules not set up yet
-                        }
-
-                        setProfile({
-                            uid: firebaseUser.uid,
-                            email: firebaseUser.email,
-                            displayName: firebaseUser.displayName,
-                            photoURL: firebaseUser.photoURL,
-                            role: "resident",
-                            status: "pending",
-                            standoutSkill: null,
-                            skills: [],
-                            onboarded: false,
-                            openToMentorship: false,
-                            linkedin: null,
-                        });
-                        setNeedsOnboarding(true);
-                    }
-                } catch {
-                    setProfile({
-                        uid: firebaseUser.uid,
-                        email: firebaseUser.email,
-                        displayName: firebaseUser.displayName,
-                        photoURL: firebaseUser.photoURL,
-                        role: "resident",
-                        status: "pending",
-                        standoutSkill: null,
-                        skills: [],
-                        openToMentorship: false,
-                        linkedin: null,
-                    });
-                }
-            } else {
-                setProfile(null);
-                setNeedsOnboarding(false);
-            }
-
-            setLoading(false);
-        });
-
-        return () => unsubscribe();
-    }, []);
+    const signInAsDemo = () => {
+        setUser(demoUser);
+        setProfile(demoProfile);
+    };
 
     const signInWithGoogle = async () => {
-        const provider = new GoogleAuthProvider();
-        await signInWithPopup(auth, provider);
+        setUser(demoUser);
+        setProfile(demoProfile);
     };
 
-    const signInWithEmail = async (email: string, password: string) => {
-        await signInWithEmailAndPassword(auth, email, password);
+    const signInWithEmail = async (_email: string, _password: string) => {
+        setUser(demoUser);
+        setProfile(demoProfile);
     };
 
-    const signUpWithEmail = async (email: string, password: string) => {
-        await createUserWithEmailAndPassword(auth, email, password);
+    const signUpWithEmail = async (_email: string, _password: string) => {
+        setUser(demoUser);
+        setProfile(demoProfile);
     };
 
     const signOut = async () => {
-        await firebaseSignOut(auth);
-        setProfile(null);
+        // Demo mode: stay logged in so dummy data always visible
+        setUser(demoUser);
+        setProfile(demoProfile);
     };
 
-    const refreshProfile = async () => {
-        const currentUser = auth.currentUser;
-        if (!currentUser) return;
-        try {
-            const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-            if (userDoc.exists()) {
-                const data = userDoc.data();
-                setProfile({
-                    uid: currentUser.uid,
-                    email: currentUser.email,
-                    displayName: data.displayName || currentUser.displayName,
-                    photoURL: data.photoURL || currentUser.photoURL,
-                    role: data.role || "member",
-                    status: data.status || (data.onboarded ? "approved" : "pending"),
-                    standoutSkill: data.standoutSkill || null,
-                    skills: data.skills || [],
-                    onboarded: data.onboarded === true,
-                    openToMentorship: data.openToMentorship || false,
-                    linkedin: data.linkedin || data.alumni?.linkedinUrl || null,
-                });
-                setNeedsOnboarding(data.onboarded !== true);
-            }
-        } catch (err) {
-            console.error("Failed to refresh profile:", err);
-        }
-    };
+    const refreshProfile = async () => {};
+
+    const needsOnboarding = profile ? !profile.onboarded : false;
 
     return (
         <AuthContext.Provider
@@ -188,6 +110,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 signUpWithEmail,
                 signOut,
                 refreshProfile,
+                signInAsDemo,
             }}
         >
             {children}
@@ -203,20 +126,21 @@ export function useAuth() {
     return context;
 }
 
-// Safe version for public pages — returns null values instead of throwing
 export function useOptionalAuth() {
     const context = useContext(AuthContext);
     if (context === undefined) {
+        // Always assume logged in so nav and public pages never show Sign In or redirect to login
         return {
-            user: null,
-            profile: null,
+            user: demoUser,
+            profile: demoProfile,
             loading: false,
             needsOnboarding: false,
-            signInWithGoogle: async () => { },
-            signInWithEmail: async () => { },
-            signUpWithEmail: async () => { },
-            signOut: async () => { },
-            refreshProfile: async () => { },
+            signInWithGoogle: async () => {},
+            signInWithEmail: async () => {},
+            signUpWithEmail: async () => {},
+            signOut: async () => {},
+            refreshProfile: async () => {},
+            signInAsDemo: () => {},
         } as AuthContextType;
     }
     return context;
