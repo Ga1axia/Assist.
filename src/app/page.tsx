@@ -82,7 +82,7 @@ export default function LandingPage() {
           <div className="relative max-w-6xl mx-auto">
             <FadeIn>
               <div className="text-center mb-16 max-w-3xl mx-auto">
-                <p className="text-sm font-semibold uppercase tracking-widest text-[#b6e36e] mb-3">
+                <p className="text-sm font-semibold uppercase tracking-widest etower-section-label mb-3">
                   Our Impact
                 </p>
                 <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">
@@ -112,12 +112,12 @@ export default function LandingPage() {
         <EtowerOutletsSection />
 
         {/* Testimonials */}
-        <section className="py-24 px-4 sm:px-6 bg-[#f8faf9]">
+        <section className="py-24 px-4 sm:px-6 border-t border-[rgba(0,255,65,0.3)]">
           <div className="max-w-6xl mx-auto">
             <FadeIn>
               <div className="text-center mb-14">
                 <p className="etower-section-label mb-3">What Our Community Says</p>
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#0A111F]">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">
                   Hear from residents and alumni
                 </h2>
               </div>
@@ -126,13 +126,13 @@ export default function LandingPage() {
             <FadeIn delay={100}>
               <blockquote className="etower-testimonial-featured mb-8 relative z-10">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-16 h-16 rounded-full etower-gradient flex items-center justify-center text-white font-bold">
+                  <div className="w-16 h-16 rounded-full etower-gradient flex items-center justify-center font-bold">
                     {featuredQuote.initials}
                   </div>
                   <div>
                     <p className="font-bold text-lg">{featuredQuote.name}</p>
                     <p className="text-sm text-white/60">{featuredQuote.role}</p>
-                    <p className="text-sm text-[#b6e36e] font-medium">{featuredQuote.company}</p>
+                    <p className="text-sm text-[#00ff41] font-medium">{featuredQuote.company}</p>
                   </div>
                 </div>
                 <p className="text-lg sm:text-xl leading-relaxed text-white/90 max-w-3xl relative z-10">
@@ -146,15 +146,15 @@ export default function LandingPage() {
                 <FadeIn key={t.name} delay={150 + i * 80}>
                   <blockquote className="etower-card p-6 h-full">
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-11 h-11 rounded-full etower-gradient flex items-center justify-center text-white font-bold text-xs">
+                      <div className="w-11 h-11 rounded-full etower-gradient flex items-center justify-center font-bold text-xs">
                         {t.initials}
                       </div>
                       <div>
-                        <p className="font-bold text-sm text-[#0A111F]">{t.name}</p>
-                        <p className="text-xs text-[#64748b]">{t.role}</p>
+                        <p className="font-bold text-sm">{t.name}</p>
+                        <p className="text-xs text-white/60">{t.role}</p>
                       </div>
                     </div>
-                    <p className="text-sm text-[#64748b] leading-relaxed line-clamp-4">
+                    <p className="text-sm text-white/60 leading-relaxed line-clamp-4">
                       &ldquo;{t.quote}&rdquo;
                     </p>
                   </blockquote>
@@ -165,12 +165,12 @@ export default function LandingPage() {
         </section>
 
         {/* Instagram */}
-        <section className="py-24 px-4 sm:px-6 bg-[#f8faf9]">
+        <section className="py-24 px-4 sm:px-6 border-t border-[rgba(0,255,65,0.3)]">
           <div className="max-w-6xl mx-auto">
             <FadeIn>
               <div className="text-center mb-14">
                 <p className="etower-section-label mb-3">Follow Our Journey</p>
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#0A111F]">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">
                   Stay connected on Instagram
                 </h2>
               </div>
@@ -180,14 +180,14 @@ export default function LandingPage() {
                 <FadeIn key={i} delay={i * 70}>
                   <div className="etower-social-card etower-card relative">
                     <div className="etower-social-card__img relative">
-                      <Image src="/etower-logo.png" alt="" width={48} height={48} className="opacity-25" />
+                      <Image src="/logo/etower-logo-new.png" alt="" width={48} height={48} className="opacity-25 brightness-0 invert" />
                       <div className="etower-social-card__overlay">
                         <p className="text-white text-xs line-clamp-2">{post.caption}</p>
                       </div>
                     </div>
                     <div className="p-4">
-                      <p className="text-sm text-[#64748b] line-clamp-2">{post.caption}</p>
-                      <p className="mt-2 text-xs text-[#94a3b8]">
+                      <p className="text-sm text-white/60 line-clamp-2">{post.caption}</p>
+                      <p className="mt-2 text-xs text-white/40">
                         {post.likes} likes · {post.comments} comments
                       </p>
                     </div>
@@ -220,11 +220,11 @@ export default function LandingPage() {
                   const Icon = PILLAR_ICONS[i];
                   return (
                     <div key={pillar.title} className="etower-card p-6 text-center group">
-                      <div className="w-12 h-12 rounded-xl etower-gradient flex items-center justify-center text-white mx-auto mb-4 group-hover:scale-110 transition-transform">
+                      <div className="w-12 h-12 rounded-xl etower-gradient flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                         <Icon className="w-5 h-5" />
                       </div>
-                      <h3 className="font-bold text-[#0A111F]">{pillar.title}</h3>
-                      <p className="mt-2 text-sm text-[#64748b]">{pillar.description}</p>
+                      <h3 className="font-bold">{pillar.title}</h3>
+                      <p className="mt-2 text-sm text-white/60">{pillar.description}</p>
                     </div>
                   );
                 })}
@@ -250,7 +250,7 @@ export default function LandingPage() {
                       href={ETOWER.instagramUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="etower-btn etower-btn--outline border-white/30 text-white bg-white/10 hover:bg-white/20 hover:border-white/50 px-8 py-3.5 text-sm"
+                      className="etower-btn etower-btn--outline px-8 py-3.5 text-sm"
                     >
                       Follow on Instagram
                     </a>

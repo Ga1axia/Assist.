@@ -10,14 +10,14 @@ export default function OurStoryPage() {
     <div className="etower-page min-h-screen">
       <EtowerNav />
       <main className="pt-8 pb-0">
-        <section className="py-16 px-4 sm:px-6">
+        <section className="py-16 px-4 sm:px-6 border-b border-[rgba(0,255,65,0.3)]">
           <div className="max-w-3xl mx-auto">
             <FadeIn>
               <p className="etower-section-label mb-3">Our Story</p>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#0A111F] tracking-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
                 20+ years of fostering entrepreneurship
               </h1>
-              <p className="mt-6 text-[#64748b] leading-relaxed">
+              <p className="mt-6 text-white/60 leading-relaxed">
                 As the first and longest-running Living Learning Community at Babson College,
                 eTower is celebrating over 20 years of fostering entrepreneurship and innovation.
                 A community of students committed to becoming successful entrepreneurs.
@@ -28,11 +28,11 @@ export default function OurStoryPage() {
               {STORY_MILESTONES.map((m, i) => (
                 <FadeIn key={m.num} delay={i * 100}>
                   <div className="etower-timeline__item">
-                    <span className="text-xs font-bold text-[#5aad4a] uppercase tracking-widest">
+                    <span className="text-xs font-bold text-[#00ff41] uppercase tracking-widest">
                       {m.num}
                     </span>
-                    <h2 className="mt-1 font-bold text-lg text-[#0A111F]">{m.title}</h2>
-                    <p className="mt-2 text-sm text-[#64748b] leading-relaxed">{m.body}</p>
+                    <h2 className="mt-1 font-bold text-lg">{m.title}</h2>
+                    <p className="mt-2 text-sm text-white/60 leading-relaxed">{m.body}</p>
                   </div>
                 </FadeIn>
               ))}
@@ -40,7 +40,7 @@ export default function OurStoryPage() {
 
             <FadeIn delay={400}>
               <div className="mt-14 etower-card p-8 text-center">
-                <p className="text-sm text-[#64748b] leading-relaxed">
+                <p className="text-sm text-white/60 leading-relaxed">
                   eTower sees itself as an example of what is possible when like-minded students
                   come together with the intention of growth — and is excited to see what else
                   is possible.

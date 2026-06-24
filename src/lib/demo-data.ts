@@ -1,5 +1,7 @@
 /** eTower static content — entrepreneurship community */
 
+export const ETOWER_LOGO = "/logo/etower-logo-new.png";
+
 export const ETOWER = {
   name: "eTower",
   tagline: "Where Boston's Next Generation of Entrepreneurs Live, Learn, and Launch",

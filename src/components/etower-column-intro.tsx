@@ -1,15 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { INTRO_COLUMN_DIRECTIONS } from "@/lib/demo-data";
+import Image from "next/image";
+import { ETOWER_LOGO, INTRO_COLUMN_DIRECTIONS } from "@/lib/demo-data";
 import { cn } from "@/lib/utils";
 
+const INTRO_SPEED = 1.5;
 const COLUMN_COUNT = INTRO_COLUMN_DIRECTIONS.length;
-const ENTER_MS = 900;
-const HOLD_MS = 1100;
-const STAGGER_MS = 55;
-const EXIT_MS = 1100;
-const FADE_MS = 400;
+const ENTER_MS = Math.round(900 * INTRO_SPEED);
+const HOLD_MS = Math.round(1100 * INTRO_SPEED);
+const STAGGER_MS = Math.round(55 * INTRO_SPEED);
+const EXIT_MS = Math.round(1100 * INTRO_SPEED);
+const FADE_MS = Math.round(400 * INTRO_SPEED);
+const ENTER_DELAY_MS = Math.round(50 * INTRO_SPEED);
 
 type EtowerColumnIntroProps = {
   onComplete: () => void;
@@ -17,18 +20,16 @@ type EtowerColumnIntroProps = {
 
 function IntroGraphicStrip() {
   return (
-    <div className="etower-intro__strip-inner flex h-full w-full items-center justify-center bg-white">
+    <div className="etower-intro__strip-inner flex h-full w-full items-center justify-center bg-[#0a1628]">
       <div className="etower-intro__content flex flex-col items-center gap-5 sm:gap-8 px-4">
-        <div className="flex items-center justify-center gap-4 sm:gap-8">
-          <div className="etower-intro__icon-mark shrink-0">
-            <span className="text-white font-bold text-[clamp(2.5rem,8vw,5.5rem)] leading-none">
-              e
-            </span>
-          </div>
-          <span className="etower-intro__wordmark whitespace-nowrap">
-            e<span className="text-[#5aad4a]">Tower</span>
-          </span>
-        </div>
+        <Image
+          src={ETOWER_LOGO}
+          alt="eTower"
+          width={480}
+          height={120}
+          className="etower-intro__logo brightness-0 invert"
+          priority
+        />
         <p className="etower-intro__tagline text-center whitespace-nowrap">
           Entrepreneurs · Live · Learn · Launch
         </p>
@@ -56,7 +57,7 @@ export function EtowerColumnIntro({ onComplete }: EtowerColumnIntroProps) {
       return;
     }
 
-    const enterTimer = setTimeout(() => setEntered(true), 50);
+    const enterTimer = setTimeout(() => setEntered(true), ENTER_DELAY_MS);
     const separateTimer = setTimeout(() => setSeparating(true), ENTER_MS + HOLD_MS);
     const fadeTimer = setTimeout(
       () => setFading(true),
@@ -84,6 +85,13 @@ export function EtowerColumnIntro({ onComplete }: EtowerColumnIntroProps) {
         entered && "etower-intro--entered",
         fading && "etower-intro--fading"
       )}
+      style={
+        {
+          "--etower-exit-duration": `${EXIT_MS}ms`,
+          "--etower-enter-duration": `${ENTER_MS}ms`,
+          "--etower-fade-duration": `${FADE_MS}ms`,
+        } as React.CSSProperties
+      }
       aria-hidden={separating}
     >
       <div className="relative h-full w-full">
@@ -91,7 +99,7 @@ export function EtowerColumnIntro({ onComplete }: EtowerColumnIntroProps) {
           <div
             key={i}
             className={cn(
-              "etower-intro__col absolute top-0 bottom-0 overflow-hidden bg-white",
+              "etower-intro__col absolute top-0 bottom-0 overflow-hidden bg-[#0a1628]",
               separating &&
                 (direction === "up"
                   ? "etower-intro__col-exit-up"

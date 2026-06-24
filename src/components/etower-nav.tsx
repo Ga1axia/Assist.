@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Instagram } from "lucide-react";
-import { ETOWER } from "@/lib/demo-data";
+import { ETOWER, ETOWER_LOGO } from "@/lib/demo-data";
 import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
@@ -19,15 +19,15 @@ export function EtowerNav() {
   const pathname = usePathname();
 
   return (
-    <header className="etower-nav sticky top-0 z-[100] bg-white/90 backdrop-blur-md border-b border-[#0A111F]/8">
+    <header className="etower-nav sticky top-0 z-[100]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
         <Link href="/" className="flex items-center gap-2.5 shrink-0">
           <Image
-            src="/etower-logo.png"
+            src={ETOWER_LOGO}
             alt="eTower"
             width={120}
             height={32}
-            className="h-8 w-auto object-contain"
+            className="h-8 w-auto object-contain brightness-0 invert"
             priority
           />
         </Link>
@@ -41,10 +41,8 @@ export function EtowerNav() {
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  "text-sm font-medium px-3 py-2 rounded-lg transition-colors",
-                  active
-                    ? "text-[#5aad4a] font-semibold"
-                    : "text-[#0A111F]/70 hover:text-[#5aad4a]"
+                  "etower-nav__link text-sm font-medium px-3 py-2 transition-colors",
+                  active && "etower-nav__link--active font-semibold"
                 )}
               >
                 {link.label}
@@ -58,7 +56,7 @@ export function EtowerNav() {
             href={ETOWER.instagramUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden sm:flex items-center gap-1.5 text-sm font-medium text-[#0A111F]/70 hover:text-[#5aad4a] px-3 py-2 transition-colors"
+            className="hidden sm:flex items-center gap-1.5 text-sm font-medium etower-nav__link px-3 py-2 transition-colors"
           >
             <Instagram className="w-4 h-4" />
             Instagram
