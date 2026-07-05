@@ -13,6 +13,7 @@ import {
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { parseClubRole, parseResidency, type ResidencyType } from "@/lib/member-residency";
+import { resolveLinkedinFromAccount, resolveOpenToMentorship } from "@/lib/alumni";
 import { syncPlatformStats } from "@/lib/platform-stats";
 
 export type UserRole =
@@ -107,8 +108,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                             standoutSkill: data.standoutSkill || null,
                             skills: data.skills || [],
                             onboarded: data.onboarded === true,
-                            openToMentorship: data.openToMentorship || false,
-                            linkedin: data.linkedin || data.alumni?.linkedinUrl || null,
+                            openToMentorship: resolveOpenToMentorship(raw),
+                            linkedin: resolveLinkedinFromAccount(raw),
                             graduationYear:
                                 typeof data.graduationYear === "string" && data.graduationYear.trim()
                                     ? data.graduationYear.trim()
@@ -226,8 +227,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     standoutSkill: data.standoutSkill || null,
                     skills: data.skills || [],
                     onboarded: data.onboarded === true,
-                    openToMentorship: data.openToMentorship || false,
-                    linkedin: data.linkedin || data.alumni?.linkedinUrl || null,
+                    openToMentorship: resolveOpenToMentorship(raw),
+                    linkedin: resolveLinkedinFromAccount(raw),
                     graduationYear:
                         typeof data.graduationYear === "string" && data.graduationYear.trim()
                             ? data.graduationYear.trim()

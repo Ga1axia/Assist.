@@ -22,6 +22,7 @@ import type { ResidencyType } from "@/lib/member-residency";
 import { cn } from "@/lib/utils";
 import { computeHousingPointsBreakdowns, HOUSING_POINTS_RULES_TEXT } from "@/lib/housing-points";
 import { buildBirthdayRows, membersMissingBirthday } from "@/lib/admin-birthdays";
+import { mentorshipPatchForAlumniStatus } from "@/lib/alumni";
 import { StartupAdminTab } from "@/components/startup-admin-tab";
 import { BudgetAdminTab } from "@/components/budget-admin-tab";
 import { ClubFiscalAdminTab } from "@/components/club-fiscal-admin-tab";
@@ -1160,6 +1161,11 @@ export default function AdminPage() {
                                                                                 await updateDoc(doc(db, "users", member.id), {
                                                                                     role: newRole,
                                                                                     updatedAt: serverTimestamp(),
+                                                                                    ...mentorshipPatchForAlumniStatus(
+                                                                                        newRole,
+                                                                                        member.residency,
+                                                                                        member.openToMentorship
+                                                                                    ),
                                                                                 });
                                                 } catch (err) {
                                                     console.error("Role update error:", err);
@@ -1189,6 +1195,11 @@ export default function AdminPage() {
                                                                                 await updateDoc(doc(db, "users", member.id), {
                                                                                     residency: next,
                                                                                     updatedAt: serverTimestamp(),
+                                                                                    ...mentorshipPatchForAlumniStatus(
+                                                                                        member.role,
+                                                                                        next,
+                                                                                        member.openToMentorship
+                                                                                    ),
                                                                                 });
                                                                             } catch (err) {
                                                                                 console.error("Residency update error:", err);

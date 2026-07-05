@@ -82,6 +82,11 @@ export function canReviewStartupSubmissions(role: string | undefined): boolean {
     return canAccessEboardWorkspace(role);
 }
 
+/** View newsletter subscriber list (core admins + functional VPs). */
+export function canAccessNewsletterList(role: string | undefined): boolean {
+    return canAccessEboardWorkspace(role);
+}
+
 export function getRoleLabel(role: string): string {
     const found = ALL_ROLES.find((r) => r.value === role);
     return found?.label || role;

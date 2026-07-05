@@ -171,5 +171,18 @@
       match /eboardCalendarEvents/{eventId} {
         allow read, create, update, delete: if isEboardMember();
       }
+
+      /** Public newsletter signups — anyone can subscribe; leadership can read; core admins manage. */
+      match /newsletterSubscribers/{subscriberId} {
+        allow read: if isEboardMember();
+        allow delete: if isAdmin();
+        allow create: if request.resource.data.keys().hasAll(['email', 'source'])
+          && request.resource.data.email is string
+          && request.resource.data.email.matches('^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$');
+        allow update: if isAdmin() || (
+          request.resource.data.email == resource.data.email
+          && request.resource.data.keys().hasAll(['email', 'source'])
+        );
+      }
     }
   }

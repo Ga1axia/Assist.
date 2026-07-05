@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { isAdmin, isPresident } from "@/lib/roles";
-import { getRoleLabel, ALL_ROLES, ADMIN_ROLES, LEADERSHIP_ROLES } from "@/lib/roles";
+import { getRoleLabel, ALL_ROLES, LEADERSHIP_ROLES } from "@/lib/roles";
 import { ALL_RESIDENCY_OPTIONS, getResidencyLabel } from "@/lib/member-residency";
 import type { ResidencyType } from "@/lib/member-residency";
 import type { UserRole } from "@/contexts/auth-context";
@@ -18,6 +18,7 @@ import {
 import { countMemberProjects, countMemberUploads } from "@/lib/member-engagement";
 import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { mentorshipPatchForAlumniStatus } from "@/lib/alumni";
 import {
     Users,
     Search,
@@ -84,13 +85,10 @@ export default function MembersPage() {
     const userIsPresident = isPresident(profile?.role);
 
     const isAlumniMember = (m: MemberItem) => m.role === "alumni" || m.residency === "alumni";
-    const isResidentsGroup = (m: MemberItem) =>
-        m.residency === "resident" || ADMIN_ROLES.includes(m.role as UserRole);
 
     const filtered = members
         .filter((m) => {
             if (roleFilter === "all") return true;
-            if (roleFilter === "residents") return isResidentsGroup(m);
             if (roleFilter === "resident") return m.residency === "resident";
             if (roleFilter === "associate") return m.residency === "associate";
             if (roleFilter === "alumni") return isAlumniMember(m);
@@ -100,7 +98,7 @@ export default function MembersPage() {
 
     const roleCounts = {
         total: members.length,
-        residents: members.filter(isResidentsGroup).length,
+        residents: members.filter((m) => m.residency === "resident").length,
         associates: members.filter((m) => m.residency === "associate").length,
         alumni: members.filter(isAlumniMember).length,
     };
@@ -136,9 +134,9 @@ export default function MembersPage() {
             {/* Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {[
-                    { label: "RESIDENTS", value: roleCounts.residents, color: "text-chart-2", border: "border-chart-2/40", bg: "bg-chart-2/5" },
-                    { label: "ASSOCIATES", value: roleCounts.associates, color: "text-primary", border: "border-primary/40", bg: "bg-primary/5" },
                     { label: "MEMBERS", value: roleCounts.total, color: "text-chart-4", border: "border-chart-4/40", bg: "bg-chart-4/5" },
+                    { label: "RESIDENT", value: roleCounts.residents, color: "text-chart-2", border: "border-chart-2/40", bg: "bg-chart-2/5" },
+                    { label: "ASSOCIATES", value: roleCounts.associates, color: "text-primary", border: "border-primary/40", bg: "bg-primary/5" },
                     { label: "ALUMNI", value: roleCounts.alumni, color: "text-chart-5", border: "border-chart-5/40", bg: "bg-chart-5/5" },
                 ].map((stat) => (
                     <div key={stat.label} className={cn("hud-corners border p-5 text-center relative scanlines overflow-hidden group", stat.bg, stat.border)}>
@@ -162,7 +160,7 @@ export default function MembersPage() {
                     />
                 </div>
                 <div className="flex gap-2 w-full sm:w-auto overflow-x-auto custom-scroll pb-1 sm:pb-0 bg-card/40 border border-border/30 p-2 hud-panel-sm">
-                    {["all", "residents", "resident", "associate", "alumni"].map((r) => (
+                    {["all", "resident", "associate", "alumni"].map((r) => (
                         <button
                             key={r}
                             onClick={() => setRoleFilter(r)}
@@ -173,7 +171,7 @@ export default function MembersPage() {
                                     : "bg-background/50 border-border/50 text-muted-foreground hover:bg-accent hover:text-foreground"
                             )}
                         >
-                            {r === "all" ? "ALL" : r === "residents" ? "RESIDENTS" : r === "resident" ? "RESIDENT" : r === "associate" ? "ASSOCIATES" : "ALUMNI"}
+                            {r === "all" ? "ALL" : r === "resident" ? "RESIDENT" : r === "associate" ? "ASSOCIATES" : "ALUMNI"}
                         </button>
                     ))}
                 </div>
@@ -314,8 +312,29 @@ export default function MembersPage() {
                                                             if (!selectedMember?.id) return;
                                                             setRoleUpdatingId(selectedMember.id);
                                                             try {
-                                                                await updateDoc(doc(db, "users", selectedMember.id), { role: newRole, updatedAt: serverTimestamp() });
-                                                                setSelectedMember((prev) => (prev ? { ...prev, role: newRole } : null));
+                                                                await updateDoc(doc(db, "users", selectedMember.id), {
+                                                                    role: newRole,
+                                                                    updatedAt: serverTimestamp(),
+                                                                    ...mentorshipPatchForAlumniStatus(
+                                                                        newRole,
+                                                                        selectedMember.residency,
+                                                                        selectedMember.openToMentorship
+                                                                    ),
+                                                                });
+                                                                setSelectedMember((prev) =>
+                                                                    prev
+                                                                        ? {
+                                                                              ...prev,
+                                                                              role: newRole as UserRole,
+                                                                              openToMentorship:
+                                                                                  mentorshipPatchForAlumniStatus(
+                                                                                      newRole,
+                                                                                      prev.residency,
+                                                                                      prev.openToMentorship
+                                                                                  )?.openToMentorship ?? prev.openToMentorship,
+                                                                          }
+                                                                        : null
+                                                                );
                                                             } catch (err) {
                                                                 console.error("Role update error:", err);
                                                             } finally {
@@ -339,8 +358,26 @@ export default function MembersPage() {
                                                             if (!selectedMember?.id) return;
                                                             setResidencyUpdatingId(selectedMember.id);
                                                             try {
-                                                                await updateDoc(doc(db, "users", selectedMember.id), { residency: next, updatedAt: serverTimestamp() });
-                                                                setSelectedMember((prev) => (prev ? { ...prev, residency: next } : null));
+                                                                const mentorshipPatch = mentorshipPatchForAlumniStatus(
+                                                                    selectedMember.role,
+                                                                    next,
+                                                                    selectedMember.openToMentorship
+                                                                );
+                                                                await updateDoc(doc(db, "users", selectedMember.id), {
+                                                                    residency: next,
+                                                                    updatedAt: serverTimestamp(),
+                                                                    ...mentorshipPatch,
+                                                                });
+                                                                setSelectedMember((prev) =>
+                                                                    prev
+                                                                        ? {
+                                                                              ...prev,
+                                                                              residency: next,
+                                                                              openToMentorship:
+                                                                                  mentorshipPatch?.openToMentorship ?? prev.openToMentorship,
+                                                                          }
+                                                                        : null
+                                                                );
                                                             } catch (err) {
                                                                 console.error("Residency update error:", err);
                                                             } finally {
@@ -366,7 +403,7 @@ export default function MembersPage() {
                                                 </span>
                                             </div>
                                         )}
-                                        {selectedMember.role === "alumni" && selectedMember.openToMentorship && (
+                                        {isAlumniMember(selectedMember) && selectedMember.openToMentorship && (
                                             <span className="inline-flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-widest px-2 py-1.5 border border-chart-2/50 bg-chart-2/10 text-chart-2 hud-panel-sm">
                                                 <Users className="w-3 h-3" /> OPEN TO OUTREACH
                                             </span>

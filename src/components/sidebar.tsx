@@ -27,9 +27,10 @@ import {
     GraduationCap,
     Rocket,
     CalendarRange,
+    Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { canAccessAdminCenter as checkExecAccess } from "@/lib/roles";
+import { canAccessAdminCenter as checkExecAccess, canAccessNewsletterList } from "@/lib/roles";
 import { useState, useEffect } from "react";
 
 interface NavItem {
@@ -37,6 +38,7 @@ interface NavItem {
     href: string;
     icon: React.ReactNode;
     adminOnly?: boolean;
+    newsletterOnly?: boolean;
     /** E-board workspace: visible to approved members (assignees); full features on page require leadership role. */
     eboardWorkspace?: boolean;
 }
@@ -56,6 +58,7 @@ const navItems: NavItem[] = [
     { label: "Members", href: "/members", icon: <Users2 className="w-4 h-4" /> },
     { label: "Alumni Network", href: "/network", icon: <GraduationCap className="w-4 h-4" /> },
     { label: "Profile", href: "/profile", icon: <User className="w-4 h-4" /> },
+    { label: "Newsletter", href: "/newsletter", icon: <Mail className="w-4 h-4" />, newsletterOnly: true },
     { label: "Admin Tools", href: "/admin", icon: <Shield className="w-4 h-4" />, adminOnly: true },
 ];
 
@@ -83,6 +86,7 @@ export function Sidebar() {
 
     const filteredNav = navItems.filter((item) => {
         if (item.adminOnly && !checkExecAccess(profile?.role)) return false;
+        if (item.newsletterOnly && !canAccessNewsletterList(profile?.role)) return false;
         if (
             item.eboardWorkspace &&
             (!profile || profile.status === "pending" || profile.status === "rejected")

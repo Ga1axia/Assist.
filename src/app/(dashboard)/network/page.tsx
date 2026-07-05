@@ -2,7 +2,9 @@
 
 import { useAuth } from "@/contexts/auth-context";
 import { isAdmin } from "@/lib/roles";
-import { useMembers, MemberItem } from "@/hooks/useFirestore";
+import { useMembers } from "@/hooks/useFirestore";
+import { db } from "@/lib/firebase";
+import { doc, serverTimestamp, writeBatch } from "firebase/firestore";
 import {
     GraduationCap,
     Search,
@@ -10,20 +12,21 @@ import {
     ExternalLink,
     Loader2,
     Clock,
-    User,
     Shield,
     Terminal
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { isAlumniUser } from "@/lib/alumni";
+
+const BACKFILL_KEY = "code-alumni-mentorship-backfill-v1";
 
 export default function AlumniNetworkPage() {
     const { profile } = useAuth();
     const { data: members, loading } = useMembers();
     const [search, setSearch] = useState("");
 
-    // Only fetch alumni explicitly.
-    const alumniMembers = members.filter((m) => m.role === "alumni" || m.residency === "alumni");
+    const alumniMembers = members.filter((m) => isAlumniUser(m.role, m.residency));
 
     const filteredAlumni = alumniMembers.filter(m =>
         m.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -31,6 +34,43 @@ export default function AlumniNetworkPage() {
     );
 
     const userIsAdmin = isAdmin(profile?.role);
+
+    useEffect(() => {
+        if (!userIsAdmin || loading) return;
+        if (typeof window === "undefined" || localStorage.getItem(BACKFILL_KEY)) return;
+
+        const targets = members.filter((m) => isAlumniUser(m.role, m.residency));
+        if (targets.length === 0) return;
+
+        void (async () => {
+            try {
+                let batch = writeBatch(db);
+                let batchCount = 0;
+
+                for (const member of targets) {
+                    batch.update(doc(db, "users", member.id), {
+                        openToMentorship: true,
+                        updatedAt: serverTimestamp(),
+                    });
+                    batchCount += 1;
+
+                    if (batchCount >= 400) {
+                        await batch.commit();
+                        batch = writeBatch(db);
+                        batchCount = 0;
+                    }
+                }
+
+                if (batchCount > 0) {
+                    await batch.commit();
+                }
+
+                localStorage.setItem(BACKFILL_KEY, "1");
+            } catch (err) {
+                console.warn("Alumni mentorship backfill:", err);
+            }
+        })();
+    }, [userIsAdmin, loading, members]);
 
     return (
         <div className="flex flex-col min-h-[calc(100vh-4rem)] animate-fade-in space-y-6 relative z-10 max-w-7xl mx-auto">
@@ -136,13 +176,22 @@ export default function AlumniNetworkPage() {
                                         </div>
                                     )}
 
-                                    <a href={`mailto:${alumni.email}`} className="flex items-center justify-between p-2.5 hud-panel-sm bg-card border border-border/50 hover:border-primary/50 transition-colors text-muted-foreground hover:text-primary group/link">
-                                        <span className="text-[10px] font-mono font-bold uppercase tracking-widest flex items-center gap-2 truncate">
-                                            <Mail className="w-3.5 h-3.5 shrink-0" />
-                                            {alumni.email}
-                                        </span>
-                                        <span className="text-primary group-hover/link:text-primary transition-colors opacity-0 group-hover/link:opacity-100">&rarr;</span>
-                                    </a>
+                                    {alumni.email ? (
+                                        <a href={`mailto:${alumni.email}`} className="flex items-center justify-between p-2.5 hud-panel-sm bg-card border border-border/50 hover:border-primary/50 transition-colors text-muted-foreground hover:text-primary group/link">
+                                            <span className="text-[10px] font-mono font-bold uppercase tracking-widest flex items-center gap-2 truncate">
+                                                <Mail className="w-3.5 h-3.5 shrink-0" />
+                                                {alumni.email}
+                                            </span>
+                                            <span className="text-primary group-hover/link:text-primary transition-colors opacity-0 group-hover/link:opacity-100">&rarr;</span>
+                                        </a>
+                                    ) : (
+                                        <div className="flex items-center p-2.5 hud-panel-sm bg-background/50 border border-border/50 text-muted-foreground/50">
+                                            <span className="text-[10px] font-mono font-bold uppercase tracking-widest flex items-center gap-2">
+                                                <Mail className="w-3.5 h-3.5" />
+                                                NO EMAIL ON ACCOUNT
+                                            </span>
+                                        </div>
+                                    )}
                                 </div>
                             )}
 

@@ -30,6 +30,7 @@ import { getRoleLabel } from "@/lib/roles";
 import { getResidencyLabel } from "@/lib/member-residency";
 import { useProjects, useResources, useEvents, countMemberAttendanceOccurrences } from "@/hooks/useFirestore";
 import { countMemberProjects, countMemberUploads, countMemberPitchProposals } from "@/lib/member-engagement";
+import { isAlumniUser, mentorshipPatchForAlumniStatus } from "@/lib/alumni";
 
 export default function ProfilePage() {
     const { profile, refreshProfile } = useAuth();
@@ -42,16 +43,18 @@ export default function ProfilePage() {
     const [saving, setSaving] = useState(false);
     const [skillSearch, setSkillSearch] = useState("");
     const [linkedin, setLinkedin] = useState(profile?.linkedin || "");
-    const [openToMentorship, setOpenToMentorship] = useState(profile?.openToMentorship || false);
+    const [openToMentorship, setOpenToMentorship] = useState(
+        profile ? profile.openToMentorship !== false : true
+    );
 
-    const isAlumni = profile?.role === "alumni" || profile?.residency === "alumni";
+    const isAlumni = isAlumniUser(profile?.role, profile?.residency);
 
     useEffect(() => {
         if (profile) {
             setStandoutSkill(profile.standoutSkill || "");
             setSkills(profile.skills || []);
             setLinkedin(profile.linkedin || "");
-            setOpenToMentorship(profile.openToMentorship || false);
+            setOpenToMentorship(isAlumniUser(profile.role, profile.residency) ? profile.openToMentorship !== false : profile.openToMentorship === true);
         }
     }, [profile]);
 
@@ -62,7 +65,7 @@ export default function ProfilePage() {
             await updateDoc(doc(db, "users", profile.uid), {
                 standoutSkill,
                 skills,
-                ...(isAlumni ? { linkedin, openToMentorship } : {}),
+                ...(isAlumni ? { linkedin: linkedin.trim() || null, openToMentorship } : {}),
             });
             await refreshProfile();
             setEditing(false);
@@ -230,7 +233,11 @@ export default function ProfilePage() {
                                         setStandoutSkill(profile?.standoutSkill || "");
                                         if (isAlumni) {
                                             setLinkedin(profile?.linkedin || "");
-                                            setOpenToMentorship(profile?.openToMentorship || false);
+                                            setOpenToMentorship(
+                                                isAlumni
+                                                    ? profile?.openToMentorship !== false
+                                                    : profile?.openToMentorship === true
+                                            );
                                         }
                                     }} className="text-[10px] font-mono font-bold px-3 py-1 hud-panel-sm border border-border text-muted-foreground hover:bg-accent transition-all flex items-center gap-1.5 uppercase">
                                         CANCEL
@@ -345,8 +352,17 @@ export default function ProfilePage() {
 
                     <div className="space-y-6 relative z-10 max-w-2xl">
                         <div className="space-y-1.5">
+                            <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">
+                                Email (from account)
+                            </label>
+                            <p className="w-full px-4 py-3 hud-panel-sm bg-background/40 border border-border/50 text-sm font-mono">
+                                {profile?.email || <span className="text-muted-foreground/50 italic">NOT PROVIDED</span>}
+                            </p>
+                        </div>
+
+                        <div className="space-y-1.5">
                             <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1 flex items-center gap-2">
-                                LINKEDIN URL
+                                LinkedIn (on your account)
                                 {editing && <span className="text-[8px] bg-warning/10 text-warning px-1 border border-warning/20">EDITING</span>}
                             </label>
                             {editing ? (

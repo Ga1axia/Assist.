@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useOptionalAuth } from "@/contexts/auth-context";
+import { useOptionalJoinModal } from "@/contexts/join-modal-context";
 import { Code2, Sun, Moon, LayoutDashboard, LogOut, User } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import { cn } from "@/lib/utils";
@@ -20,6 +21,7 @@ export function PublicNav({ alwaysVisible }: PublicNavProps = {}) {
     const pathname = usePathname();
     const { theme, setTheme } = useTheme();
     const { user, profile, signOut } = useOptionalAuth();
+    const { openJoinModal } = useOptionalJoinModal();
     const [showDropdown, setShowDropdown] = useState(false);
     const [scrolled, setScrolled] = useState(false);
 
@@ -147,12 +149,13 @@ export function PublicNav({ alwaysVisible }: PublicNavProps = {}) {
                                 )}
                             </div>
                         ) : (
-                            <Link
-                                href="/login"
+                            <button
+                                type="button"
+                                onClick={() => openJoinModal({ view: "choose" })}
                                 className="hud-panel-sm bg-primary text-primary-foreground px-5 sm:px-6 py-2 sm:py-2.5 text-[10px] sm:text-xs font-mono font-bold uppercase tracking-widest hover:brightness-110 transition-all glow-border"
                             >
                                 Sign in
-                            </Link>
+                            </button>
                         )}
                     </div>
                 </div>

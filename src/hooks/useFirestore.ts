@@ -33,6 +33,7 @@ import {
 import { isStartupPubliclyVisible } from "@/lib/startup-gallery";
 import { formatTimestamp, parseStartupDocument, type StartupItem } from "@/lib/startup-document";
 import { parseClubRole, parseResidency, type ResidencyType } from "@/lib/member-residency";
+import { resolveLinkedinFromAccount, resolveOpenToMentorship } from "@/lib/alumni";
 
 // ──────────────────────────────────────
 // Generic real-time collection hook
@@ -459,10 +460,10 @@ export function useMembers(enabled: boolean = true) {
                 ? `${raw.engagementMetrics.attendanceRate}%`
                 : "—",
             joinDate: formatTimestamp(raw.joinDate) || formatTimestamp(raw.createdAt),
-            linkedin: raw.linkedin || raw.alumni?.linkedinUrl || null,
+            linkedin: resolveLinkedinFromAccount(rec),
             bio: raw.bio || null,
             skills: raw.skills || [],
-            openToMentorship: raw.openToMentorship || false,
+            openToMentorship: resolveOpenToMentorship(rec),
             birthday: (() => {
                 const b = raw.birthday;
                 if (typeof b === "string" && /^\d{4}-\d{2}-\d{2}$/.test(b.trim())) return b.trim();
@@ -1343,4 +1344,34 @@ export function useDashboardStats() {
     }, []);
 
     return { stats, loading };
+}
+
+// ──────────────────────────────────────
+// Newsletter subscribers (Admin)
+// ──────────────────────────────────────
+export interface NewsletterSubscriberItem {
+    id: string;
+    email: string;
+    source: string;
+    date: string;
+}
+
+export function useNewsletterSubscribers(enabled: boolean = true) {
+    const result = useCollection<NewsletterSubscriberItem>(
+        "newsletterSubscribers",
+        [orderBy("createdAt", "desc")],
+        (raw, id) => ({
+            id,
+            email: raw.email || "",
+            source: raw.source || "unknown",
+            date: formatTimestamp(raw.createdAt),
+        }),
+        enabled
+    );
+
+    const removeSubscriber = async (subscriberId: string) => {
+        await deleteDoc(doc(db, "newsletterSubscribers", subscriberId));
+    };
+
+    return { ...result, removeSubscriber };
 }

@@ -3,6 +3,7 @@ import { GeistSans } from "geist/font/sans";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/contexts/auth-context";
 import { ColorCustomizer } from "@/components/color-customizer";
+import { ClientProviders } from "@/components/client-providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -31,7 +32,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
-            {children}
+            <ClientProviders>
+              {children}
+            </ClientProviders>
             <ColorCustomizer />
           </AuthProvider>
         </ThemeProvider>

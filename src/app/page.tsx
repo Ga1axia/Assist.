@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Users,
   FolderKanban,
@@ -12,21 +13,28 @@ import {
   Terminal,
   Zap,
   Shield,
-  ChevronRight,
 } from "lucide-react";
 import { PublicNav } from "@/components/public-nav";
 import { BootSequence } from "@/components/boot-sequence";
 import { useOptionalAuth } from "@/contexts/auth-context";
-import { useProjects, useDashboardStats } from "@/hooks/useFirestore";
+import { useJoinModal } from "@/contexts/join-modal-context";
+import { useDashboardStats } from "@/hooks/useFirestore";
 import { usePublicPlatformStats } from "@/hooks/usePublicPlatformStats";
-import Image from "next/image";
 
 export default function LandingPage() {
+  const router = useRouter();
   const { user } = useOptionalAuth();
-  const { data: projects, loading: projectsLoading } = useProjects();
+  const { openJoinModal } = useJoinModal();
   const { stats: platformStats, loading: platformStatsLoading } = usePublicPlatformStats();
   const { stats: dashboardStats, loading: statsLoading } = useDashboardStats();
-  const featuredProject = projects?.[0];
+
+  const handleUplinkClick = () => {
+    if (user) {
+      router.push("/dashboard");
+    } else {
+      openJoinModal({ view: "choose" });
+    }
+  };
 
   const features = [
     { icon: <Users className="w-5 h-5" />, title: "MEMBER_MGMT", subtitle: "Member Management", description: "Track attendance, manage roles, and monitor engagement metrics for all club members." },
@@ -144,7 +152,17 @@ ERR_CONNECTION_REFUSED
               ))}
             </div>
 
-            {/* CTA Buttons - Removed View Archives, Dashboard button is now built into the HUD on the right */}
+            {/* CTA Buttons - mobile uplink + desktop uses HUD button */}
+            <div className="flex flex-wrap gap-3 mt-4 lg:hidden">
+              <button
+                type="button"
+                onClick={handleUplinkClick}
+                className="inline-flex items-center gap-2 hud-panel bg-primary text-primary-foreground px-6 py-3 text-xs font-bold uppercase tracking-wider hover:brightness-110 transition-all glow-border-strong"
+              >
+                <Terminal className="w-4 h-4" />
+                {user ? "Enter dashboard" : "Init uplink"}
+              </button>
+            </div>
           </div>
 
           <div className="hidden lg:block w-[400px] h-[500px] relative z-10 select-none pointer-events-none">
@@ -176,8 +194,9 @@ ERR_CONNECTION_REFUSED
             </div>
 
             {/* Center Circular Dashboard Button (Glowing Eye) */}
-            <Link
-              href={user ? "/dashboard" : "/login"}
+            <button
+              type="button"
+              onClick={handleUplinkClick}
               className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full bg-primary border-[6px] border-background text-primary-foreground flex flex-col items-center justify-center font-black text-[10px] sm:text-[11px] tracking-widest uppercase hover:bg-foreground hover:text-primary transition-transform duration-300 z-50 pointer-events-auto hero-dashboard-glow group hover:scale-110"
             >
               <div className="absolute inset-0 bg-primary/50 animate-ping rounded-full opacity-30 pointer-events-none" />
@@ -185,7 +204,7 @@ ERR_CONNECTION_REFUSED
               <span className="text-center leading-tight mt-1 group-hover:animate-pulse">
                 {user ? "ENTER\nDASHBOARD" : "INIT\nUPLINK"}
               </span>
-            </Link>
+            </button>
           </div>
         </div>
 
@@ -252,67 +271,6 @@ ERR_CONNECTION_REFUSED
         </div>
       </section>
 
-      {/* ═══ FEATURED PROJECT SECTION ═══ */}
-      {featuredProject && !projectsLoading && (
-        <section className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
-          <div className="inline-flex items-center gap-2 text-xs font-mono text-primary tracking-widest uppercase mb-8 animate-fade-in">
-            <span className="w-8 h-px bg-primary/50" />
-            FEATURED PROJECT
-            <span className="w-8 h-px bg-primary/50" />
-          </div>
-
-          <Link href={`/projects/${featuredProject.id}`} className="group block text-left">
-            <div className="hud-panel bg-card/60 border border-border/40 overflow-hidden relative hover:border-primary/50 landing-featured-card">
-              {/* Corner accent */}
-              <div className="absolute top-0 right-0 w-0 h-0 border-t-[32px] border-t-primary/20 border-l-[32px] border-l-transparent group-hover:border-t-primary/50 transition-colors z-20" />
-
-              {/* Cover Image Background */}
-              <div className="relative w-full h-64 sm:h-80 md:h-[400px] border-b border-border/40 bg-muted/20">
-                {featuredProject.coverImage ? (
-                  <Image
-                    src={featuredProject.coverImage}
-                    alt={featuredProject.name}
-                    fill
-                    className="object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500 ease-out mix-blend-luminosity hover:mix-blend-normal"
-                  />
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center font-mono text-muted-foreground/30 text-2xl font-black">
-                    NO_COVER_IMAGE
-                  </div>
-                )}
-                {/* Overlay Gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
-
-                {/* Status Badge */}
-                <div className="absolute top-4 left-4 z-20">
-                  <span className="inline-block px-3 py-1 bg-background/80 glass font-mono text-[10px] tracking-widest uppercase border border-border/50 text-foreground">
-                    STATUS: <span className="text-primary font-bold">{featuredProject.status}</span>
-                  </span>
-                </div>
-              </div>
-
-              {/* Content Area */}
-              <div className="p-6 sm:p-8 relative z-10 -mt-16 bg-gradient-to-t from-card/90 via-card/90 to-transparent">
-                <h3 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter mb-4 group-hover:text-primary transition-colors">
-                  {featuredProject.name}
-                </h3>
-                <p className="text-sm sm:text-base text-muted-foreground mb-6 font-mono max-w-2xl line-clamp-2">
-                  {featuredProject.description}
-                </p>
-
-                <div className="flex items-center gap-4 text-xs font-mono tracking-widest uppercase text-muted-foreground">
-                  <span className="flex items-center gap-2 group-hover:text-primary transition-colors">
-                    ACCESS LOG <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </span>
-                  <span className="text-border/40">|</span>
-                  <span>MEMBERS: {featuredProject.teamMembers?.length || 0}</span>
-                </div>
-              </div>
-            </div>
-          </Link>
-        </section>
-      )}
-
       {/* ═══ CTA SECTION ═══ */}
       <section className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
         <div className="relative hud-panel bg-card/70 border border-primary/20 p-8 sm:p-12 md:p-16 text-center overflow-hidden scanlines noise animate-border-pulse">
@@ -334,14 +292,15 @@ ERR_CONNECTION_REFUSED
               Sign in with your credentials to access the CODE dashboard.
             </p>
 
-            <Link
-              href={user ? "/dashboard" : "/login"}
+            <button
+              type="button"
+              onClick={handleUplinkClick}
               className="mt-8 inline-flex items-center gap-3 hud-panel bg-primary text-primary-foreground px-8 py-3.5 text-sm font-bold uppercase tracking-wider hover:brightness-110 transition-all glow-border-strong"
             >
               <Shield className="w-4 h-4" />
               {user ? "ENTER DASHBOARD" : "GET STARTED"}
               <ArrowRight className="w-4 h-4" />
-            </Link>
+            </button>
           </div>
         </div>
       </section>
@@ -355,7 +314,13 @@ ERR_CONNECTION_REFUSED
           <div className="flex items-center gap-4 sm:gap-6 text-xs font-mono text-muted-foreground uppercase tracking-wider">
             <Link href="/hall-of-fame" className="hover:text-primary transition-colors">Hall of Fame</Link>
             <Link href="/faq" className="hover:text-primary transition-colors">FAQ</Link>
-            <Link href={user ? "/dashboard" : "/login"} className="hover:text-primary transition-colors">{user ? "Dashboard" : "Sign In"}</Link>
+            <button
+              type="button"
+              onClick={() => (user ? router.push("/dashboard") : openJoinModal({ view: "choose" }))}
+              className="hover:text-primary transition-colors"
+            >
+              {user ? "Dashboard" : "Sign In"}
+            </button>
           </div>
           <p className="text-[10px] font-mono text-muted-foreground tracking-wider">© {new Date().getFullYear()} BABSON CODE</p>
         </div>
