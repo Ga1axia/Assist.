@@ -70,6 +70,9 @@ const DURATION_MINS = [
     { label: "2h", m: 120 },
 ];
 
+const selectClass =
+    "px-2 sm:px-3 py-2.5 rounded-xl bg-[#0a1628] border border-[rgba(0,255,65,0.28)] focus:border-[#00ff41] text-xs sm:text-sm focus:outline-none cursor-pointer";
+
 function TimeSelectBlock({
     title,
     valueHHMM,
@@ -97,21 +100,21 @@ function TimeSelectBlock({
     return (
         <div
             className={cn(
-                "rounded-md border p-3 sm:p-4 space-y-3 transition-colors",
+                "rounded-2xl border p-3 sm:p-4 space-y-3 transition-colors",
                 accent === "start"
-                    ? "border-primary/35 bg-primary/[0.06]"
+                    ? "border-[#00ff41]/35 bg-[#00ff41]/[0.06]"
                     : "border-chart-2/35 bg-chart-2/[0.06]"
             )}
         >
-            <div className="flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-muted-foreground">
-                <Timer className={cn("w-3.5 h-3.5", accent === "start" ? "text-primary" : "text-chart-2")} />
+            <div className="flex items-center gap-2 text-xs font-semibold text-white/50">
+                <Timer className={cn("w-3.5 h-3.5", accent === "start" ? "text-[#00ff41]" : "text-chart-2")} />
                 {title}
             </div>
             <div className="flex gap-2 items-stretch">
                 <select
                     value={p.h}
                     onChange={(e) => setHour(Number(e.target.value))}
-                    className="flex-1 min-w-0 px-2 sm:px-3 py-2.5 hud-panel-sm bg-background/80 border border-border/50 focus:border-primary/50 text-xs sm:text-sm font-mono focus:outline-none cursor-pointer"
+                    className={cn(selectClass, "flex-1 min-w-0")}
                 >
                     {hours24.map((h) => {
                         const d = new Date();
@@ -124,11 +127,11 @@ function TimeSelectBlock({
                         );
                     })}
                 </select>
-                <span className="flex items-center text-muted-foreground font-mono text-sm select-none">:</span>
+                <span className="flex items-center text-white/40 text-sm select-none">:</span>
                 <select
                     value={p.m}
                     onChange={(e) => setMinute(Number(e.target.value))}
-                    className="w-[4.25rem] sm:w-[5.5rem] shrink-0 px-2 py-2.5 hud-panel-sm bg-background/80 border border-border/50 focus:border-primary/50 text-xs sm:text-sm font-mono focus:outline-none cursor-pointer"
+                    className={cn(selectClass, "w-[4.25rem] sm:w-[5.5rem] shrink-0")}
                 >
                     {MINUTE_STEPS.map((m) => (
                         <option key={m} value={m}>
@@ -179,19 +182,19 @@ export function EventTimeSchedule({ startTime, endTime, onChange, label = "Time 
     };
 
     return (
-        <div className={cn("p-4 hud-corners bg-background/40 border border-border/50 space-y-4", className)}>
-            <div className="flex items-center gap-2 text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest">
-                <Clock className="w-4 h-4 text-primary shrink-0" />
+        <div className={cn("p-4 rounded-2xl bg-[#0a1628]/40 border border-[rgba(0,255,65,0.2)] space-y-4", className)}>
+            <div className="flex items-center gap-2 text-xs font-semibold text-white/50">
+                <Clock className="w-4 h-4 text-[#00ff41] shrink-0" />
                 {label}
             </div>
 
-            <div className="flex p-0.5 hud-panel-sm bg-background/60 border border-border/50 rounded-sm">
+            <div className="flex p-1 etower-soft-card gap-1">
                 <button
                     type="button"
                     onClick={() => onChange({ startTime: "", endTime: "" })}
                     className={cn(
-                        "flex-1 flex items-center justify-center gap-1.5 px-2 py-2.5 text-[10px] font-mono font-bold uppercase tracking-widest transition-all rounded-sm",
-                        allDay ? "bg-primary text-primary-foreground shadow-[0_0_12px_rgba(203,247,2,0.25)]" : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                        "flex-1 flex items-center justify-center gap-1.5 etower-soft-btn text-xs",
+                        allDay ? "etower-soft-btn--primary" : "etower-soft-btn--ghost border-transparent"
                     )}
                 >
                     <CalendarRange className="w-3.5 h-3.5 shrink-0" />
@@ -203,8 +206,8 @@ export function EventTimeSchedule({ startTime, endTime, onChange, label = "Time 
                         if (allDay) onChange({ startTime: toHHMM(18, 0), endTime: toHHMM(19, 0) });
                     }}
                     className={cn(
-                        "flex-1 flex items-center justify-center gap-1.5 px-2 py-2.5 text-[10px] font-mono font-bold uppercase tracking-widest transition-all rounded-sm border-l border-border/40",
-                        !allDay ? "bg-primary text-primary-foreground shadow-[0_0_12px_rgba(203,247,2,0.25)]" : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                        "flex-1 flex items-center justify-center gap-1.5 etower-soft-btn text-xs",
+                        !allDay ? "etower-soft-btn--primary" : "etower-soft-btn--ghost border-transparent"
                     )}
                 >
                     <Timer className="w-3.5 h-3.5 shrink-0" />
@@ -245,14 +248,14 @@ export function EventTimeSchedule({ startTime, endTime, onChange, label = "Time 
                     </div>
 
                     <div className="space-y-2">
-                        <p className="text-[9px] font-mono font-bold text-muted-foreground uppercase tracking-widest">Quick start</p>
+                        <p className="etower-section-label">Quick start</p>
                         <div className="flex flex-wrap gap-1.5">
                             {PRESET_STARTS.map((pr) => (
                                 <button
                                     key={pr.label}
                                     type="button"
                                     onClick={() => applyPresetStart(pr.h, pr.m)}
-                                    className="px-2.5 py-1.5 text-[9px] font-mono font-bold uppercase tracking-widest hud-panel-sm border border-border/50 bg-card/40 hover:border-primary/50 hover:text-primary transition-colors"
+                                    className="etower-soft-btn etower-soft-btn--ghost text-xs py-1.5 px-3"
                                 >
                                     {pr.label}
                                 </button>
@@ -261,14 +264,14 @@ export function EventTimeSchedule({ startTime, endTime, onChange, label = "Time 
                     </div>
 
                     <div className="space-y-2">
-                        <p className="text-[9px] font-mono font-bold text-muted-foreground uppercase tracking-widest">Block length (from start)</p>
+                        <p className="etower-section-label">Block length (from start)</p>
                         <div className="flex flex-wrap gap-1.5">
                             {DURATION_MINS.map((d) => (
                                 <button
                                     key={d.label}
                                     type="button"
                                     onClick={() => applyDuration(d.m)}
-                                    className="px-2.5 py-1.5 text-[9px] font-mono font-bold uppercase tracking-widest hud-panel-sm border border-border/50 bg-card/40 hover:border-chart-2/50 hover:text-chart-2 transition-colors"
+                                    className="etower-soft-btn etower-soft-btn--ghost text-xs py-1.5 px-3"
                                 >
                                     {d.label}
                                 </button>
@@ -278,11 +281,11 @@ export function EventTimeSchedule({ startTime, endTime, onChange, label = "Time 
                 </>
             )}
 
-            <div className="flex items-center gap-2 px-3 py-2.5 rounded-md border border-primary/25 bg-primary/5">
-                <div className="w-1 h-8 rounded-full bg-primary/60 shrink-0" />
+            <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#00ff41]/25 bg-[#00ff41]/5">
+                <div className="w-1 h-8 rounded-full bg-[#00ff41]/60 shrink-0" />
                 <div className="min-w-0">
-                    <p className="text-[9px] font-mono font-bold text-primary/80 uppercase tracking-widest">Live preview</p>
-                    <p className="text-sm font-mono font-bold text-foreground tracking-tight break-words">{preview}</p>
+                    <p className="etower-section-label text-[#00ff41]/80">Live preview</p>
+                    <p className="text-sm font-semibold text-foreground tracking-tight break-words">{preview}</p>
                 </div>
             </div>
         </div>

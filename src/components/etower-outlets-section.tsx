@@ -29,7 +29,7 @@ export function EtowerOutletsSection() {
                 <Shirt className="w-6 h-6" />
               </div>
               <p className="etower-outlet-card__status">{clothing.status}</p>
-              <h3 className="mt-3 text-lg font-bold tracking-wide uppercase">
+              <h3 className="mt-3 text-lg font-bold tracking-tight">
                 {clothing.title}
               </h3>
               <p className="mt-3 text-sm text-white/60 flex-1">
@@ -48,7 +48,7 @@ export function EtowerOutletsSection() {
                 <div className="etower-outlet-card__icon bg-[#00ff41] text-[#0a0a0a]">
                   <Megaphone className="w-6 h-6" />
                 </div>
-                <h3 className="etower-outlet-card__megaphone-title mt-4 text-xl font-bold uppercase">
+                <h3 className="etower-outlet-card__megaphone-title mt-4 text-xl font-bold">
                   {megaphone.title}
                 </h3>
                 <p className="etower-outlet-card__megaphone-text mt-4 text-sm leading-relaxed flex-1">
@@ -66,8 +66,7 @@ export function EtowerOutletsSection() {
             <article className="etower-outlet-card etower-outlet-card--cafe h-full flex flex-col relative min-h-[320px] overflow-hidden">
               <div className="relative z-10 flex flex-col h-full pr-[48%]">
                 <div
-                  className="etower-outlet-card__icon border-2 border-[#2d5f4c] bg-[#fffdf7] text-[#2d5f4c]"
-                  style={{ borderRadius: 0 }}
+                  className="etower-outlet-card__icon border border-[#2d5f4c] bg-[#fffdf7] text-[#2d5f4c] rounded-[0.85rem]"
                 >
                   <Coffee className="w-6 h-6" />
                 </div>

@@ -11,6 +11,7 @@ import { deleteStartup, reviewStartupListing } from "@/hooks/useFirestore";
 import type { StartupItem } from "@/lib/startup-document";
 import { isStartupPubliclyVisible, STARTUP_BUSINESS_CATEGORIES } from "@/lib/startup-gallery";
 import { cn } from "@/lib/utils";
+import { DEMO_MODE } from "@/lib/demo-mode";
 import { Loader2, Rocket, Send, ThumbsDown, ThumbsUp, Trash2, Upload } from "lucide-react";
 
 type RosterMember = {
@@ -92,6 +93,22 @@ export function StartupAdminTab({
             return;
         setStartupSending(true);
         try {
+            if (DEMO_MODE) {
+                setStartupName("");
+                setStartupDesc("");
+                setStartupFounderStory("");
+                setStartupFounders("");
+                setStartupYear("");
+                setStartupWebsite("");
+                setStartupInstagram("");
+                setStartupLinkedinCompany("");
+                setStartupBusinessCategory(STARTUP_BUSINESS_CATEGORIES[0]);
+                setStartupLogo(null);
+                setStartupLogoPreview(null);
+                if (startupLogoRef.current) startupLogoRef.current.value = "";
+                setStartupLinkedUid(profile.uid);
+                return;
+            }
             let logoUrl: string | null = null;
             if (startupLogo) {
                 const safe = startupLogo.name.replace(/[^\w.-]/g, "_").slice(0, 80);
@@ -168,6 +185,7 @@ export function StartupAdminTab({
     const handleReviewStartup = async (startupId: string, name: string, decision: "approved" | "rejected") => {
         if (!profile?.uid) return;
         if (!confirm(`${decision === "approved" ? "Approve" : "Reject"} “${name}” for the public gallery?`)) return;
+        if (DEMO_MODE) return;
         setReviewingStartupId(startupId);
         try {
             await reviewStartupListing(startupId, decision, {
@@ -197,22 +215,22 @@ export function StartupAdminTab({
     return (
         <div className="space-y-6">
             {pendingProposals.length > 0 && (
-                <div className="hud-panel bg-warning/5 border border-warning/40 p-6 sm:p-8 scanlines relative">
+                <div className="etower-soft-card p-6 sm:p-8 relative border-warning/40 bg-warning/5">
                     <div className="absolute top-0 right-0 w-32 h-1 bg-gradient-to-r from-transparent to-warning/50" />
-                    <h3 className="font-bold text-lg mb-2 flex items-center gap-3 uppercase tracking-tight relative z-10 text-warning border-b border-warning/20 pb-4">
-                        <Rocket className="w-5 h-5" /> PENDING PROPOSALS
+                    <h3 className="font-bold text-lg mb-2 flex items-center gap-3 tracking-tight relative z-10 text-warning border-b border-warning/20 pb-4">
+                        <Rocket className="w-5 h-5" /> Pending proposals
                         <span className="ml-auto text-[10px] bg-warning/15 text-warning border border-warning/30 px-2 py-0.5">
                             {pendingProposals.length}
                         </span>
                     </h3>
-                    <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest mb-4 relative z-10">
+                    <p className="text-xs text-white/45 mb-4 relative z-10">
                         Member submissions awaiting e-board approval before they appear on the public gallery.
                     </p>
                     <div className="space-y-3 relative z-10">
                         {pendingProposals.map((startup) => (
                             <div
                                 key={startup.id}
-                                className="flex flex-col lg:flex-row lg:items-start justify-between gap-4 p-4 hud-panel-sm bg-background/50 border border-warning/30"
+                                className="flex flex-col lg:flex-row lg:items-start justify-between gap-4 p-4 rounded-xl bg-background/50 border border-warning/30"
                             >
                                 <div className="flex min-w-0 flex-1 items-start gap-3">
                                     {startup.logoUrl ? (
@@ -223,9 +241,9 @@ export function StartupAdminTab({
                                         </div>
                                     )}
                                     <div className="min-w-0">
-                                        <p className="font-bold font-mono tracking-tight uppercase text-sm">{startup.name}</p>
-                                        <p className="text-[10px] font-mono text-muted-foreground mt-1 line-clamp-2">{startup.companyOverview}</p>
-                                        <p className="text-[9px] font-mono text-primary/80 uppercase tracking-widest mt-2">
+                                        <p className="font-bold tracking-tight text-sm">{startup.name}</p>
+                                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{startup.companyOverview}</p>
+                                        <p className="text-[10px] text-primary/80 tracking-wide mt-2">
                                             {startup.submitterName}
                                             {startup.submitterGraduationYear ? ` · Class of ${startup.submitterGraduationYear}` : ""}
                                             {startup.createdAt ? ` · ${startup.createdAt}` : ""}
@@ -235,7 +253,7 @@ export function StartupAdminTab({
                                 <div className="flex shrink-0 flex-wrap items-center gap-2">
                                     <Link
                                         href={`/startups/edit/${startup.id}`}
-                                        className="inline-flex items-center gap-1.5 px-3 py-2 hud-panel-sm border border-border/50 text-[10px] font-mono font-bold uppercase tracking-widest text-muted-foreground hover:border-primary/50 hover:text-primary transition-colors"
+                                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-border/50 etower-section-label text-muted-foreground hover:border-primary/50 hover:text-primary transition-colors"
                                     >
                                         Review
                                     </Link>
@@ -243,7 +261,7 @@ export function StartupAdminTab({
                                         type="button"
                                         disabled={reviewingStartupId === startup.id}
                                         onClick={() => void handleReviewStartup(startup.id, startup.name, "approved")}
-                                        className="inline-flex items-center gap-1.5 px-3 py-2 hud-panel-sm border border-primary/50 bg-primary/10 text-[10px] font-mono font-bold uppercase tracking-widest text-primary hover:bg-primary/20 transition-colors disabled:opacity-50"
+                                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-primary/50 bg-primary/10 etower-section-label text-primary hover:bg-primary/20 transition-colors disabled:opacity-50"
                                     >
                                         {reviewingStartupId === startup.id ? (
                                             <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -256,7 +274,7 @@ export function StartupAdminTab({
                                         type="button"
                                         disabled={reviewingStartupId === startup.id}
                                         onClick={() => void handleReviewStartup(startup.id, startup.name, "rejected")}
-                                        className="inline-flex items-center gap-1.5 px-3 py-2 hud-panel-sm border border-destructive/40 text-[10px] font-mono font-bold uppercase tracking-widest text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50"
+                                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-destructive/40 etower-section-label text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50"
                                     >
                                         <ThumbsDown className="w-3.5 h-3.5" /> Reject
                                     </button>
@@ -267,22 +285,22 @@ export function StartupAdminTab({
                 </div>
             )}
 
-            <div className="hud-panel bg-card/60 border border-primary/40 p-6 sm:p-8 scanlines relative">
+            <div className="etower-soft-card p-6 sm:p-8 relative border-[#00ff41]/30">
                 <div className="absolute top-0 right-0 w-32 h-1 bg-gradient-to-r from-transparent to-primary/50" />
-                <h3 className="font-bold text-lg mb-2 flex items-center gap-3 uppercase tracking-tight relative z-10 text-primary border-b border-primary/20 pb-4">
-                    <Rocket className="w-5 h-5" /> PUBLISH DIRECTLY
+                <h3 className="font-bold text-lg mb-2 flex items-center gap-3 tracking-tight relative z-10 text-primary border-b border-primary/20 pb-4">
+                    <Rocket className="w-5 h-5" /> Publish directly
                 </h3>
-                <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest mb-6 relative z-10">
+                <p className="text-xs text-white/45 mb-6 relative z-10">
                     Skip review and add a listing straight to the public gallery.
                 </p>
 
                 <div className="space-y-5 relative z-10 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
                     <div className="space-y-1.5 md:col-span-2">
-                        <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">LINKED MEMBER (CODE OS)</label>
+                        <label className="etower-section-label ml-1">Linked member</label>
                         <select
                             value={startupLinkedUid}
                             onChange={(e) => setStartupLinkedUid(e.target.value)}
-                            className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none"
+                            className="w-full px-4 py-3 rounded-xl bg-background/60 border border-border/50 focus:border-primary/50 text-sm transition-colors focus:outline-none"
                         >
                             {(approvedMembersSorted.length > 0
                                 ? approvedMembersSorted
@@ -306,21 +324,21 @@ export function StartupAdminTab({
                     </div>
 
                     <div className="space-y-1.5 md:col-span-1">
-                        <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">COMPANY DESIGNATION</label>
-                        <input type="text" value={startupName} onChange={(e) => setStartupName(e.target.value)} placeholder="e.g. OpenAI..." className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono uppercase transition-colors focus:outline-none" />
+                        <label className="etower-section-label ml-1">Company name</label>
+                        <input type="text" value={startupName} onChange={(e) => setStartupName(e.target.value)} placeholder="e.g. OpenAI..." className="w-full px-4 py-3 rounded-xl bg-background/60 border border-border/50 focus:border-primary/50 text-sm transition-colors focus:outline-none" />
                     </div>
 
                     <div className="space-y-1.5 md:col-span-1">
-                        <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">YEAR ESTABLISHED</label>
-                        <input type="text" value={startupYear} onChange={(e) => setStartupYear(e.target.value)} placeholder="e.g. 2024..." className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none" />
+                        <label className="etower-section-label ml-1">Year founded</label>
+                        <input type="text" value={startupYear} onChange={(e) => setStartupYear(e.target.value)} placeholder="e.g. 2024..." className="w-full px-4 py-3 rounded-xl bg-background/60 border border-border/50 focus:border-primary/50 text-sm transition-colors focus:outline-none" />
                     </div>
 
                     <div className="space-y-1.5 md:col-span-1">
-                        <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">BUSINESS CATEGORY</label>
+                        <label className="etower-section-label ml-1">Business category</label>
                         <select
                             value={startupBusinessCategory}
                             onChange={(e) => setStartupBusinessCategory(e.target.value)}
-                            className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none"
+                            className="w-full px-4 py-3 rounded-xl bg-background/60 border border-border/50 focus:border-primary/50 text-sm transition-colors focus:outline-none"
                         >
                             {STARTUP_BUSINESS_CATEGORIES.map((c) => (
                                 <option key={c} value={c}>
@@ -331,33 +349,33 @@ export function StartupAdminTab({
                     </div>
 
                     <div className="space-y-1.5 md:col-span-1">
-                        <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">FOUNDING OPERATIVES</label>
-                        <input type="text" value={startupFounders} onChange={(e) => setStartupFounders(e.target.value)} placeholder="e.g. Alice & Bob..." className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none" />
+                        <label className="etower-section-label ml-1">Founders</label>
+                        <input type="text" value={startupFounders} onChange={(e) => setStartupFounders(e.target.value)} placeholder="e.g. Alice & Bob..." className="w-full px-4 py-3 rounded-xl bg-background/60 border border-border/50 focus:border-primary/50 text-sm transition-colors focus:outline-none" />
                     </div>
 
                     <div className="space-y-1.5 md:col-span-1">
-                        <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">COMPANY WEBSITE</label>
-                        <input type="url" value={startupWebsite} onChange={(e) => setStartupWebsite(e.target.value)} placeholder="https://..." className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none" />
+                        <label className="etower-section-label ml-1">Website</label>
+                        <input type="url" value={startupWebsite} onChange={(e) => setStartupWebsite(e.target.value)} placeholder="https://..." className="w-full px-4 py-3 rounded-xl bg-background/60 border border-border/50 focus:border-primary/50 text-sm transition-colors focus:outline-none" />
                     </div>
 
                     <div className="space-y-1.5 md:col-span-1">
-                        <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">INSTAGRAM</label>
-                        <input type="text" value={startupInstagram} onChange={(e) => setStartupInstagram(e.target.value)} placeholder="@handle or URL" className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none" />
+                        <label className="etower-section-label ml-1">Instagram</label>
+                        <input type="text" value={startupInstagram} onChange={(e) => setStartupInstagram(e.target.value)} placeholder="@handle or URL" className="w-full px-4 py-3 rounded-xl bg-background/60 border border-border/50 focus:border-primary/50 text-sm transition-colors focus:outline-none" />
                     </div>
 
                     <div className="space-y-1.5 md:col-span-1">
-                        <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">COMPANY LINKEDIN</label>
-                        <input type="text" value={startupLinkedinCompany} onChange={(e) => setStartupLinkedinCompany(e.target.value)} placeholder="company/slug or URL" className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none" />
+                        <label className="etower-section-label ml-1">Company LinkedIn</label>
+                        <input type="text" value={startupLinkedinCompany} onChange={(e) => setStartupLinkedinCompany(e.target.value)} placeholder="company/slug or URL" className="w-full px-4 py-3 rounded-xl bg-background/60 border border-border/50 focus:border-primary/50 text-sm transition-colors focus:outline-none" />
                     </div>
 
                     <div className="space-y-1.5 col-span-1 md:col-span-2">
-                        <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">COMPANY LOGO (OPTIONAL)</label>
+                        <label className="etower-section-label ml-1">Logo (optional)</label>
                         <input ref={startupLogoRef} type="file" accept="image/png,image/jpeg,image/webp" onChange={handleStartupLogo} className="hidden" />
                         <button
                             type="button"
                             onClick={() => startupLogoRef.current?.click()}
                             className={cn(
-                                "w-full flex flex-col items-center justify-center gap-2 px-4 py-4 border border-dashed transition-colors hud-panel-sm",
+                                "w-full flex flex-col items-center justify-center gap-2 px-4 py-4 border border-dashed transition-colors rounded-xl",
                                 startupLogo ? "border-primary/40 bg-primary/5" : "border-border/50 bg-background/40 hover:border-primary/50"
                             )}
                         >
@@ -366,24 +384,24 @@ export function StartupAdminTab({
                             ) : (
                                 <Upload className="w-6 h-6 text-muted-foreground" />
                             )}
-                            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                            <span className="text-xs text-white/45 text-muted-foreground">
                                 {startupLogo ? "Click to replace" : "PNG, JPG, WebP"}
                             </span>
                         </button>
                     </div>
 
                     <div className="space-y-1.5 col-span-1 md:col-span-2">
-                        <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">COMPANY OVERVIEW</label>
-                        <textarea value={startupDesc} onChange={(e) => setStartupDesc(e.target.value)} placeholder="Short overview for cards and detail header…" rows={3} className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none resize-none" />
+                        <label className="etower-section-label ml-1">Company overview</label>
+                        <textarea value={startupDesc} onChange={(e) => setStartupDesc(e.target.value)} placeholder="Short overview for cards and detail header…" rows={3} className="w-full px-4 py-3 rounded-xl bg-background/60 border border-border/50 focus:border-primary/50 text-sm transition-colors focus:outline-none resize-none" />
                     </div>
 
                     <div className="space-y-1.5 col-span-1 md:col-span-2">
-                        <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">FOUNDER STORY</label>
-                        <textarea value={startupFounderStory} onChange={(e) => setStartupFounderStory(e.target.value)} placeholder="Why you started, milestones, vision…" rows={5} className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none resize-none" />
+                        <label className="etower-section-label ml-1">Founder story</label>
+                        <textarea value={startupFounderStory} onChange={(e) => setStartupFounderStory(e.target.value)} placeholder="Why you started, milestones, vision…" rows={5} className="w-full px-4 py-3 rounded-xl bg-background/60 border border-border/50 focus:border-primary/50 text-sm transition-colors focus:outline-none resize-none" />
                     </div>
 
                     <div className="col-span-1 md:col-span-2 pt-2 flex items-center justify-between">
-                        <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest leading-relaxed max-w-sm border-l-2 border-primary/30 pl-3">
+                        <p className="text-xs text-white/45 leading-relaxed max-w-sm border-l-2 border-primary/30 pl-3">
                             Publishes immediately to the public gallery (no review queue).
                         </p>
                         <button
@@ -399,7 +417,7 @@ export function StartupAdminTab({
                                 !startupLinkedUid.trim() ||
                                 !startupBusinessCategory.trim()
                             }
-                            className="hud-panel bg-primary text-primary-foreground px-8 py-3.5 text-xs font-mono font-bold uppercase tracking-widest hover:brightness-110 transition-all glow-border disabled:opacity-50 flex items-center gap-3"
+                            className="etower-soft-btn etower-soft-btn--primary disabled:opacity-50"
                         >
                             {startupSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                             {startupSending ? "Publishing…" : "Publish startup"}
@@ -408,35 +426,35 @@ export function StartupAdminTab({
                 </div>
             </div>
 
-            <div className="hud-panel bg-card/40 border border-border/40 p-6 sm:p-8 scanlines relative">
-                <h3 className="font-bold text-sm mb-4 flex items-center gap-2 uppercase tracking-tight relative z-10 text-muted-foreground">
-                    <Rocket className="w-4 h-4" /> LIVE GALLERY
+            <div className="etower-soft-card p-6 sm:p-8 relative">
+                <h3 className="font-bold text-sm mb-4 flex items-center gap-2 tracking-tight relative z-10 text-muted-foreground">
+                    <Rocket className="w-4 h-4" /> Live gallery
                     <span className="ml-auto text-[10px] bg-primary/10 text-primary border border-primary/30 px-2 py-0.5">
-                        {approvedListings.length} PUBLISHED
+                        {approvedListings.length} published
                     </span>
                 </h3>
                 {approvedListings.length === 0 ? (
-                    <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest relative z-10">No approved listings yet.</p>
+                    <p className="text-xs text-white/45 relative z-10">No approved listings yet.</p>
                 ) : (
                     <div className="space-y-3 relative z-10">
                         {approvedListings.map((startup) => (
                             <div
                                 key={startup.id}
-                                className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 hud-panel-sm bg-background/50 border border-border/40 hover:border-primary/40 transition-colors"
+                                className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl bg-background/50 border border-border/40 hover:border-primary/40 transition-colors"
                             >
                                 <div className="flex min-w-0 flex-1 items-start gap-3">
                                     {startup.logoUrl ? (
                                         <img src={startup.logoUrl} alt="" className="h-10 w-10 shrink-0 border border-border/50 object-contain" />
                                     ) : null}
                                     <div className="min-w-0">
-                                        <p className="font-bold font-mono tracking-tight uppercase text-sm">
+                                        <p className="font-bold tracking-tight text-sm">
                                             {startup.name}
                                             <span className="text-muted-foreground ml-2">
                                                 [{startup.foundedYear}] · {startup.businessCategory}
                                             </span>
                                         </p>
                                         {(startup.submitterName || startup.submitterGraduationYear) && (
-                                            <p className="text-[9px] font-mono text-primary/70 uppercase tracking-widest mt-1">
+                                            <p className="text-[10px] text-primary/70 tracking-wide mt-1">
                                                 {startup.submitterName}
                                                 {startup.submitterGraduationYear ? ` · Class of ${startup.submitterGraduationYear}` : ""}
                                             </p>
@@ -444,14 +462,14 @@ export function StartupAdminTab({
                                     </div>
                                 </div>
                                 <div className="flex shrink-0 items-center gap-2">
-                                    <Link href={`/startups/edit/${startup.id}`} className="inline-flex items-center gap-1.5 px-3 py-2 hud-panel-sm border border-border/50 text-[10px] font-mono font-bold uppercase tracking-widest text-muted-foreground hover:border-primary/50 hover:text-primary transition-colors">
+                                    <Link href={`/startups/edit/${startup.id}`} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-border/50 etower-section-label text-muted-foreground hover:border-primary/50 hover:text-primary transition-colors">
                                         Edit
                                     </Link>
                                     <button
                                         type="button"
                                         disabled={deletingStartupId === startup.id}
                                         onClick={() => void handleDeleteStartupListing(startup.id, startup.name)}
-                                        className="inline-flex items-center gap-1.5 px-3 py-2 hud-panel-sm border border-destructive/40 text-[10px] font-mono font-bold uppercase tracking-widest text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50"
+                                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-destructive/40 etower-section-label text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50"
                                     >
                                         {deletingStartupId === startup.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
                                         Remove

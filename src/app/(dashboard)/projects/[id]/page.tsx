@@ -12,7 +12,6 @@ import {
     Users,
     ExternalLink,
     Calendar,
-    Terminal,
     Image as ImageIcon,
     Clock,
     LinkIcon,
@@ -25,6 +24,8 @@ import {
     X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { PageHeader } from "@/components/page-header";
+import { DEMO_MODE } from "@/lib/demo-mode";
 
 const TEAM_ROLES = ["lead", "developer", "designer", "member"] as const;
 
@@ -34,15 +35,19 @@ const statusColors: Record<string, string> = {
     development: "bg-primary/10 border-primary/30 text-primary",
     review: "bg-warning/10 border-warning/30 text-warning",
     complete: "bg-success/10 border-success/30 text-success",
-    published: "bg-primary/10 border-primary/30 text-primary",
+    published: "bg-[#00ff41]/10 border-[#00ff41]/30 text-[#00ff41]",
     active: "bg-chart-2/10 border-chart-2/30 text-chart-2",
 };
+
+const inputClass =
+    "w-full px-4 py-2.5 rounded-xl bg-[#0a1628] border border-[rgba(0,255,65,0.28)] focus:border-[#00ff41] text-sm transition-colors focus:outline-none";
 
 export default function ProjectDetailPage() {
     const params = useParams();
     const id = params?.id as string;
     const { profile } = useAuth();
-    const { data: projects, loading, addProjectTask, updateProjectTask, removeProjectTask, updateProject } = useProjects();
+    const { data: projects, loading, addProjectTask, updateProjectTask, removeProjectTask, updateProject } =
+        useProjects();
     const { data: members, loading: membersLoading } = useMembers();
     const [newTaskTitle, setNewTaskTitle] = useState("");
     const [taskSubmitting, setTaskSubmitting] = useState(false);
@@ -53,23 +58,22 @@ export default function ProjectDetailPage() {
     const isTeamMember = project && profile && project.teamMembers.some((m) => m.uid === profile.uid);
     const tasks = project?.tasks ?? [];
 
-    const addedUids = useMemo(() => new Set(project?.teamMembers?.map((m) => m.uid) ?? []), [project?.teamMembers]);
-    const nonAlumniMembers = useMemo(() => members.filter((m) => m.role !== "alumni"), [members]);
-    const filteredMemberList = useMemo(
-        () => {
-            if (!memberSearch.trim()) return nonAlumniMembers;
-            const q = memberSearch.toLowerCase().trim();
-            return nonAlumniMembers.filter(
-                (m) =>
-                    m.name.toLowerCase().includes(q) ||
-                    m.email.toLowerCase().includes(q)
-            );
-        },
-        [nonAlumniMembers, memberSearch]
+    const addedUids = useMemo(
+        () => new Set(project?.teamMembers?.map((m) => m.uid) ?? []),
+        [project?.teamMembers]
     );
+    const nonAlumniMembers = useMemo(() => members.filter((m) => m.role !== "alumni"), [members]);
+    const filteredMemberList = useMemo(() => {
+        if (!memberSearch.trim()) return nonAlumniMembers;
+        const q = memberSearch.toLowerCase().trim();
+        return nonAlumniMembers.filter(
+            (m) => m.name.toLowerCase().includes(q) || m.email.toLowerCase().includes(q)
+        );
+    }, [nonAlumniMembers, memberSearch]);
 
     const addProjectMember = async (uid: string, name: string, role: string = "member") => {
         if (!project || addedUids.has(uid) || teamUpdating) return;
+        if (DEMO_MODE) return;
         setTeamUpdating(true);
         try {
             const next = [...project.teamMembers, { uid, role, name }];
@@ -82,6 +86,7 @@ export default function ProjectDetailPage() {
         if (!project || teamUpdating) return;
         if (project.teamMembers.length <= 1) return;
         if (uid === profile?.uid && project.teamMembers.filter((m) => m.role === "lead").length <= 1) return;
+        if (DEMO_MODE) return;
         setTeamUpdating(true);
         try {
             const next = project.teamMembers.filter((m) => m.uid !== uid);
@@ -92,6 +97,7 @@ export default function ProjectDetailPage() {
     };
     const setProjectMemberRole = async (uid: string, role: string) => {
         if (!project || teamUpdating) return;
+        if (DEMO_MODE) return;
         setTeamUpdating(true);
         try {
             const next = project.teamMembers.map((m) => (m.uid === uid ? { ...m, role } : m));
@@ -104,20 +110,19 @@ export default function ProjectDetailPage() {
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center py-32 gap-4">
-                <Clock className="w-8 h-8 animate-spin text-primary" />
-                <span className="text-xs font-mono text-primary uppercase tracking-widest animate-pulse">DECRYPTING ARCHIVE...</span>
+                <Clock className="w-8 h-8 animate-spin text-[#00ff41]" />
+                <span className="text-sm text-white/55">Loading project…</span>
             </div>
         );
     }
 
     if (!project) {
         return (
-            <div className="flex flex-col items-center justify-center py-32 text-center space-y-4">
-                <Terminal className="w-12 h-12 text-destructive mb-2" />
-                <h1 className="text-2xl font-black uppercase tracking-widest text-destructive">DATA_CORRUPTION</h1>
-                <p className="text-muted-foreground font-mono text-sm">The requested project file could not be located in the directory.</p>
-                <Link href="/projects" className="mt-4 px-6 py-3 hud-panel-sm bg-background border border-border/50 hover:bg-primary/10 hover:text-primary transition-colors font-mono text-xs font-bold uppercase tracking-widest">
-                    RETURN TO DIRECTORY
+            <div className="flex flex-col items-center justify-center py-32 text-center space-y-4 etower-soft-card max-w-lg mx-auto p-8">
+                <h1 className="text-2xl font-bold tracking-tight text-red-300">Project not found</h1>
+                <p className="text-white/55 text-sm">This project could not be located in the directory.</p>
+                <Link href="/projects" className="etower-soft-btn etower-soft-btn--ghost mt-2">
+                    Back to projects
                 </Link>
             </div>
         );
@@ -125,161 +130,161 @@ export default function ProjectDetailPage() {
 
     return (
         <div className="space-y-6 animate-fade-in relative z-10 pb-20">
-            {/* Navigation Header */}
-            <div className="flex flex-col sm:flex-row items-start gap-4 pb-4">
+            <div className="flex items-start gap-3">
                 <Link
                     href="/projects"
-                    className="p-2 hud-panel-sm bg-background border border-border/40 hover:border-primary/50 hover:text-primary transition-colors text-muted-foreground"
+                    className="etower-soft-btn etower-soft-btn--ghost p-2.5 mt-1"
+                    aria-label="Back to projects"
                 >
                     <ArrowLeft className="w-5 h-5" />
                 </Link>
-                <div className="flex-1 flex flex-wrap items-center gap-3">
-                    <div className="flex items-center gap-2 text-[10px] font-mono text-primary/80 uppercase tracking-widest">
-                        <Terminal className="w-3.5 h-3.5" />
-                        ID_{project.id.slice(0, 8)}
-                    </div>
-                    <div className="w-1 h-1 bg-border rounded-full" />
-                    <span className={cn("text-[10px] font-mono font-bold px-2 py-0.5 uppercase tracking-widest border hud-panel-sm", statusColors[project.status] || statusColors.published)}>
-                        {project.status}
-                    </span>
-                </div>
+                <PageHeader
+                    className="flex-1 border-b-0 pb-0"
+                    eyebrow="Projects"
+                    title={project.name}
+                    description={project.description}
+                    actions={
+                        <span
+                            className={cn(
+                                "text-[10px] font-semibold px-2.5 py-1 rounded-full border capitalize",
+                                statusColors[project.status] || statusColors.published
+                            )}
+                        >
+                            {project.status}
+                        </span>
+                    }
+                />
             </div>
 
-            {/* Hero Section */}
-            <div className="w-full aspect-video md:aspect-[21/9] max-h-[500px] hud-panel bg-card border border-border/40 relative overflow-hidden flex items-center justify-center glow-border group scanlines">
+            <div className="w-full aspect-video md:aspect-[21/9] max-h-[500px] etower-soft-card relative overflow-hidden flex items-center justify-center group">
                 {project.coverImage ? (
-                    <img src={project.coverImage} alt={project.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" />
+                    <img
+                        src={project.coverImage}
+                        alt={project.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
+                    />
                 ) : (
-                    <div className="w-full h-full bg-background/50 flex flex-col items-center justify-center text-muted-foreground/30 pattern-grid-lg">
+                    <div className="w-full h-full bg-[#0a1628]/50 flex flex-col items-center justify-center text-white/25">
                         <ImageIcon className="w-12 h-12 mb-3" />
-                        <span className="text-xs font-mono uppercase tracking-widest font-bold">MISSING VISUAL ASSET</span>
+                        <span className="text-xs font-semibold">No cover image</span>
                     </div>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
-
-                {/* Hero Title Overlay */}
-                <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-10 z-10">
-                    <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tighter uppercase mb-4 text-foreground drop-shadow-lg">
-                        {project.name}
-                    </h1>
-                    <p className="text-lg sm:text-xl font-mono text-primary/90 max-w-3xl drop-shadow-md leading-relaxed">
-                        {project.description}
-                    </p>
-                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-[#0a1628]/20 to-transparent pointer-events-none" />
             </div>
 
-            {/* Content Split Layout */}
-            <div className="grid lg:grid-cols-3 gap-8 pt-4">
-                {/* Main Story Content */}
-                <div className="lg:col-span-2 space-y-8">
-                    <div className="hud-panel bg-card/40 border border-border/40 p-6 sm:p-8 sm:px-10 scanlines relative min-h-[500px]">
-                        <div className="absolute top-0 right-0 w-32 h-1 bg-gradient-to-r from-transparent to-primary/50" />
-
-                        <div className="prose prose-invert prose-p:font-mono prose-p:text-sm prose-p:leading-loose prose-p:text-muted-foreground prose-headings:font-black prose-headings:uppercase prose-headings:tracking-tight prose-a:text-primary prose-a:no-underline hover:prose-a:text-primary/80 max-w-none">
+            <div className="grid lg:grid-cols-3 gap-6 pt-2">
+                <div className="lg:col-span-2 space-y-6">
+                    <div className="etower-soft-card p-6 sm:p-8 sm:px-10 min-h-[400px]">
+                        <div className="prose prose-invert prose-p:text-sm prose-p:leading-relaxed prose-p:text-white/60 prose-headings:font-bold prose-headings:tracking-tight prose-a:text-[#00ff41] prose-a:no-underline hover:prose-a:text-[#00ff41]/80 max-w-none">
                             {project.content ? (
-                                <ReactMarkdown>
-                                    {project.content}
-                                </ReactMarkdown>
+                                <ReactMarkdown>{project.content}</ReactMarkdown>
                             ) : (
                                 <div className="text-center py-20 opacity-50">
-                                    <Terminal className="w-12 h-12 mx-auto mb-4" />
-                                    <p className="text-xs uppercase tracking-widest font-bold">NO PROJECT LOG AVAILABLE.</p>
+                                    <p className="text-sm text-white/50">No project story yet.</p>
                                 </div>
                             )}
                         </div>
                     </div>
                 </div>
 
-                {/* Sidebar */}
-                <div className="space-y-6">
-                    {/* Endpoints */}
-                    <div className="hud-corners bg-card/60 border border-border/40 p-6 scanlines relative group">
-                        <h2 className="font-bold font-mono tracking-tight uppercase mb-5 flex items-center gap-2 pb-3 border-b border-border/40 text-primary">
+                <div className="space-y-5">
+                    <div className="etower-soft-card p-6">
+                        <h2 className="font-semibold tracking-tight mb-4 flex items-center gap-2 pb-3 border-b border-[rgba(0,255,65,0.18)] text-[#00ff41]">
                             <LinkIcon className="w-5 h-5" />
-                            DEPLOYMENT ENDPOINTS
+                            Links
                         </h2>
-
                         <div className="space-y-3">
                             {project.liveUrl ? (
-                                <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4 hud-panel-sm bg-primary border border-primary text-primary-foreground hover:brightness-110 transition-all group/link glow-border">
-                                    <ExternalLink className="w-5 h-5" />
-                                    <div className="flex-1">
-                                        <div className="text-xs font-bold font-mono uppercase tracking-widest">LIVE APP DEPLOYMENT</div>
-                                    </div>
-                                    <ArrowLeft className="w-4 h-4 rotate-135 group-hover/link:translate-x-1 group-hover/link:-translate-y-1 transition-transform" />
+                                <a
+                                    href={project.liveUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="etower-soft-btn etower-soft-btn--primary w-full justify-between"
+                                >
+                                    <span className="flex items-center gap-2">
+                                        <ExternalLink className="w-4 h-4" />
+                                        Live app
+                                    </span>
+                                    <ArrowLeft className="w-4 h-4 rotate-135" />
                                 </a>
                             ) : (
-                                <div className="p-4 hud-panel-sm bg-background border border-border/40 text-muted-foreground/50 text-xs font-mono uppercase tracking-widest text-center">
-                                    NO SECURE UPLINK ESTABLISHED
+                                <div className="p-4 rounded-xl border border-[rgba(0,255,65,0.15)] bg-[#0a1628]/50 text-white/40 text-xs text-center">
+                                    No live URL yet
                                 </div>
                             )}
 
                             {project.githubUrl && (
-                                <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4 hud-panel-sm bg-card border border-border/40 hover:border-chart-1/50 hover:bg-chart-1/5 text-muted-foreground hover:text-chart-1 transition-colors group/git">
-                                    <GitBranch className="w-5 h-5" />
-                                    <div className="flex-1">
-                                        <div className="text-xs font-bold font-mono uppercase tracking-widest">SOURCE_CODE / REPO</div>
-                                    </div>
-                                    <ExternalLink className="w-4 h-4 opacity-50 group-hover/git:opacity-100 transition-opacity" />
+                                <a
+                                    href={project.githubUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="etower-soft-btn etower-soft-btn--ghost w-full justify-between"
+                                >
+                                    <span className="flex items-center gap-2">
+                                        <GitBranch className="w-4 h-4" />
+                                        Source repo
+                                    </span>
+                                    <ExternalLink className="w-4 h-4 opacity-50" />
                                 </a>
                             )}
                         </div>
                     </div>
 
-                    {/* Personnel — same tag UI as new project form / onboarding */}
-                    <div className="hud-panel bg-card/60 border border-border/40 p-6 sm:p-8 scanlines relative">
-                        <div className="flex items-center justify-between mb-4 border-b border-border/40 pb-4 relative z-10">
-                            <h2 className="font-bold text-lg font-mono tracking-tight uppercase flex items-center gap-2">
-                                <Users className="w-5 h-5 text-primary" /> PROJECT CONTRIBUTORS
+                    <div className="etower-soft-card p-6">
+                        <div className="flex items-center justify-between mb-4 border-b border-[rgba(0,255,65,0.18)] pb-4">
+                            <h2 className="font-semibold tracking-tight flex items-center gap-2">
+                                <Users className="w-5 h-5 text-[#00ff41]" /> Contributors
                             </h2>
-                            <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
-                                {project.teamMembers.length} SELECTED
-                            </span>
+                            <span className="text-xs text-white/45">{project.teamMembers.length}</span>
                         </div>
-                        <div className="space-y-4 relative z-10">
+                        <div className="space-y-4">
                             {isTeamMember && (
                                 <>
-                                    {/* Search */}
                                     <div className="relative">
-                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
                                         <input
                                             type="text"
                                             value={memberSearch}
                                             onChange={(e) => setMemberSearch(e.target.value)}
                                             placeholder="Search by name or email..."
-                                            className="w-full pl-10 pr-4 py-2.5 hud-panel-sm bg-background/50 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none"
+                                            className={cn(inputClass, "pl-10")}
                                         />
                                     </div>
 
-                                    {/* Selected pills — same as new project form */}
                                     {project.teamMembers.length > 0 && (
                                         <div className="flex flex-wrap gap-1.5">
                                             {project.teamMembers.map((m) => (
                                                 <div
                                                     key={m.uid}
-                                                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-sm bg-primary/20 border border-primary text-primary text-[10px] font-mono uppercase tracking-wider"
+                                                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#00ff41]/15 border border-[#00ff41]/40 text-[#00ff41] text-xs"
                                                 >
                                                     <select
                                                         value={m.role}
                                                         onChange={(e) => setProjectMemberRole(m.uid, e.target.value)}
                                                         onClick={(e) => e.stopPropagation()}
                                                         disabled={teamUpdating}
-                                                        className="bg-transparent border-none focus:outline-none cursor-pointer text-[10px] font-mono font-bold uppercase text-primary pr-0.5 min-w-0 disabled:opacity-70"
+                                                        className="bg-transparent border-none focus:outline-none cursor-pointer text-xs font-semibold text-[#00ff41] pr-0.5 min-w-0 disabled:opacity-70"
                                                     >
                                                         {TEAM_ROLES.map((r) => (
-                                                            <option key={r} value={r}>{r}</option>
+                                                            <option key={r} value={r}>
+                                                                {r}
+                                                            </option>
                                                         ))}
                                                     </select>
-                                                    <span className="truncate max-w-[100px]">{m.name || m.uid.slice(0, 8)}</span>
+                                                    <span className="truncate max-w-[100px]">
+                                                        {m.name || m.uid.slice(0, 8)}
+                                                    </span>
                                                     <button
                                                         type="button"
                                                         onClick={() => removeProjectMember(m.uid)}
                                                         disabled={
                                                             teamUpdating ||
                                                             project.teamMembers.length <= 1 ||
-                                                            (m.uid === profile?.uid && project.teamMembers.filter((x) => x.role === "lead").length <= 1)
+                                                            (m.uid === profile?.uid &&
+                                                                project.teamMembers.filter((x) => x.role === "lead")
+                                                                    .length <= 1)
                                                         }
-                                                        className="p-0.5 text-primary/80 hover:text-primary hover:bg-primary/20 rounded disabled:opacity-40 disabled:cursor-not-allowed"
+                                                        className="p-0.5 text-[#00ff41]/80 hover:text-[#00ff41] hover:bg-[#00ff41]/20 rounded-full disabled:opacity-40 disabled:cursor-not-allowed"
                                                         title="Remove from project"
                                                     >
                                                         <X className="w-3 h-3" />
@@ -289,16 +294,17 @@ export default function ProjectDetailPage() {
                                         </div>
                                     )}
 
-                                    {/* Directory — clickable tags like new project form */}
                                     <div className="max-h-[40vh] overflow-y-auto space-y-4 pr-2 custom-scroll">
                                         {membersLoading ? (
                                             <div className="flex flex-col items-center justify-center py-8 gap-2">
-                                                <Loader2 className="w-5 h-5 animate-spin text-primary" />
-                                                <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Loading directory...</p>
+                                                <Loader2 className="w-5 h-5 animate-spin text-[#00ff41]" />
+                                                <p className="text-xs text-white/45">Loading directory…</p>
                                             </div>
                                         ) : filteredMemberList.length === 0 ? (
-                                            <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest py-4 text-center">
-                                                {memberSearch.trim() ? "No matching members." : "No non-alumni members in directory."}
+                                            <p className="text-xs text-white/45 py-4 text-center">
+                                                {memberSearch.trim()
+                                                    ? "No matching members."
+                                                    : "No non-alumni members in directory."}
                                             </p>
                                         ) : (
                                             <div className="flex flex-wrap gap-2">
@@ -313,12 +319,19 @@ export default function ProjectDetailPage() {
                                                                     ? removeProjectMember(mem.id)
                                                                     : addProjectMember(mem.id, mem.name)
                                                             }
-                                                            disabled={teamUpdating || (onTeam && project.teamMembers.length <= 1) || (onTeam && mem.id === profile?.uid && project.teamMembers.filter((x) => x.role === "lead").length <= 1)}
+                                                            disabled={
+                                                                teamUpdating ||
+                                                                (onTeam && project.teamMembers.length <= 1) ||
+                                                                (onTeam &&
+                                                                    mem.id === profile?.uid &&
+                                                                    project.teamMembers.filter((x) => x.role === "lead")
+                                                                        .length <= 1)
+                                                            }
                                                             className={cn(
-                                                                "px-3 py-1.5 hud-panel-sm text-xs font-mono transition-all border",
+                                                                "etower-soft-btn text-xs py-1.5 px-3",
                                                                 onTeam
-                                                                    ? "bg-primary/10 text-primary border-primary glow-border"
-                                                                    : "bg-card/40 border-border/40 text-muted-foreground hover:bg-accent hover:border-border"
+                                                                    ? "etower-soft-btn--primary"
+                                                                    : "etower-soft-btn--ghost"
                                                             )}
                                                         >
                                                             {mem.name}
@@ -335,10 +348,12 @@ export default function ProjectDetailPage() {
                                     {project.teamMembers.map((m) => (
                                         <div
                                             key={m.uid}
-                                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-sm bg-card/60 border border-border/50 text-muted-foreground text-[10px] font-mono uppercase tracking-wider"
+                                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#0a1628]/60 border border-[rgba(0,255,65,0.2)] text-white/60 text-xs"
                                         >
-                                            <span className="text-primary/80">{m.role}</span>
-                                            <span className="truncate max-w-[100px]">{m.name || m.uid.slice(0, 8)}</span>
+                                            <span className="text-[#00ff41]/80">{m.role}</span>
+                                            <span className="truncate max-w-[100px]">
+                                                {m.name || m.uid.slice(0, 8)}
+                                            </span>
                                         </div>
                                     ))}
                                 </div>
@@ -346,50 +361,70 @@ export default function ProjectDetailPage() {
                         </div>
                     </div>
 
-                    {/* Tasks */}
-                    <div className="hud-panel bg-card/60 border border-border/40 p-6 scanlines relative group">
-                        <h2 className="font-bold font-mono tracking-tight uppercase mb-4 flex items-center gap-2 pb-3 border-b border-border/40">
-                            <CheckSquare className="w-5 h-5 text-primary" />
-                            TASKS
+                    <div className="etower-soft-card p-6">
+                        <h2 className="font-semibold tracking-tight mb-4 flex items-center gap-2 pb-3 border-b border-[rgba(0,255,65,0.18)]">
+                            <CheckSquare className="w-5 h-5 text-[#00ff41]" />
+                            Tasks
                             {tasks.length > 0 && (
-                                <span className="text-[10px] font-mono text-muted-foreground font-normal">
+                                <span className="text-xs text-white/45 font-normal">
                                     {tasks.filter((t) => t.completed).length}/{tasks.length}
                                 </span>
                             )}
                         </h2>
-                        <div className="space-y-3 relative z-10">
+                        <div className="space-y-3">
                             {tasks.length === 0 && !isTeamMember && (
-                                <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">No tasks yet.</p>
+                                <p className="text-xs text-white/45">No tasks yet.</p>
                             )}
                             {tasks.map((task) => (
                                 <div
                                     key={task.id}
                                     className={cn(
-                                        "flex items-center gap-3 p-3 hud-panel-sm bg-background/50 border border-border/40 group/task hover:border-primary/30 transition-colors",
+                                        "flex items-center gap-3 p-3 rounded-xl bg-[#0a1628]/50 border border-[rgba(0,255,65,0.15)] group/task hover:border-[#00ff41]/30 transition-colors",
                                         task.completed && "opacity-70"
                                     )}
                                 >
                                     {isTeamMember ? (
                                         <button
                                             type="button"
-                                            onClick={() => updateProjectTask(project.id, task.id, { completed: !task.completed })}
-                                            className="shrink-0 text-primary hover:brightness-110 transition-opacity"
+                                            onClick={() => {
+                                                if (DEMO_MODE) return;
+                                                void updateProjectTask(project.id, task.id, {
+                                                    completed: !task.completed,
+                                                });
+                                            }}
+                                            className="shrink-0 text-[#00ff41] hover:brightness-110"
                                         >
-                                            {task.completed ? <CheckSquare className="w-4 h-4 fill-primary" /> : <Square className="w-4 h-4" />}
+                                            {task.completed ? (
+                                                <CheckSquare className="w-4 h-4 fill-[#00ff41]" />
+                                            ) : (
+                                                <Square className="w-4 h-4" />
+                                            )}
                                         </button>
                                     ) : (
-                                        <span className="shrink-0 text-muted-foreground">
-                                            {task.completed ? <CheckSquare className="w-4 h-4 fill-primary/50" /> : <Square className="w-4 h-4 opacity-50" />}
+                                        <span className="shrink-0 text-white/40">
+                                            {task.completed ? (
+                                                <CheckSquare className="w-4 h-4 fill-[#00ff41]/50" />
+                                            ) : (
+                                                <Square className="w-4 h-4 opacity-50" />
+                                            )}
                                         </span>
                                     )}
-                                    <span className={cn("flex-1 text-sm font-mono uppercase tracking-tight", task.completed && "line-through text-muted-foreground")}>
+                                    <span
+                                        className={cn(
+                                            "flex-1 text-sm",
+                                            task.completed && "line-through text-white/40"
+                                        )}
+                                    >
                                         {task.title}
                                     </span>
                                     {isTeamMember && (
                                         <button
                                             type="button"
-                                            onClick={() => removeProjectTask(project.id, task.id)}
-                                            className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover/task:opacity-100"
+                                            onClick={() => {
+                                                if (DEMO_MODE) return;
+                                                void removeProjectTask(project.id, task.id);
+                                            }}
+                                            className="p-1.5 text-white/40 hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover/task:opacity-100 rounded-lg"
                                         >
                                             <Trash2 className="w-3.5 h-3.5" />
                                         </button>
@@ -402,6 +437,7 @@ export default function ProjectDetailPage() {
                                     onSubmit={async (e) => {
                                         e.preventDefault();
                                         if (!newTaskTitle.trim() || taskSubmitting) return;
+                                        if (DEMO_MODE) return;
                                         setTaskSubmitting(true);
                                         try {
                                             await addProjectTask(project.id, newTaskTitle);
@@ -416,24 +452,29 @@ export default function ProjectDetailPage() {
                                         value={newTaskTitle}
                                         onChange={(e) => setNewTaskTitle(e.target.value)}
                                         placeholder="Add a task..."
-                                        className="flex-1 px-3 py-2 hud-panel-sm bg-background/50 border border-border/50 focus:border-primary/50 text-xs font-mono uppercase tracking-wider focus:outline-none"
+                                        className={cn(inputClass, "flex-1")}
                                         disabled={taskSubmitting}
                                     />
                                     <button
                                         type="submit"
                                         disabled={!newTaskTitle.trim() || taskSubmitting}
-                                        className="p-2 hud-panel-sm bg-primary text-primary-foreground hover:brightness-110 disabled:opacity-50 transition-all"
+                                        className="etower-soft-btn etower-soft-btn--primary p-2.5 disabled:opacity-50"
                                     >
-                                        {taskSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                                        {taskSubmitting ? (
+                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                        ) : (
+                                            <Plus className="w-4 h-4" />
+                                        )}
                                     </button>
                                 </form>
                             )}
                         </div>
                     </div>
 
-                    {/* Meta */}
-                    <div className="hud-panel-sm bg-card/40 border border-border/40 p-4 flex items-center justify-between text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                        <span className="flex items-center gap-1.5"><Calendar className="w-3 h-3 text-primary" /> INITIALIZED</span>
+                    <div className="etower-soft-card p-4 flex items-center justify-between text-xs text-white/45">
+                        <span className="flex items-center gap-1.5">
+                            <Calendar className="w-3 h-3 text-[#00ff41]" /> Created
+                        </span>
                         <span>{project.createdAt}</span>
                     </div>
                 </div>

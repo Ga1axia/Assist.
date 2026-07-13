@@ -53,7 +53,7 @@ export function EtowerFooter() {
             </div>
           </div>
         </div>
-        <div className="mt-12 pt-8 border-t border-[rgba(0,255,65,0.3)] flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-white/40">
+        <div className="mt-12 pt-8 border-t border-[rgba(0,255,65,0.18)] flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-white/40">
           <p>© {new Date().getFullYear()} eTower. All rights reserved.</p>
           <div className="flex gap-6">
             <span>Privacy Policy</span>

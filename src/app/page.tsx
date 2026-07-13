@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
   ArrowRight,
   Instagram,
@@ -112,7 +113,7 @@ export default function LandingPage() {
         <EtowerOutletsSection />
 
         {/* Testimonials */}
-        <section className="py-24 px-4 sm:px-6 border-t border-[rgba(0,255,65,0.3)]">
+        <section className="py-24 px-4 sm:px-6 border-t border-[rgba(0,255,65,0.18)]">
           <div className="max-w-6xl mx-auto">
             <FadeIn>
               <div className="text-center mb-14">
@@ -165,7 +166,7 @@ export default function LandingPage() {
         </section>
 
         {/* Instagram */}
-        <section className="py-24 px-4 sm:px-6 border-t border-[rgba(0,255,65,0.3)]">
+        <section className="py-24 px-4 sm:px-6 border-t border-[rgba(0,255,65,0.18)]">
           <div className="max-w-6xl mx-auto">
             <FadeIn>
               <div className="text-center mb-14">
@@ -242,9 +243,12 @@ export default function LandingPage() {
                     on a rolling basis — early applications encouraged.
                   </p>
                   <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <a href="#contact" className="etower-btn etower-btn--primary px-8 py-3.5 text-sm">
-                      Learn More
+                    <Link href="/login" className="etower-btn etower-btn--primary px-8 py-3.5 text-sm">
+                      Member Login
                       <ArrowRight className="w-4 h-4" />
+                    </Link>
+                    <a href="#contact" className="etower-btn etower-btn--outline px-8 py-3.5 text-sm">
+                      Learn More
                     </a>
                     <a
                       href={ETOWER.instagramUrl}

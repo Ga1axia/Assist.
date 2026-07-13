@@ -58,41 +58,35 @@ export function ClubFiscalAdminTab() {
     };
 
     return (
-        <div className="hud-panel bg-card/60 border border-primary/40 p-6 sm:p-8 scanlines relative">
-            <div className="absolute top-0 right-0 w-32 h-1 bg-gradient-to-r from-transparent to-primary/50" />
-            <h3 className="font-bold text-lg mb-2 flex items-center gap-3 uppercase tracking-tight relative z-10 text-primary border-b border-primary/20 pb-4">
-                <CalendarClock className="w-5 h-5" /> CLUB FISCAL TERM
+        <div className="etower-soft-card p-6 sm:p-8 border-[#00ff41]/30">
+            <h3 className="font-semibold text-lg mb-2 flex items-center gap-3 tracking-tight text-[#00ff41] border-b border-[rgba(0,255,65,0.18)] pb-4">
+                <CalendarClock className="w-5 h-5" /> Club fiscal term
             </h3>
-            <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest mb-6 relative z-10 max-w-xl leading-relaxed">
-                Sets the global label shown on the dashboard and applied automatically when budgets are saved or exported (e.g.{" "}
-                <span className="text-primary">S26</span> = Spring &apos;26, <span className="text-primary">F26</span> = Fall &apos;26).
+            <p className="text-sm text-white/55 mb-6 max-w-xl leading-relaxed">
+                Sets the global label shown on the dashboard and applied automatically when budgets are saved or
+                exported (e.g. <span className="text-[#00ff41]">S26</span> = Spring &apos;26,{" "}
+                <span className="text-[#00ff41]">F26</span> = Fall &apos;26).
             </p>
 
-            {error && (
-                <p className="text-xs font-mono text-destructive mb-4 relative z-10">
-                    Firestore: {error}
-                </p>
-            )}
+            {error && <p className="text-xs text-destructive mb-4">Could not load settings: {error}</p>}
 
             {loading ? (
-                <div className="flex items-center gap-3 py-12 relative z-10">
-                    <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                    <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Loading settings…</span>
+                <div className="flex items-center gap-3 py-12">
+                    <Loader2 className="w-6 h-6 animate-spin text-[#00ff41]" />
+                    <span className="text-sm text-white/45">Loading settings…</span>
                 </div>
             ) : (
-                <div className="space-y-6 relative z-10">
+                <div className="space-y-6">
                     <div className="flex flex-wrap gap-3 items-center">
-                        <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-muted-foreground">Term</span>
+                        <span className="etower-section-label">Term</span>
                         {(["spring", "fall"] as const).map((t) => (
                             <button
                                 key={t}
                                 type="button"
                                 onClick={() => setTerm(t)}
                                 className={cn(
-                                    "px-4 py-2 text-[10px] font-mono font-bold uppercase tracking-widest border transition-colors",
-                                    term === t
-                                        ? "border-primary bg-primary/15 text-primary"
-                                        : "border-border/50 bg-background/40 hover:border-primary/40"
+                                    "etower-soft-btn text-xs",
+                                    term === t ? "etower-soft-btn--primary" : "etower-soft-btn--ghost"
                                 )}
                             >
                                 {t === "spring" ? "Spring (S)" : "Fall (F)"}
@@ -101,23 +95,23 @@ export function ClubFiscalAdminTab() {
                     </div>
 
                     <div className="space-y-1.5 max-w-xs">
-                        <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest ml-1">
-                            Year (2 digits)
-                        </label>
+                        <label className="etower-section-label block">Year (2 digits)</label>
                         <input
                             type="text"
                             inputMode="numeric"
                             value={yearInput}
                             onChange={(e) => setYearInput(e.target.value)}
                             placeholder="26"
-                            className="w-full px-4 py-3 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono tabular-nums focus:outline-none"
+                            className="w-full px-4 py-3 rounded-xl bg-[#0a1628] border border-[rgba(0,255,65,0.28)] focus:border-[#00ff41] text-sm tabular-nums focus:outline-none"
                         />
-                        <p className="text-[9px] font-mono text-muted-foreground">You can type 26 or 2026 — only the last two digits are stored.</p>
+                        <p className="text-xs text-white/40">
+                            You can type 26 or 2026 — only the last two digits are stored.
+                        </p>
                     </div>
 
-                    <div className="hud-panel-sm border border-primary/30 bg-primary/5 px-4 py-3 inline-block">
-                        <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground mr-2">Preview</span>
-                        <span className="text-lg font-black font-mono text-primary tabular-nums">{preview}</span>
+                    <div className="rounded-xl border border-[#00ff41]/30 bg-[#00ff41]/5 px-4 py-3 inline-block">
+                        <span className="etower-section-label mr-2">Preview</span>
+                        <span className="text-lg font-bold text-[#00ff41] tabular-nums">{preview}</span>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-4 pt-2">
@@ -125,12 +119,12 @@ export function ClubFiscalAdminTab() {
                             type="button"
                             disabled={saving}
                             onClick={() => void handleSave()}
-                            className="hud-panel bg-primary text-primary-foreground px-8 py-3.5 text-xs font-mono font-bold uppercase tracking-widest hover:brightness-110 transition-all glow-border disabled:opacity-50 flex items-center gap-3"
+                            className="etower-soft-btn etower-soft-btn--primary disabled:opacity-50"
                         >
                             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                             {saving ? "Saving…" : "Save club fiscal"}
                         </button>
-                        {msg && <span className="text-[10px] font-mono text-muted-foreground">{msg}</span>}
+                        {msg && <span className="text-xs text-white/45">{msg}</span>}
                     </div>
                 </div>
             )}

@@ -12,6 +12,8 @@ import {
     timestampToMs,
     type StartupItem,
 } from "@/lib/startup-document";
+import { DEMO_MODE } from "@/lib/demo-mode";
+import { DEMO_STARTUPS } from "@/lib/demo-dashboard-data";
 
 function sortStartupDocs(docs: { data: () => Record<string, unknown>; id: string }[]) {
     return docs
@@ -47,6 +49,13 @@ export function usePublicStartups(enabled: boolean = true) {
 
     useEffect(() => {
         if (!enabled || authLoading) return;
+
+        if (DEMO_MODE) {
+            setData(DEMO_STARTUPS.filter((s) => s.status === "approved"));
+            setLoading(false);
+            setError(null);
+            return;
+        }
 
         let cancelled = false;
         setLoading(true);

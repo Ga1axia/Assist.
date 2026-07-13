@@ -10,7 +10,7 @@ export default function OurStoryPage() {
     <div className="etower-page min-h-screen">
       <EtowerNav />
       <main className="pt-8 pb-0">
-        <section className="py-16 px-4 sm:px-6 border-b border-[rgba(0,255,65,0.3)]">
+        <section className="py-16 px-4 sm:px-6 border-b border-[rgba(0,255,65,0.18)]">
           <div className="max-w-3xl mx-auto">
             <FadeIn>
               <p className="etower-section-label mb-3">Our Story</p>

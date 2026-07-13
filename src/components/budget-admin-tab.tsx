@@ -259,7 +259,7 @@ export function BudgetAdminTab() {
         return (
             <div className="flex flex-col items-center justify-center py-20 gap-3">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                <span className="text-xs text-white/45">
                     Loading budgets…
                 </span>
             </div>
@@ -270,12 +270,12 @@ export function BudgetAdminTab() {
         const isPermission =
             error.toLowerCase().includes("permission") || error.toLowerCase().includes("insufficient");
         return (
-            <div className="hud-panel border border-destructive/40 bg-destructive/5 p-6 space-y-3">
-                <p className="text-sm font-mono text-destructive font-bold uppercase tracking-tight">
+            <div className="etower-soft-card border-destructive/40 bg-destructive/5 p-6 space-y-3">
+                <p className="text-sm text-destructive font-bold tracking-tight">
                     Firestore: {error}
                 </p>
                 {isPermission && (
-                    <div className="text-xs font-mono text-muted-foreground space-y-2 leading-relaxed border-l-2 border-destructive/30 pl-3">
+                    <div className="text-xs text-muted-foreground space-y-2 leading-relaxed border-l-2 border-destructive/30 pl-3">
                         <p>
                             Localhost still talks to your real Firebase project. If the <code className="text-foreground">budgets</code> rules are
                             not published in that project, every listener gets permission-denied (this is not a Next.js or CORS bug).
@@ -290,7 +290,7 @@ export function BudgetAdminTab() {
                             <code className="text-foreground">firebase use &lt;your-project-id&gt;</code>):{" "}
                             <code className="text-primary whitespace-nowrap">firebase deploy --only firestore:rules</code>
                         </p>
-                        <p className="text-[10px] uppercase tracking-widest">
+                        <p className="text-[10px] tracking-wide">
                             Confirm <code className="normal-case text-foreground">NEXT_PUBLIC_FIREBASE_PROJECT_ID</code> matches the project where
                             you published rules.
                         </p>
@@ -302,18 +302,18 @@ export function BudgetAdminTab() {
 
     return (
         <div className="space-y-6">
-            <div className="hud-panel bg-card/60 border border-primary/40 p-6 scanlines relative">
+            <div className="etower-soft-card p-6 relative border-[#00ff41]/30">
                 <div className="absolute top-0 right-0 w-32 h-1 bg-gradient-to-r from-transparent to-primary/50" />
-                <h3 className="font-bold text-lg mb-2 flex items-center gap-3 uppercase tracking-tight relative z-10 text-primary border-b border-primary/20 pb-4">
-                    <FileSpreadsheet className="w-5 h-5" /> BUDGET WORKSPACE
+                <h3 className="font-bold text-lg mb-2 flex items-center gap-3 tracking-tight relative z-10 text-primary border-b border-primary/20 pb-4">
+                    <FileSpreadsheet className="w-5 h-5" /> Budget workspace
                 </h3>
-                <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest mb-4 relative z-10">
+                <p className="text-xs text-white/45 mb-4 relative z-10">
                     Columns: Item, Price, Quantity, Notes, Link. Total cost = Σ (price × quantity). Export downloads an .xlsx with summary fields and
                     line items.
                 </p>
 
                 {orgSettingsError && (
-                    <div className="relative z-10 mb-4 rounded-sm border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-[10px] font-mono text-amber-200/90 leading-relaxed">
+                    <div className="relative z-10 mb-4 rounded-sm border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-200/90 leading-relaxed">
                         {orgSettingsError}
                     </div>
                 )}
@@ -322,7 +322,7 @@ export function BudgetAdminTab() {
                     <button
                         type="button"
                         onClick={startNew}
-                        className="hud-panel-sm px-4 py-2 text-[10px] font-mono font-bold uppercase tracking-widest border border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 flex items-center gap-2"
+                        className="rounded-xl px-4 py-2 etower-section-label border border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 flex items-center gap-2"
                     >
                         <Plus className="w-3.5 h-3.5" /> New budget
                     </button>
@@ -336,14 +336,14 @@ export function BudgetAdminTab() {
                     <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="hud-panel-sm px-4 py-2 text-[10px] font-mono font-bold uppercase tracking-widest border border-border/50 hover:border-primary/50 flex items-center gap-2"
+                        className="rounded-xl px-4 py-2 etower-section-label border border-border/50 hover:border-primary/50 flex items-center gap-2"
                     >
                         <Upload className="w-3.5 h-3.5" /> Import CSV / Excel
                     </button>
                     <button
                         type="button"
                         onClick={() => void exportXlsx()}
-                        className="hud-panel-sm px-4 py-2 text-[10px] font-mono font-bold uppercase tracking-widest border border-border/50 hover:border-primary/50 flex items-center gap-2"
+                        className="rounded-xl px-4 py-2 etower-section-label border border-border/50 hover:border-primary/50 flex items-center gap-2"
                     >
                         <Download className="w-3.5 h-3.5" /> Export .xlsx
                     </button>
@@ -351,7 +351,7 @@ export function BudgetAdminTab() {
 
                 {budgets.length > 0 && (
                     <div className="relative z-10 mb-6">
-                        <div className="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground mb-2">
+                        <div className="etower-section-label text-muted-foreground mb-2">
                             Saved budgets
                         </div>
                         <div className="flex flex-wrap gap-2">
@@ -361,7 +361,7 @@ export function BudgetAdminTab() {
                                     type="button"
                                     onClick={() => openBudget(b.id)}
                                     className={cn(
-                                        "px-3 py-1.5 text-[10px] font-mono uppercase tracking-tight border transition-colors",
+                                        "px-3 py-1.5 text-xs tracking-tight border transition-colors",
                                         selectedId === b.id
                                             ? "border-primary bg-primary/15 text-primary"
                                             : "border-border/50 bg-background/40 hover:border-primary/40"
@@ -376,34 +376,34 @@ export function BudgetAdminTab() {
                 )}
 
                 {importMsg && (
-                    <p className="text-[10px] font-mono text-muted-foreground mb-3 relative z-10">{importMsg}</p>
+                    <p className="text-xs text-muted-foreground mb-3 relative z-10">{importMsg}</p>
                 )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 relative z-10 mb-4">
                     <div>
-                        <label className="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground block mb-1">
+                        <label className="etower-section-label text-muted-foreground block mb-1">
                             Title
                         </label>
                         <input
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             placeholder="e.g. Spring social"
-                            className="w-full px-3 py-2 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono focus:outline-none"
+                            className="w-full px-3 py-2 rounded-xl bg-background/60 border border-border/50 focus:border-primary/50 text-sm focus:outline-none"
                         />
                     </div>
                     <div>
-                        <label className="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground block mb-1">
+                        <label className="etower-section-label text-muted-foreground block mb-1">
                             Fiscal term (club-wide)
                         </label>
-                        <div className="w-full px-3 py-2 hud-panel-sm bg-background/40 border border-border/50 text-sm font-mono font-bold text-primary tabular-nums">
+                        <div className="w-full px-3 py-2 rounded-xl bg-background/40 border border-border/50 text-sm font-semibold text-primary tabular-nums">
                             {fiscalLabel}
                         </div>
-                        <p className="text-[9px] font-mono text-muted-foreground/90 mt-1 leading-snug">
+                        <p className="text-[10px] text-muted-foreground/90 mt-1 leading-snug">
                             Applied on save and export. Core admins set this under Admin → CLUB FISCAL.
                         </p>
                     </div>
                     <div>
-                        <label className="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground block mb-1">
+                        <label className="etower-section-label text-muted-foreground block mb-1">
                             Expected attendees
                         </label>
                         <input
@@ -413,15 +413,15 @@ export function BudgetAdminTab() {
                             value={Number.isFinite(expectedAttendees) ? expectedAttendees : 0}
                             onChange={(e) => setExpectedAttendees(parseInt(e.target.value, 10) || 0)}
                             placeholder="0"
-                            className="w-full px-3 py-2 hud-panel-sm bg-background/60 border border-border/50 focus:border-primary/50 text-sm font-mono focus:outline-none tabular-nums"
+                            className="w-full px-3 py-2 rounded-xl bg-background/60 border border-border/50 focus:border-primary/50 text-sm focus:outline-none tabular-nums"
                         />
                     </div>
                 </div>
 
                 <div className="overflow-x-auto custom-scroll relative z-10 border border-border/40 rounded-sm">
-                    <table className="w-full text-left text-[11px] font-mono min-w-[960px] table-fixed">
+                    <table className="w-full text-left text-[11px] min-w-[960px] table-fixed">
                         <thead>
-                            <tr className="border-b-2 border-primary/40 text-[9px] uppercase tracking-widest bg-primary/10">
+                            <tr className="border-b-2 border-primary/40 text-[9px] tracking-wide bg-primary/10">
                                 <th className="py-2.5 px-3 w-[18%] text-left font-bold text-primary">Item</th>
                                 <th className="py-2.5 px-2 w-[11%] text-right font-bold text-chart-1">Price</th>
                                 <th className="py-2.5 px-2 w-[8%] text-right font-bold text-chart-3">Qty</th>
@@ -533,14 +533,14 @@ export function BudgetAdminTab() {
                     <button
                         type="button"
                         onClick={addRow}
-                        className="text-[10px] font-mono font-bold uppercase tracking-widest text-primary hover:underline flex items-center gap-1"
+                        className="etower-section-label text-primary hover:underline flex items-center gap-1"
                     >
                         <Plus className="w-3.5 h-3.5" /> Add row
                     </button>
-                    <div className="text-[10px] font-mono uppercase tracking-tight space-y-2 text-right rounded-sm border border-chart-1/30 bg-chart-1/5 px-4 py-3">
+                    <div className="text-xs tracking-tight space-y-2 text-right rounded-sm border border-chart-1/30 bg-chart-1/5 px-4 py-3">
                         <div>
                             <span className="text-muted-foreground font-bold">Total cost </span>
-                            <span className="text-chart-1 font-black text-base tabular-nums">{formatUsd(totalCost)}</span>
+                            <span className="text-chart-1 font-bold text-base tabular-nums">{formatUsd(totalCost)}</span>
                         </div>
                         <div>
                             <span className="text-muted-foreground font-bold">Cost per attendee </span>
@@ -559,7 +559,7 @@ export function BudgetAdminTab() {
                         type="button"
                         disabled={saving || selectedId === null}
                         onClick={handleSave}
-                        className="hud-panel bg-primary text-primary-foreground px-6 py-3 text-xs font-mono font-bold uppercase tracking-widest hover:brightness-110 transition-all glow-border disabled:opacity-50 flex items-center gap-2"
+                        className="etower-soft-btn etower-soft-btn--primary disabled:opacity-50"
                     >
                         {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                         {selectedId === "new" ? "Create budget" : selectedId ? "Save changes" : "Save"}
@@ -569,14 +569,14 @@ export function BudgetAdminTab() {
                             type="button"
                             disabled={saving}
                             onClick={handleDelete}
-                            className="hud-panel-sm px-6 py-3 text-xs font-mono font-bold uppercase tracking-widest border border-destructive/40 text-destructive hover:bg-destructive/10 disabled:opacity-50"
+                            className="rounded-xl px-6 py-3 text-xs font-semibold border border-destructive/40 text-destructive hover:bg-destructive/10 disabled:opacity-50"
                         >
                             Delete
                         </button>
                     )}
                 </div>
                 {selectedId === null && (
-                    <p className="text-[9px] font-mono text-muted-foreground mt-2 relative z-10">
+                    <p className="text-[10px] text-muted-foreground mt-2 relative z-10">
                         Choose a saved budget above or start a new one to enable saving.
                     </p>
                 )}

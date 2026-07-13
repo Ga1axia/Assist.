@@ -5,6 +5,7 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useOptionalAuth } from "@/contexts/auth-context";
 import { readPlatformStats, syncPlatformStats, type PublicPlatformStats } from "@/lib/platform-stats";
+import { DEMO_MODE } from "@/lib/demo-mode";
 
 /** Client fallback — approved startups only (no member count without cached public doc). */
 async function fetchApprovedStartupCount(): Promise<number> {
@@ -22,6 +23,12 @@ export function usePublicPlatformStats() {
 
     useEffect(() => {
         if (authLoading) return;
+
+        if (DEMO_MODE) {
+            setStats({ totalMembers: 5, totalStartups: 6 });
+            setLoading(false);
+            return;
+        }
 
         let cancelled = false;
 

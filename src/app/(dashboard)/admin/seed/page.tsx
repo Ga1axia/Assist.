@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { useAuth } from "@/contexts/auth-context";
-import { collection, addDoc, serverTimestamp, doc, setDoc } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { isAdmin as checkAdmin } from "@/lib/roles";
+import { PageHeader } from "@/components/page-header";
 import { Loader2, Database, CheckCircle2, AlertTriangle } from "lucide-react";
 
 const SEED_DATA = {
@@ -49,7 +50,7 @@ const SEED_DATA = {
     resources: [
         {
             title: "Getting Started with Next.js",
-            description: "Official CODE guide to building apps with Next.js, including routing, data fetching, and deployment.",
+            description: "Official eTower guide to building apps with Next.js, including routing, data fetching, and deployment.",
             type: "guide",
             tier: "official",
             phase: "beginner",
@@ -60,7 +61,7 @@ const SEED_DATA = {
         },
         {
             title: "Git & GitHub Workflow",
-            description: "Step-by-step guide for branches, PRs, and code reviews following CODE conventions.",
+            description: "Step-by-step guide for branches, PRs, and code reviews following eTower conventions.",
             type: "guide",
             tier: "official",
             phase: "beginner",
@@ -97,9 +98,7 @@ const SEED_DATA = {
             name: "Accessibility Checker",
             description: "Browser extension that checks web pages for WCAG compliance and suggests accessibility improvements.",
             status: "in-progress",
-            teamMembers: [
-                { uid: "system", role: "lead", name: "Project Lead" },
-            ],
+            teamMembers: [{ uid: "system", role: "lead", name: "Project Lead" }],
             githubUrl: "https://github.com/codeos/a11y-checker",
             liveUrl: null,
             milestoneProgress: 45,
@@ -173,15 +172,15 @@ const SEED_DATA = {
     ],
     faq: [
         {
-            question: "How do I join CODE?",
-            answer: "CODE accepts new members each semester. Reach out to E-Board or attend one of our info sessions to get started.",
+            question: "How do I join eTower?",
+            answer: "eTower accepts new members each semester. Reach out to E-Board or attend one of our info sessions to get started.",
         },
         {
             question: "Do I need coding experience to join?",
-            answer: "Not at all! CODE welcomes members of all skill levels. We have resources and workshops for complete beginners.",
+            answer: "Not at all! eTower welcomes members of all skill levels. We have resources and workshops for complete beginners.",
         },
         {
-            question: "What kind of projects does CODE work on?",
+            question: "What kind of projects does eTower work on?",
             answer: "We build real-world applications primarily for our partner organization, Seven Hills Foundation. Projects range from web apps to data dashboards.",
         },
     ],
@@ -224,22 +223,20 @@ export default function SeedPage() {
     const userIsAdmin = checkAdmin(profile?.role);
 
     return (
-        <div className="space-y-6 animate-fade-in">
-            <div>
-                <h1 className="text-2xl font-bold flex items-center gap-3">
-                    <Database className="w-7 h-7 text-primary" />
-                    Initialize Database
-                </h1>
-                <p className="text-muted-foreground mt-1 text-sm">Seed your Firestore with sample data for all collections.</p>
-            </div>
+        <div className="space-y-6 animate-fade-in max-w-3xl">
+            <PageHeader
+                eyebrow="Admin tools"
+                title="Initialize database"
+                description="Seed your Firestore with sample data for all collections."
+            />
 
-            <div className="bg-card border border-border rounded-xl p-6">
-                <h2 className="font-semibold mb-3">Collections to seed:</h2>
+            <div className="etower-soft-card p-6 sm:p-8">
+                <p className="etower-section-label mb-3">Collections</p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-6">
                     {Object.entries(SEED_DATA).map(([name, items]) => (
-                        <div key={name} className="bg-accent rounded-lg px-3 py-2 text-sm">
-                            <span className="font-medium">{name}</span>
-                            <span className="text-muted-foreground ml-1.5">({items.length} docs)</span>
+                        <div key={name} className="border border-[rgba(0,255,65,0.2)] bg-[#0a1628] px-3 py-2 text-sm">
+                            <span className="font-semibold">{name}</span>
+                            <span className="text-white/50 ml-1.5">({items.length})</span>
                         </div>
                     ))}
                 </div>
@@ -249,12 +246,12 @@ export default function SeedPage() {
                         {results.map((r) => (
                             <div key={r.collection} className="flex items-center gap-2 text-sm">
                                 {r.status === "success" ? (
-                                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                                    <CheckCircle2 className="w-4 h-4 text-[#00ff41]" />
                                 ) : (
                                     <AlertTriangle className="w-4 h-4 text-destructive" />
                                 )}
                                 <span className="font-medium">{r.collection}</span>
-                                <span className="text-muted-foreground">— {r.count} documents added</span>
+                                <span className="text-white/50">— {r.count} documents added</span>
                             </div>
                         ))}
                     </div>
@@ -262,16 +259,20 @@ export default function SeedPage() {
 
                 <button
                     onClick={handleSeed}
-                    disabled={seeding || done}
-                    className="flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-xl text-sm font-semibold hover:brightness-110 transition-all disabled:opacity-50"
+                    disabled={seeding || done || !userIsAdmin}
+                    className="etower-soft-btn etower-btn--primary px-5 py-2.5 text-sm disabled:opacity-50"
                 >
                     {seeding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Database className="w-4 h-4" />}
-                    {done ? "Database Seeded ✓" : seeding ? "Seeding..." : "Seed Database"}
+                    {done ? "Database seeded" : seeding ? "Seeding…" : "Seed database"}
                 </button>
 
+                {!userIsAdmin && (
+                    <p className="mt-3 text-sm text-white/50">Admin access required to seed the database.</p>
+                )}
+
                 {done && (
-                    <p className="mt-3 text-sm text-muted-foreground">
-                        All collections have been initialized! Navigate to other pages to see the data.
+                    <p className="mt-3 text-sm text-white/55">
+                        All collections have been initialized. Navigate to other pages to see the data.
                     </p>
                 )}
             </div>

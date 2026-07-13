@@ -7,12 +7,17 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "@/lib/firebase";
-import { ArrowLeft, Rocket, Terminal, Image as ImageIcon, LinkIcon, GitBranch, AlignLeft, Loader2, Upload, X, Users, Search } from "lucide-react";
+import { DEMO_MODE } from "@/lib/demo-mode";
+import { ArrowLeft, Rocket, Image as ImageIcon, LinkIcon, GitBranch, AlignLeft, Loader2, Upload, X, Users, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { PageHeader } from "@/components/page-header";
 
 const TEAM_ROLES = ["lead", "developer", "designer", "member"] as const;
 
 type TeamMemberEntry = { uid: string; role: string; name?: string };
+
+const inputClass =
+    "w-full px-4 py-3 rounded-xl bg-[#0a1628] border border-[rgba(0,255,65,0.28)] focus:border-[#00ff41] text-sm transition-colors focus:outline-none";
 
 export default function NewProjectPage() {
     const { profile } = useAuth();
@@ -41,18 +46,13 @@ export default function NewProjectPage() {
         () => members.filter((m) => m.role !== "alumni"),
         [members]
     );
-    const filteredMemberList = useMemo(
-        () => {
-            if (!memberSearch.trim()) return nonAlumniMembers;
-            const q = memberSearch.toLowerCase().trim();
-            return nonAlumniMembers.filter(
-                (m) =>
-                    m.name.toLowerCase().includes(q) ||
-                    m.email.toLowerCase().includes(q)
-            );
-        },
-        [nonAlumniMembers, memberSearch]
-    );
+    const filteredMemberList = useMemo(() => {
+        if (!memberSearch.trim()) return nonAlumniMembers;
+        const q = memberSearch.toLowerCase().trim();
+        return nonAlumniMembers.filter(
+            (m) => m.name.toLowerCase().includes(q) || m.email.toLowerCase().includes(q)
+        );
+    }, [nonAlumniMembers, memberSearch]);
 
     const toggleTeamMember = (mem: { id: string; name: string }) => {
         if (addedUids.has(mem.id)) {
@@ -123,6 +123,11 @@ export default function NewProjectPage() {
 
         setSubmitting(true);
         try {
+            if (DEMO_MODE) {
+                router.push("/projects");
+                return;
+            }
+
             const uid = profile?.uid || "anon";
             let coverUrl = form.coverImage?.trim() || null;
 
@@ -148,7 +153,10 @@ export default function NewProjectPage() {
                 coverImage: coverUrl,
                 gallery: galleryUrls,
                 content: form.content,
-                teamMembers: teamMembers.length > 0 ? teamMembers : [{ uid: profile?.uid || "", role: "lead", name: profile?.displayName || "" }],
+                teamMembers:
+                    teamMembers.length > 0
+                        ? teamMembers
+                        : [{ uid: profile?.uid || "", role: "lead", name: profile?.displayName || "" }],
             });
 
             router.push("/projects");
@@ -160,50 +168,41 @@ export default function NewProjectPage() {
 
     return (
         <div className="max-w-4xl mx-auto space-y-6 animate-fade-in relative z-10 pb-20">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row items-start gap-4 pb-6 border-b border-border/50">
+            <div className="flex items-start gap-3">
                 <Link
                     href="/projects"
-                    className="p-2 hud-panel-sm bg-background border border-border/40 hover:border-primary/50 hover:text-primary transition-colors text-muted-foreground mt-1"
+                    className="etower-soft-btn etower-soft-btn--ghost p-2.5 mt-1"
+                    aria-label="Back to projects"
                 >
                     <ArrowLeft className="w-5 h-5" />
                 </Link>
-                <div className="flex-1">
-                    <div className="flex items-center gap-2 text-[10px] font-mono text-primary/80 uppercase tracking-widest mb-1.5">
-                        <Terminal className="w-3 h-3" />
-                        SYSTEM_OVERRIDE: PORTFOLIO_ENTRY
-                    </div>
-                    <h1 className="text-2xl md:text-3xl font-black tracking-tighter uppercase">
-                        SUBMIT <span className="gradient-text text-transparent bg-clip-text">NEW PROJECT</span>
-                    </h1>
-                    <p className="text-muted-foreground text-sm font-mono mt-2">
-                        Add a completed or in-progress project to the CODE public directory.
-                    </p>
-                </div>
+                <PageHeader
+                    className="flex-1 border-b-0 pb-0"
+                    eyebrow="Projects"
+                    title="New project"
+                    description="Add a completed or in-progress project to the eTower directory."
+                />
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-8">
-                {/* Core Details */}
-                <div className="hud-panel bg-card/60 border border-border/40 p-6 sm:p-8 scanlines relative">
-                    <div className="flex items-center justify-between mb-6 border-b border-border/40 pb-4 relative z-10">
-                        <h2 className="font-bold text-lg font-mono tracking-tight uppercase">PRIMARY CLASSIFICATION</h2>
-                    </div>
-
-                    <div className="space-y-5 relative z-10">
+            <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="etower-soft-card p-6 sm:p-8">
+                    <h2 className="font-semibold text-lg tracking-tight mb-6 border-b border-[rgba(0,255,65,0.18)] pb-4">
+                        Basics
+                    </h2>
+                    <div className="space-y-5">
                         <div>
-                            <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">PROJECT TITLE</label>
+                            <label className="etower-section-label mb-1.5 block">Project title</label>
                             <input
                                 required
                                 type="text"
                                 value={form.name}
                                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                                placeholder="E.G. Neural Interface v2"
-                                className="w-full px-4 py-3 hud-panel-sm bg-background/50 border border-border/50 focus:border-primary/50 text-base font-mono uppercase transition-colors focus:outline-none"
+                                placeholder="e.g. Campus event finder"
+                                className={inputClass}
                             />
                         </div>
-
                         <div>
-                            <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">ELEVATOR PITCH (ONE-LINER)</label>
+                            <label className="etower-section-label mb-1.5 block">Short description</label>
                             <input
                                 required
                                 type="text"
@@ -211,51 +210,48 @@ export default function NewProjectPage() {
                                 onChange={(e) => setForm({ ...form, description: e.target.value })}
                                 maxLength={150}
                                 placeholder="A brief description of what it is and who it's for..."
-                                className="w-full px-4 py-3 hud-panel-sm bg-background/50 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none"
+                                className={inputClass}
                             />
                         </div>
                     </div>
                 </div>
 
-                {/* Team Members — same tag UI as onboarding skills/interests */}
-                <div className="hud-panel bg-card/60 border border-border/40 p-6 sm:p-8 scanlines relative">
-                    <div className="flex items-center justify-between mb-4 border-b border-border/40 pb-4 relative z-10">
-                        <h2 className="font-bold text-lg font-mono tracking-tight uppercase flex items-center gap-2">
-                            <Users className="w-5 h-5 text-primary" /> TEAM MEMBERS
+                <div className="etower-soft-card p-6 sm:p-8">
+                    <div className="flex items-center justify-between mb-4 border-b border-[rgba(0,255,65,0.18)] pb-4">
+                        <h2 className="font-semibold text-lg tracking-tight flex items-center gap-2">
+                            <Users className="w-5 h-5 text-[#00ff41]" /> Team members
                         </h2>
-                        <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
-                            {teamMembers.length} SELECTED
-                        </span>
+                        <span className="text-xs text-white/45">{teamMembers.length} selected</span>
                     </div>
-                    <div className="space-y-4 relative z-10">
-                        {/* Search */}
+                    <div className="space-y-4">
                         <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
                             <input
                                 type="text"
                                 value={memberSearch}
                                 onChange={(e) => setMemberSearch(e.target.value)}
                                 placeholder="Search by name or email..."
-                                className="w-full pl-10 pr-4 py-2.5 hud-panel-sm bg-background/50 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none"
+                                className={cn(inputClass, "pl-10")}
                             />
                         </div>
 
-                        {/* Selected pills — same as onboarding selected skills */}
                         {teamMembers.length > 0 && (
                             <div className="flex flex-wrap gap-1.5">
                                 {teamMembers.map((m) => (
                                     <div
                                         key={m.uid}
-                                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-sm bg-primary/20 border border-primary text-primary text-[10px] font-mono uppercase tracking-wider"
+                                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#00ff41]/15 border border-[#00ff41]/40 text-[#00ff41] text-xs"
                                     >
                                         <select
                                             value={m.role}
                                             onChange={(e) => setMemberRole(m.uid, e.target.value)}
                                             onClick={(e) => e.stopPropagation()}
-                                            className="bg-transparent border-none focus:outline-none cursor-pointer text-[10px] font-mono font-bold uppercase text-primary pr-0.5 min-w-0"
+                                            className="bg-transparent border-none focus:outline-none cursor-pointer text-xs font-semibold text-[#00ff41] pr-0.5 min-w-0"
                                         >
                                             {TEAM_ROLES.map((r) => (
-                                                <option key={r} value={r}>{r}</option>
+                                                <option key={r} value={r}>
+                                                    {r}
+                                                </option>
                                             ))}
                                         </select>
                                         <span className="truncate max-w-[100px]">{m.name || m.uid.slice(0, 8)}</span>
@@ -263,8 +259,12 @@ export default function NewProjectPage() {
                                             type="button"
                                             onClick={() => removeTeamMember(m.uid)}
                                             disabled={m.uid === profile?.uid && teamMembers.length === 1}
-                                            className="p-0.5 text-primary/80 hover:text-primary hover:bg-primary/20 rounded disabled:opacity-40 disabled:cursor-not-allowed"
-                                            title={m.uid === profile?.uid && teamMembers.length === 1 ? "Keep at least one member" : "Remove"}
+                                            className="p-0.5 text-[#00ff41]/80 hover:text-[#00ff41] hover:bg-[#00ff41]/20 rounded-full disabled:opacity-40 disabled:cursor-not-allowed"
+                                            title={
+                                                m.uid === profile?.uid && teamMembers.length === 1
+                                                    ? "Keep at least one member"
+                                                    : "Remove"
+                                            }
                                         >
                                             <X className="w-3 h-3" />
                                         </button>
@@ -273,16 +273,17 @@ export default function NewProjectPage() {
                             </div>
                         )}
 
-                        {/* Directory — clickable tags like onboarding skills */}
                         <div className="max-h-[40vh] overflow-y-auto space-y-4 pr-2 custom-scroll">
                             {membersLoading ? (
                                 <div className="flex flex-col items-center justify-center py-8 gap-2">
-                                    <Loader2 className="w-5 h-5 animate-spin text-primary" />
-                                    <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Loading directory...</p>
+                                    <Loader2 className="w-5 h-5 animate-spin text-[#00ff41]" />
+                                    <p className="text-xs text-white/45">Loading directory…</p>
                                 </div>
                             ) : filteredMemberList.length === 0 ? (
-                                <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest py-4 text-center">
-                                    {memberSearch.trim() ? "No matching members." : "No non-alumni members in directory."}
+                                <p className="text-xs text-white/45 py-4 text-center">
+                                    {memberSearch.trim()
+                                        ? "No matching members."
+                                        : "No non-alumni members in directory."}
                                 </p>
                             ) : (
                                 <div className="flex flex-wrap gap-2">
@@ -294,10 +295,10 @@ export default function NewProjectPage() {
                                                 type="button"
                                                 onClick={() => toggleTeamMember(mem)}
                                                 className={cn(
-                                                    "px-3 py-1.5 hud-panel-sm text-xs font-mono transition-all border",
+                                                    "etower-soft-btn text-xs py-1.5 px-3",
                                                     onTeam
-                                                        ? "bg-primary/10 text-primary border-primary glow-border"
-                                                        : "bg-card/40 border-border/40 text-muted-foreground hover:bg-accent hover:border-border"
+                                                        ? "etower-soft-btn--primary"
+                                                        : "etower-soft-btn--ghost"
                                                 )}
                                             >
                                                 {mem.name}
@@ -310,25 +311,33 @@ export default function NewProjectPage() {
                     </div>
                 </div>
 
-                {/* Media & Links */}
-                <div className="hud-panel bg-card/60 border border-border/40 p-6 sm:p-8 scanlines relative">
-                    <div className="flex items-center justify-between mb-6 border-b border-border/40 pb-4 relative z-10">
-                        <h2 className="font-bold text-lg font-mono tracking-tight uppercase text-chart-2">MEDIA & ENDPOINTS</h2>
-                    </div>
-
-                    <div className="space-y-5 relative z-10">
+                <div className="etower-soft-card p-6 sm:p-8">
+                    <h2 className="font-semibold text-lg tracking-tight mb-6 border-b border-[rgba(0,255,65,0.18)] pb-4 text-[#00ff41]">
+                        Media & links
+                    </h2>
+                    <div className="space-y-5">
                         <div>
-                            <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest mb-1.5 flex items-center gap-2">
-                                <ImageIcon className="w-3 h-3 text-primary" /> COVER IMAGE
+                            <label className="etower-section-label mb-1.5 flex items-center gap-2">
+                                <ImageIcon className="w-3 h-3 text-[#00ff41]" /> Cover image
                             </label>
-                            <p className="text-[10px] font-mono text-muted-foreground mb-2">Drag and drop an image, click to upload, or paste a URL.</p>
+                            <p className="text-xs text-white/45 mb-2">
+                                Drag and drop an image, click to upload, or paste a URL.
+                            </p>
                             <div
                                 role="button"
                                 tabIndex={0}
                                 onClick={() => coverInputRef.current?.click()}
                                 onKeyDown={(e) => e.key === "Enter" && coverInputRef.current?.click()}
-                                onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setCoverDragActive(true); }}
-                                onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setCoverDragActive(false); }}
+                                onDragOver={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setCoverDragActive(true);
+                                }}
+                                onDragLeave={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setCoverDragActive(false);
+                                }}
                                 onDrop={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
@@ -337,10 +346,10 @@ export default function NewProjectPage() {
                                     if (file) processCoverFile(file);
                                 }}
                                 className={cn(
-                                    "relative flex flex-col items-center justify-center gap-2 rounded-none border-2 border-dashed p-8 min-h-[140px] transition-colors cursor-pointer",
+                                    "relative flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed p-8 min-h-[140px] transition-colors cursor-pointer",
                                     coverDragActive
-                                        ? "border-primary bg-primary/10 text-primary"
-                                        : "border-border/50 bg-background/30 hover:border-primary/50 hover:bg-primary/5 text-muted-foreground hover:text-primary"
+                                        ? "border-[#00ff41] bg-[#00ff41]/10 text-[#00ff41]"
+                                        : "border-[rgba(0,255,65,0.28)] bg-[#0a1628]/60 hover:border-[#00ff41]/50 hover:bg-[#00ff41]/5 text-white/50 hover:text-[#00ff41]"
                                 )}
                             >
                                 <input
@@ -351,10 +360,10 @@ export default function NewProjectPage() {
                                     className="hidden"
                                 />
                                 <Upload className={cn("w-10 h-10", coverDragActive && "scale-110")} />
-                                <span className="text-xs font-mono font-bold uppercase tracking-widest">
-                                    {coverDragActive ? "DROP COVER IMAGE" : "DRAG & DROP OR CLICK TO UPLOAD"}
+                                <span className="text-xs font-semibold">
+                                    {coverDragActive ? "Drop cover image" : "Drag & drop or click to upload"}
                                 </span>
-                                <span className="text-[10px] font-mono opacity-80">JPG, PNG, WEBP</span>
+                                <span className="text-[10px] opacity-80">JPG, PNG, WEBP</span>
                             </div>
                             <div className="flex flex-wrap gap-3 mt-3">
                                 <input
@@ -362,25 +371,31 @@ export default function NewProjectPage() {
                                     value={form.coverImage}
                                     onChange={(e) => {
                                         setForm({ ...form, coverImage: e.target.value });
-                                        if (e.target.value) { setCoverImageFile(null); setCoverImagePreview(null); }
+                                        if (e.target.value) {
+                                            setCoverImageFile(null);
+                                            setCoverImagePreview(null);
+                                        }
                                     }}
                                     placeholder="Or paste image URL..."
-                                    className="flex-1 min-w-[200px] px-4 py-3 hud-panel-sm bg-background/50 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none"
+                                    className={cn(inputClass, "flex-1 min-w-[200px]")}
                                 />
                             </div>
                             {(coverImagePreview || form.coverImage) && (
-                                <div className="mt-4 aspect-video w-full max-w-md bg-background/50 border border-border/50 hud-corners overflow-hidden p-1 relative group">
+                                <div className="mt-4 aspect-video w-full max-w-md rounded-2xl border border-[rgba(0,255,65,0.2)] overflow-hidden p-1 relative group">
                                     <img
                                         src={coverImagePreview || form.coverImage || ""}
                                         alt="Cover Preview"
-                                        className="w-full h-full object-cover"
+                                        className="w-full h-full object-cover rounded-xl"
                                         onError={(e) => (e.currentTarget.style.display = "none")}
                                     />
                                     {coverImageFile && (
                                         <button
                                             type="button"
-                                            onClick={() => { setCoverImageFile(null); setCoverImagePreview(null); }}
-                                            className="absolute top-2 right-2 p-1.5 bg-destructive/90 text-destructive-foreground rounded hud-panel-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                                            onClick={() => {
+                                                setCoverImageFile(null);
+                                                setCoverImagePreview(null);
+                                            }}
+                                            className="absolute top-2 right-2 p-1.5 bg-destructive/90 text-destructive-foreground rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                                         >
                                             <X className="w-3.5 h-3.5" />
                                         </button>
@@ -389,10 +404,8 @@ export default function NewProjectPage() {
                             )}
                         </div>
                         <div>
-                            <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest mb-1.5 flex items-center gap-2">
-                                GALLERY IMAGES (OPTIONAL)
-                            </label>
-                            <p className="text-[10px] font-mono text-muted-foreground mb-2">Drag and drop or click to add multiple images.</p>
+                            <label className="etower-section-label mb-1.5 block">Gallery images (optional)</label>
+                            <p className="text-xs text-white/45 mb-2">Drag and drop or click to add multiple images.</p>
                             <input
                                 ref={galleryInputRef}
                                 type="file"
@@ -406,8 +419,16 @@ export default function NewProjectPage() {
                                 tabIndex={0}
                                 onClick={() => galleryInputRef.current?.click()}
                                 onKeyDown={(e) => e.key === "Enter" && galleryInputRef.current?.click()}
-                                onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setGalleryDragActive(true); }}
-                                onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setGalleryDragActive(false); }}
+                                onDragOver={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setGalleryDragActive(true);
+                                }}
+                                onDragLeave={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setGalleryDragActive(false);
+                                }}
                                 onDrop={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
@@ -416,21 +437,24 @@ export default function NewProjectPage() {
                                     if (files.length) processGalleryFiles(files);
                                 }}
                                 className={cn(
-                                    "flex flex-col items-center justify-center gap-2 rounded-none border-2 border-dashed p-6 min-h-[100px] transition-colors cursor-pointer",
+                                    "flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed p-6 min-h-[100px] transition-colors cursor-pointer",
                                     galleryDragActive
-                                        ? "border-primary bg-primary/10 text-primary"
-                                        : "border-border/50 bg-background/30 hover:border-primary/50 hover:bg-primary/5 text-muted-foreground hover:text-primary"
+                                        ? "border-[#00ff41] bg-[#00ff41]/10 text-[#00ff41]"
+                                        : "border-[rgba(0,255,65,0.28)] bg-[#0a1628]/60 hover:border-[#00ff41]/50 hover:bg-[#00ff41]/5 text-white/50 hover:text-[#00ff41]"
                                 )}
                             >
                                 <Upload className={cn("w-8 h-8", galleryDragActive && "scale-110")} />
-                                <span className="text-[10px] font-mono font-bold uppercase tracking-widest">
-                                    {galleryDragActive ? "DROP IMAGES" : "DRAG & DROP OR CLICK TO ADD GALLERY IMAGES"}
+                                <span className="text-xs font-semibold">
+                                    {galleryDragActive ? "Drop images" : "Drag & drop or click to add gallery images"}
                                 </span>
                             </div>
                             {galleryPreviews.length > 0 && (
                                 <div className="flex flex-wrap gap-2 mt-3">
                                     {galleryPreviews.map((src, i) => (
-                                        <div key={i} className="relative w-20 h-20 hud-corners border border-border/50 overflow-hidden group">
+                                        <div
+                                            key={i}
+                                            className="relative w-20 h-20 rounded-xl border border-[rgba(0,255,65,0.2)] overflow-hidden group"
+                                        >
                                             <img src={src} alt="" className="w-full h-full object-cover" />
                                             <button
                                                 type="button"
@@ -447,77 +471,76 @@ export default function NewProjectPage() {
 
                         <div className="grid sm:grid-cols-2 gap-5">
                             <div>
-                                <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest mb-1.5 flex items-center gap-2">
-                                    <GitBranch className="w-3 h-3 text-chart-1" /> GITHUB REPOSITORY URL
+                                <label className="etower-section-label mb-1.5 flex items-center gap-2">
+                                    <GitBranch className="w-3 h-3 text-chart-1" /> GitHub repository
                                 </label>
                                 <input
                                     type="url"
                                     value={form.githubUrl}
                                     onChange={(e) => setForm({ ...form, githubUrl: e.target.value })}
                                     placeholder="https://github.com/..."
-                                    className="w-full px-4 py-3 hud-panel-sm bg-background/50 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none"
+                                    className={inputClass}
                                 />
                             </div>
                             <div>
-                                <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest mb-1.5 flex items-center gap-2">
-                                    <LinkIcon className="w-3 h-3 text-success" /> LIVE DEPLOYMENT URL
+                                <label className="etower-section-label mb-1.5 flex items-center gap-2">
+                                    <LinkIcon className="w-3 h-3 text-success" /> Live URL
                                 </label>
                                 <input
                                     type="url"
                                     value={form.liveUrl}
                                     onChange={(e) => setForm({ ...form, liveUrl: e.target.value })}
                                     placeholder="https://my-project.app"
-                                    className="w-full px-4 py-3 hud-panel-sm bg-background/50 border border-border/50 focus:border-primary/50 text-sm font-mono transition-colors focus:outline-none"
+                                    className={inputClass}
                                 />
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* The Story */}
-                <div className="hud-panel bg-card/60 border border-border/40 p-6 sm:p-8 scanlines relative">
-                    <div className="flex items-center justify-between mb-6 border-b border-border/40 pb-4 relative z-10">
-                        <h2 className="font-bold text-lg font-mono tracking-tight uppercase text-primary">PROJECT LOG (THE STORY)</h2>
-                        <p className="text-xs font-mono text-muted-foreground mt-1">Write a blog post about how you built this, what tech stack you used, and what you learned. Markdown formatting is supported.</p>
+                <div className="etower-soft-card p-6 sm:p-8">
+                    <div className="mb-6 border-b border-[rgba(0,255,65,0.18)] pb-4">
+                        <h2 className="font-semibold text-lg tracking-tight text-[#00ff41]">Project story</h2>
+                        <p className="text-xs text-white/45 mt-1">
+                            Share how you built this, the stack you used, and what you learned. Markdown is supported.
+                        </p>
                     </div>
-
-                    <div className="relative z-10">
-                        <div className="flex items-center gap-2 bg-background/80 border border-b-0 border-border/50 px-4 py-2 hud-corners-top text-muted-foreground">
+                    <div>
+                        <div className="flex items-center gap-2 bg-[#0a1628]/80 border border-[rgba(0,255,65,0.2)] border-b-0 px-4 py-2 rounded-t-xl text-white/50">
                             <AlignLeft className="w-4 h-4" />
-                            <span className="text-[10px] font-mono font-bold tracking-widest uppercase">MARKDOWN EDITOR</span>
+                            <span className="text-xs font-semibold">Markdown editor</span>
                         </div>
                         <textarea
                             value={form.content}
                             onChange={(e) => setForm({ ...form, content: e.target.value })}
                             placeholder="Write your story here..."
                             rows={15}
-                            className="w-full px-4 py-4 hud-corners-bottom bg-background/50 border border-border/50 focus:border-primary/50 text-sm font-sans transition-colors focus:outline-none resize-y leading-relaxed"
+                            className="w-full px-4 py-4 rounded-b-xl bg-[#0a1628]/50 border border-[rgba(0,255,65,0.28)] focus:border-[#00ff41] text-sm transition-colors focus:outline-none resize-y leading-relaxed"
                         />
                     </div>
                 </div>
 
-                {/* Submit Action */}
-                <div className="flex justify-end gap-4 relative z-10">
-                    <Link href="/projects" className="px-6 py-3 hud-panel-sm bg-background/60 border border-border/50 text-muted-foreground hover:text-foreground hover:bg-accent hover:border-border transition-colors text-xs font-bold font-mono uppercase tracking-widest">
-                        CANCEL
+                <div className="flex justify-end gap-3">
+                    <Link href="/projects" className="etower-soft-btn etower-soft-btn--ghost">
+                        Cancel
                     </Link>
                     <button
                         type="submit"
                         disabled={submitting}
                         className={cn(
-                            "px-8 py-3 hud-panel text-primary-foreground text-xs font-bold font-mono uppercase tracking-widest transition-all glow-border-strong flex items-center gap-2",
-                            submitting ? "bg-primary/50 cursor-not-allowed" : "bg-primary hover:brightness-110"
+                            "etower-soft-btn etower-soft-btn--primary",
+                            submitting && "opacity-60 cursor-not-allowed"
                         )}
                     >
                         {submitting ? (
                             <>
                                 <Loader2 className="w-4 h-4 animate-spin" />
-                                DEPLOYING DIRECTORY ENTRY...
+                                Publishing…
                             </>
                         ) : (
                             <>
                                 <Rocket className="w-4 h-4" />
-                                PUBLISH PROJECT SHOWCASE
+                                Publish project
                             </>
                         )}
                     </button>

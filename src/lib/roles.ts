@@ -92,6 +92,11 @@ export function canReviewStartupSubmissions(role: string | undefined): boolean {
     return canAccessEboardWorkspace(role);
 }
 
+/** View newsletter subscriber list (core admins + functional VPs). */
+export function canAccessNewsletterList(role: string | undefined): boolean {
+    return canAccessEboardWorkspace(role);
+}
+
 export function getRoleLabel(role: string, viewerRole?: string): string {
     if (role === ROOT_ROLE) {
         return viewerRole === ROOT_ROLE ? "System Admin" : "Member";

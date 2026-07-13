@@ -862,7 +862,7 @@ body {
   --light-ash: #1a2332;
   --grid-line: #060d18;
   --etower-foreground: #fafafa;
-  --etower-border: rgba(0, 255, 65, 0.3);
+  --etower-border: rgba(0, 255, 65, 0.22);
   --etower-muted: rgba(250, 250, 250, 0.6);
   --etower-muted-soft: rgba(250, 250, 250, 0.4);
   --cafe-cream: #f8f4e8;
@@ -920,31 +920,32 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  border-radius: 0;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  font-size: 0.8125rem;
+  border-radius: 9999px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease, filter 0.15s ease;
 }
 
 .etower-btn:hover {
-  transform: translate(-2px, -2px);
+  transform: translateY(-1px);
 }
 
 .etower-btn--primary {
   background: var(--electric-green);
   color: #0a0a0a;
-  border: 2px solid var(--electric-green);
-  box-shadow: 4px 4px 0 rgba(0, 255, 65, 0.35);
+  border: 1px solid var(--electric-green);
+  box-shadow: 0 6px 18px rgba(0, 255, 65, 0.22);
 }
 
 .etower-btn--primary:hover {
-  box-shadow: 6px 6px 0 rgba(0, 255, 65, 0.45);
+  filter: brightness(1.05);
+  box-shadow: 0 8px 22px rgba(0, 255, 65, 0.3);
 }
 
 .etower-btn--outline {
-  border: 2px solid var(--etower-border);
+  border: 1px solid rgba(0, 255, 65, 0.28);
   color: var(--etower-foreground);
   background: transparent;
 }
@@ -952,29 +953,30 @@ body {
 .etower-btn--outline:hover {
   border-color: var(--electric-green);
   color: var(--electric-green);
-  box-shadow: 4px 4px 0 rgba(0, 255, 65, 0.2);
+  background: rgba(0, 255, 65, 0.06);
+  box-shadow: none;
 }
 
 .etower-section-label {
   font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--electric-green);
 }
 
 .etower-card {
-  background: var(--light-ash);
-  border: 1px solid var(--etower-border);
-  border-radius: 0;
-  box-shadow: none;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  background: rgba(20, 32, 51, 0.88);
+  border: 1px solid rgba(0, 255, 65, 0.18);
+  border-radius: 1rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .etower-card:hover {
-  transform: translate(-2px, -2px);
-  border-color: var(--electric-green);
-  box-shadow: 4px 4px 0 rgba(0, 255, 65, 0.15);
+  transform: translateY(-2px);
+  border-color: rgba(0, 255, 65, 0.38);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.28);
 }
 
 .etower-stat-value {
@@ -1065,21 +1067,21 @@ body {
 
 .etower-marquee {
   overflow: hidden;
-  background: var(--light-ash);
+  background: rgba(20, 32, 51, 0.9);
   color: var(--etower-foreground);
-  border-top: 1px solid var(--etower-border);
-  border-bottom: 1px solid var(--etower-border);
+  border-top: 1px solid rgba(0, 255, 65, 0.18);
+  border-bottom: 1px solid rgba(0, 255, 65, 0.18);
   padding: 0.875rem 0;
 }
 
 .etower-marquee__track span {
   padding: 0 2rem;
   font-size: 0.8125rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: none;
   white-space: nowrap;
-  color: rgba(250, 250, 250, 0.8);
+  color: rgba(250, 250, 250, 0.75);
 }
 
 .etower-marquee__track span strong {
@@ -1104,18 +1106,19 @@ body {
 }
 
 .etower-impact-card {
-  background: var(--light-ash);
-  border: 1px solid var(--etower-border);
-  border-radius: 0;
+  background: rgba(20, 32, 51, 0.88);
+  border: 1px solid rgba(0, 255, 65, 0.18);
+  border-radius: 1rem;
   padding: 2rem 1.5rem;
   text-align: center;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .etower-impact-card:hover {
-  transform: translate(-2px, -2px);
-  border-color: var(--electric-green);
-  box-shadow: 4px 4px 0 rgba(0, 255, 65, 0.12);
+  transform: translateY(-2px);
+  border-color: rgba(0, 255, 65, 0.4);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.26);
 }
 
 .etower-impact-card .etower-stat-value {
@@ -1125,10 +1128,11 @@ body {
 .etower-startup-card {
   position: relative;
   overflow: hidden;
-  border-radius: 0;
-  background: var(--light-ash);
-  border: 1px solid var(--etower-border);
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  border-radius: 1rem;
+  background: rgba(20, 32, 51, 0.9);
+  border: 1px solid rgba(0, 255, 65, 0.18);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .etower-startup-card::before {
@@ -1145,9 +1149,9 @@ body {
 }
 
 .etower-startup-card:hover {
-  transform: translate(-2px, -2px);
-  border-color: var(--electric-green);
-  box-shadow: 4px 4px 0 rgba(0, 255, 65, 0.12);
+  transform: translateY(-2px);
+  border-color: rgba(0, 255, 65, 0.4);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.26);
 }
 
 .etower-startup-card:hover::before {
@@ -1155,13 +1159,14 @@ body {
 }
 
 .etower-testimonial-featured {
-  background: var(--light-ash);
+  background: rgba(20, 32, 51, 0.92);
   color: var(--etower-foreground);
-  border: 1px solid var(--etower-border);
-  border-radius: 0;
+  border: 1px solid rgba(0, 255, 65, 0.2);
+  border-radius: 1.25rem;
   padding: 2.5rem;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.24);
 }
 
 .etower-testimonial-featured::after {
@@ -1202,14 +1207,14 @@ body {
   top: 0.4rem;
   width: 10px;
   height: 10px;
-  border-radius: 0;
+  border-radius: 9999px;
   background: var(--electric-green);
   box-shadow: 0 0 0 3px rgba(0, 255, 65, 0.2);
 }
 
 .etower-social-card {
   overflow: hidden;
-  border-radius: 0;
+  border-radius: 1rem;
   transition: transform 0.3s ease;
 }
 
@@ -1233,14 +1238,15 @@ body {
 }
 
 .etower-cta-banner {
-  background: var(--light-ash);
-  border: 1px solid var(--etower-border);
-  border-radius: 0;
+  background: rgba(20, 32, 51, 0.92);
+  border: 1px solid rgba(0, 255, 65, 0.22);
+  border-radius: 1.5rem;
   padding: 3rem 2rem;
   text-align: center;
   color: var(--etower-foreground);
   position: relative;
   overflow: hidden;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.28);
 }
 
 .etower-cta-banner::before {
@@ -1261,45 +1267,50 @@ body {
 .etower-outlet-card {
   position: relative;
   overflow: hidden;
-  border-radius: 0;
+  border-radius: 1.25rem;
   padding: 2rem;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .etower-outlet-card--default {
-  background: var(--light-ash);
-  border: 1px solid var(--etower-border);
+  background: rgba(20, 32, 51, 0.88);
+  border: 1px solid rgba(0, 255, 65, 0.18);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
 }
 
 .etower-outlet-card--default:hover {
-  transform: translate(-2px, -2px);
-  border-color: var(--electric-green);
-  box-shadow: 4px 4px 0 rgba(0, 255, 65, 0.12);
+  transform: translateY(-2px);
+  border-color: rgba(0, 255, 65, 0.4);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.26);
 }
 
 .etower-outlet-card--soon {
-  background: var(--deep-navy);
-  border: 2px dashed var(--etower-border);
+  background: rgba(10, 22, 40, 0.85);
+  border: 1.5px dashed rgba(0, 255, 65, 0.28);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
 }
 
 .etower-outlet-card--megaphone {
   background: #fff;
   border: 1px solid #e5e7eb;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
 }
 
 .etower-outlet-card--megaphone:hover {
   border-color: #d1d5db;
+  transform: translateY(-2px);
 }
 
 .etower-outlet-card--cafe {
   background: var(--cafe-cream);
-  border: 2px solid var(--dark-forest);
+  border: 1.5px solid var(--dark-forest);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
 }
 
 .etower-outlet-card__icon {
   width: 3rem;
   height: 3rem;
-  border-radius: 0;
+  border-radius: 0.85rem;
   background: var(--electric-green);
   color: #0a0a0a;
   display: flex;
@@ -1317,12 +1328,14 @@ body {
   display: inline-block;
   margin-top: 1.25rem;
   font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--electric-green);
-  border: 1px solid var(--etower-border);
-  padding: 0.25rem 0.625rem;
+  border: 1px solid rgba(0, 255, 65, 0.28);
+  border-radius: 9999px;
+  padding: 0.3rem 0.75rem;
+  background: rgba(0, 255, 65, 0.06);
 }
 
 .etower-outlet-card__megaphone-title {
@@ -1340,21 +1353,23 @@ body {
   font-family: var(--font-dm-sans), sans-serif;
   background: var(--electric-green);
   color: #0a0a0a;
-  border: 2px solid #0a0a0a;
-  font-weight: 700;
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  letter-spacing: 0.06em;
-  padding: 0.75rem 1.25rem;
+  border: 1px solid #0a0a0a;
+  font-weight: 600;
+  text-transform: none;
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+  padding: 0.7rem 1.25rem;
+  border-radius: 9999px;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  transition: transform 0.15s ease;
+  transition: transform 0.15s ease, filter 0.15s ease;
 }
 
 .etower-outlet-card__megaphone-btn:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 3px 3px 0 #0a0a0a;
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
 
 .etower-outlet-card__cafe-title {
@@ -1371,17 +1386,24 @@ body {
 .etower-outlet-card__cafe-btn {
   font-family: var(--font-space-grotesk), sans-serif;
   color: var(--dark-forest);
-  font-weight: 700;
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  text-transform: none;
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid var(--dark-forest);
+  padding: 0.55rem 1rem;
+  background: rgba(255, 253, 247, 0.7);
+  transition: background 0.15s ease, transform 0.15s ease;
 }
 
 .etower-outlet-card__cafe-btn:hover {
-  text-decoration: underline;
+  background: rgba(255, 255, 255, 0.95);
+  transform: translateY(-1px);
+  text-decoration: none;
 }
 
 .etower-outlet-card__cafe-image {
@@ -1400,7 +1422,7 @@ body {
 .etower-nav {
   background: rgba(10, 22, 40, 0.92);
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--etower-border);
+  border-bottom: 1px solid rgba(0, 255, 65, 0.16);
 }
 
 .etower-nav__link {
@@ -1469,14 +1491,14 @@ body {
 .etower-startup-badge {
   display: inline-block;
   font-size: 0.75rem;
-  font-weight: 700;
-  padding: 0.25rem 0.75rem;
-  border-radius: 0;
-  border: 1px solid var(--etower-border);
+  font-weight: 600;
+  padding: 0.3rem 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(0, 255, 65, 0.28);
   background: rgba(0, 255, 65, 0.08);
   color: var(--electric-green);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  text-transform: none;
+  letter-spacing: 0.02em;
 }
 
 .etower-social-card__img {
@@ -1628,7 +1650,7 @@ body.etower-intro-active {
 .hero-gallery__logo-fallback {
   width: 2.75rem;
   height: 2.75rem;
-  border-radius: 0;
+  border-radius: 0.75rem;
   background: var(--deep-navy);
   color: var(--electric-green);
   border: 1px solid var(--etower-border);
@@ -1691,27 +1713,12 @@ body.etower-intro-active {
   animation: etower-page-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-.etower-page--ready .etower-nav {
-  animation: etower-nav-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
-}
-
 @keyframes etower-page-in {
   from {
     opacity: 0.85;
   }
   to {
     opacity: 1;
-  }
-}
-
-@keyframes etower-nav-in {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -1737,4 +1744,183 @@ body.etower-intro-active {
   .etower-intro {
     display: none;
   }
+}
+
+/* ══════════════════════════════════════════
+   eTOWER APP — management / login shell
+   Remaps design tokens so dashboard pages inherit eTower look
+   ══════════════════════════════════════════ */
+
+.etower-app {
+  --electric-green: #00ff41;
+  --deep-navy: #0a1628;
+  --light-ash: #1a2332;
+  --grid-line: #060d18;
+  --etower-foreground: #fafafa;
+  --etower-border: rgba(0, 255, 65, 0.22);
+  --etower-muted: rgba(250, 250, 250, 0.6);
+
+  --background: #0a1628;
+  --foreground: #fafafa;
+  --card: #142033;
+  --card-foreground: #fafafa;
+  --popover: #121c2c;
+  --popover-foreground: rgba(250, 250, 250, 0.75);
+
+  --primary: #00ff41;
+  --primary-foreground: #0a0a0a;
+
+  --secondary: #121c2c;
+  --secondary-foreground: #fafafa;
+
+  --muted: #121c2c;
+  --muted-foreground: rgba(250, 250, 250, 0.58);
+
+  --accent: #152033;
+  --accent-foreground: #fafafa;
+
+  --destructive: #ff6b6b;
+  --destructive-foreground: #fafafa;
+  --warning: #f5c542;
+  --warning-foreground: #0a0a0a;
+  --success: #00ff41;
+  --success-foreground: #0a0a0a;
+
+  --border: rgba(0, 255, 65, 0.2);
+  --input: #101a28;
+  --input-border: rgba(0, 255, 65, 0.28);
+  --ring: #00ff41;
+
+  --chart-1: #00ff41;
+  --chart-2: #4dd4e6;
+  --chart-3: #f43f5e;
+  --chart-4: #14b8a6;
+  --chart-5: #f59e0b;
+
+  --sidebar: #07101c;
+  --sidebar-foreground: rgba(250, 250, 250, 0.72);
+  --sidebar-primary: #00ff41;
+  --sidebar-primary-foreground: #0a0a0a;
+  --sidebar-accent: #121c2c;
+  --sidebar-accent-foreground: #fafafa;
+  --sidebar-border: rgba(0, 255, 65, 0.16);
+  --sidebar-ring: #00ff41;
+
+  --radius: 0.75rem;
+
+  background: var(--background);
+  color: var(--foreground);
+  min-height: 100%;
+}
+
+.etower-app .bg-grid-brutalist,
+.etower-app .etower-app-grid {
+  background-color: var(--deep-navy);
+  background-image:
+    linear-gradient(rgba(6, 13, 24, 0.9) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(6, 13, 24, 0.9) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Soft rounded panels instead of CODE HUD clip-paths */
+.etower-app .hud-panel,
+.etower-app .hud-panel-alt,
+.etower-app .hud-panel-sm,
+.etower-app .hud-corners {
+  clip-path: none;
+  border-radius: 0.85rem;
+}
+
+.etower-app .scanlines::after,
+.etower-app .noise::before {
+  opacity: 0.025;
+}
+
+.etower-app .glow-border,
+.etower-app .glow-border-strong {
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 255, 65, 0.22),
+    0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.etower-app .gradient-text-cyber {
+  background: linear-gradient(135deg, #00ff41 0%, #8dffad 55%, #00ff41 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: none;
+}
+
+.etower-app .grid-bg {
+  background-image:
+    linear-gradient(rgba(0, 255, 65, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 65, 0.035) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Soft primary actions across management UI */
+.etower-app button.bg-primary,
+.etower-app a.bg-primary,
+.etower-app .etower-btn--primary {
+  border-radius: 9999px !important;
+  box-shadow: 0 6px 18px rgba(0, 255, 65, 0.22) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.02em !important;
+  text-transform: none !important;
+}
+
+.etower-app button.bg-primary:hover,
+.etower-app a.bg-primary:hover,
+.etower-app .etower-btn--primary:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.etower-app input,
+.etower-app textarea,
+.etower-app select {
+  border-radius: 0.75rem;
+}
+
+.etower-app .etower-soft-card {
+  background: rgba(20, 32, 51, 0.88);
+  border: 1px solid rgba(0, 255, 65, 0.18);
+  border-radius: 1rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+}
+
+.etower-app .etower-soft-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  padding: 0.55rem 1.1rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.etower-app .etower-soft-btn--primary {
+  background: #00ff41;
+  color: #0a0a0a;
+  border: 1px solid #00ff41;
+  box-shadow: 0 6px 18px rgba(0, 255, 65, 0.22);
+}
+
+.etower-app .etower-soft-btn--primary:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.etower-app .etower-soft-btn--ghost {
+  background: transparent;
+  color: rgba(250, 250, 250, 0.8);
+  border: 1px solid rgba(0, 255, 65, 0.28);
+}
+
+.etower-app .etower-soft-btn--ghost:hover {
+  border-color: #00ff41;
+  color: #00ff41;
+  background: rgba(0, 255, 65, 0.06);
 }

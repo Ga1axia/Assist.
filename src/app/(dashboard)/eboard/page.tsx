@@ -29,6 +29,7 @@ import {
     Filter,
 } from "lucide-react";
 import { serverTimestamp } from "firebase/firestore";
+import { PageHeader } from "@/components/page-header";
 
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 
@@ -343,67 +344,55 @@ export default function EboardPage() {
 
     const loading = tasksLoading || (canAccess && calLoading);
 
+    const tabBtnClass = (active: boolean, disabled = false) =>
+        cn(
+            "etower-soft-btn flex items-center gap-2 px-4 py-2 text-xs font-bold tracking-wide",
+            active ? "etower-btn--primary" : "etower-soft-btn etower-soft-btn--ghost text-white/60",
+            disabled && "opacity-40 cursor-not-allowed pointer-events-none"
+        );
+
+    const inputClass =
+        "w-full border border-[rgba(0,255,65,0.3)] bg-[#0a1628] px-3 py-2 text-sm focus:border-[#00ff41] focus:outline-none";
+
     return (
         <div className="mx-auto max-w-6xl animate-fade-in space-y-6 pb-16 pt-4 px-4">
-            <div className="flex flex-col gap-4 border-b border-border/40 pb-6 sm:flex-row sm:items-end sm:justify-between">
-                <div>
-                    <div className="mb-2 flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-primary">
-                        <CalendarRange className="h-4 w-4" /> E-board workspace
+            <PageHeader
+                eyebrow="E-board workspace"
+                title="Calendar & tasks"
+                description={
+                    canAccess
+                        ? "Shared planning for leadership: schedule e-board items, assign work, and track deadlines."
+                        : "Tasks assigned to you by e-board appear here. Leadership tools are limited to executives and VPs."
+                }
+                actions={
+                    <div className="flex gap-2">
+                        <button type="button" disabled={!canAccess} onClick={() => setTab("calendar")} className={tabBtnClass(tab === "calendar", !canAccess)}>
+                            <CalendarRange className="h-3.5 w-3.5" /> Calendar
+                        </button>
+                        <button type="button" onClick={() => setTab("tasks")} className={tabBtnClass(tab === "tasks")}>
+                            <CheckSquare className="h-3.5 w-3.5" /> Tasks
+                        </button>
                     </div>
-                    <h1 className="text-2xl font-black uppercase tracking-tight sm:text-3xl">Command calendar & tasks</h1>
-                    <p className="mt-2 max-w-xl text-xs font-mono text-muted-foreground">
-                        {canAccess
-                            ? "Shared planning for leadership: schedule e-board items, assign work, and track deadlines."
-                            : "Tasks assigned to you by e-board appear here. Leadership tools are limited to executives and VPs."}
-                    </p>
-                </div>
-                <div className="flex gap-2">
-                    <button
-                        type="button"
-                        disabled={!canAccess}
-                        onClick={() => setTab("calendar")}
-                        className={cn(
-                            "flex items-center gap-2 px-4 py-2 text-[10px] font-mono font-bold uppercase tracking-widest border transition-colors",
-                            tab === "calendar"
-                                ? "border-primary bg-primary/15 text-primary"
-                                : "border-border/50 text-muted-foreground hover:border-primary/40",
-                            !canAccess && "opacity-40 cursor-not-allowed hover:border-border/50"
-                        )}
-                    >
-                        <CalendarRange className="h-3.5 w-3.5" /> Calendar
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => setTab("tasks")}
-                        className={cn(
-                            "flex items-center gap-2 px-4 py-2 text-[10px] font-mono font-bold uppercase tracking-widest border transition-colors",
-                            tab === "tasks"
-                                ? "border-primary bg-primary/15 text-primary"
-                                : "border-border/50 text-muted-foreground hover:border-primary/40"
-                        )}
-                    >
-                        <CheckSquare className="h-3.5 w-3.5" /> Tasks
-                    </button>
-                </div>
-            </div>
+                }
+            />
 
             {tab === "calendar" && canAccess && (
                 <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-                    <div className="hud-panel border border-primary/30 bg-card/60 p-4 sm:p-6 scanlines">
+                    <div className="etower-soft-card p-4 sm:p-6">
                         <div className="mb-4 flex items-center justify-between gap-3">
                             <button
                                 type="button"
                                 onClick={prevMonth}
-                                className="rounded-sm border border-border/50 p-2 text-muted-foreground hover:border-primary/50 hover:text-primary"
+                                className="etower-soft-btn etower-soft-btn etower-soft-btn--ghost p-2"
                                 aria-label="Previous month"
                             >
                                 <ChevronLeft className="h-4 w-4" />
                             </button>
-                            <h2 className="text-sm font-mono font-bold uppercase tracking-widest text-foreground">{monthLabel}</h2>
+                            <h2 className="text-sm font-bold tracking-wide">{monthLabel}</h2>
                             <button
                                 type="button"
                                 onClick={nextMonth}
-                                className="rounded-sm border border-border/50 p-2 text-muted-foreground hover:border-primary/50 hover:text-primary"
+                                className="etower-soft-btn etower-soft-btn etower-soft-btn--ghost p-2"
                                 aria-label="Next month"
                             >
                                 <ChevronRight className="h-4 w-4" />
@@ -416,7 +405,7 @@ export default function EboardPage() {
                         )}
                         {!loading && (
                             <>
-                                <div className="grid grid-cols-7 gap-1 text-center text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground mb-2">
+                                <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-bold tracking-wide text-white/50 mb-2">
                                     {WEEKDAYS.map((d) => (
                                         <div key={d} className="py-1">
                                             {d}
@@ -435,10 +424,10 @@ export default function EboardPage() {
                                                 type="button"
                                                 onClick={() => setSelectedYmd(cell.ymd)}
                                                 className={cn(
-                                                    "min-h-[4.25rem] sm:min-h-[5rem] border p-1 text-left transition-colors flex flex-col gap-0.5",
-                                                    cell.inMonth ? "bg-background/40" : "bg-background/10 opacity-60",
-                                                    isSel && "ring-2 ring-primary border-primary/50",
-                                                    isToday && "bg-primary/10"
+                                                    "min-h-[4.25rem] sm:min-h-[5rem] border border-[rgba(0,255,65,0.2)] p-1 text-left transition-colors flex flex-col gap-0.5",
+                                                    cell.inMonth ? "bg-[#0a1628]" : "bg-[#0a1628]/40 opacity-60",
+                                                    isSel && "ring-2 ring-[#00ff41] border-[#00ff41]",
+                                                    isToday && "bg-[#00ff41]/10"
                                                 )}
                                             >
                                                 <span
@@ -472,9 +461,9 @@ export default function EboardPage() {
                     </div>
 
                     <div className="space-y-4">
-                        <div className="hud-panel border border-border/50 bg-card/50 p-4">
+                        <div className="etower-soft-card p-4">
                             <div className="mb-3 flex items-center justify-between gap-2">
-                                <h3 className="text-[10px] font-mono font-bold uppercase tracking-widest text-muted-foreground">
+                                <p className="etower-section-label">
                                     {selectedYmd
                                         ? parseYmd(selectedYmd).toLocaleDateString("en-US", {
                                               weekday: "short",
@@ -482,29 +471,29 @@ export default function EboardPage() {
                                               day: "numeric",
                                           })
                                         : "Pick a day"}
-                                </h3>
+                                </p>
                                 <button
                                     type="button"
                                     disabled={!selectedYmd}
                                     onClick={() => selectedYmd && openNewEventForDay(selectedYmd)}
-                                    className="inline-flex items-center gap-1 text-[9px] font-mono font-bold uppercase tracking-widest text-primary hover:underline disabled:opacity-40"
+                                    className="etower-soft-btn etower-soft-btn etower-soft-btn--ghost text-[10px] px-3 py-1.5 disabled:opacity-40"
                                 >
                                     <Plus className="h-3 w-3" /> Add entry
                                 </button>
                             </div>
                             <div className="space-y-3 max-h-[280px] overflow-y-auto custom-scroll">
                                 {selectedDayEvents.length === 0 && selectedDayTasks.length === 0 && (
-                                    <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
+                                    <p className="text-xs text-white/50">
                                         Nothing scheduled — add an entry or task with a due date.
                                     </p>
                                 )}
                                 {selectedDayEvents.map((ev) => (
                                     <div
                                         key={ev.id}
-                                        className="border border-primary/25 bg-primary/5 p-2 text-[10px] font-mono"
+                                        className="border border-[rgba(0,255,65,0.25)] bg-[#00ff41]/5 p-2 text-xs"
                                     >
                                         <div className="flex items-start justify-between gap-2">
-                                            <p className="font-bold uppercase tracking-tight text-primary">{ev.title}</p>
+                                            <p className="font-bold uppercase tracking-tight text-[#00ff41]">{ev.title}</p>
                                             <div className="flex shrink-0 gap-1">
                                                 <button
                                                     type="button"
@@ -555,46 +544,46 @@ export default function EboardPage() {
                         </div>
 
                         {showEventForm && (
-                            <div className="hud-panel border border-border/50 bg-background/40 p-4 space-y-3">
-                                <h3 className="text-[10px] font-mono font-bold uppercase tracking-widest text-primary">
+                            <div className="etower-soft-card p-4 space-y-3">
+                                <p className="etower-section-label">
                                     {editingEventId ? "Edit calendar entry" : "New calendar entry"}
-                                </h3>
+                                </p>
                                 <input
                                     value={evTitle}
                                     onChange={(e) => setEvTitle(e.target.value)}
                                     placeholder="Title"
-                                    className="w-full border border-border/50 bg-background/60 px-3 py-2 text-xs font-mono uppercase focus:border-primary/50 focus:outline-none"
+                                    className={inputClass}
                                 />
                                 <textarea
                                     value={evDesc}
                                     onChange={(e) => setEvDesc(e.target.value)}
                                     placeholder="Notes"
                                     rows={2}
-                                    className="w-full border border-border/50 bg-background/60 px-3 py-2 text-xs font-mono focus:border-primary/50 focus:outline-none resize-none"
+                                    className={cn(inputClass, "resize-none")}
                                 />
                                 <div className="grid grid-cols-2 gap-2">
                                     <div>
-                                        <label className="text-[9px] font-mono uppercase text-muted-foreground">Start</label>
+                                        <label className="text-xs font-bold tracking-wide text-white/50">Start</label>
                                         <input
                                             type="date"
                                             value={evStart}
                                             onChange={(e) => setEvStart(e.target.value)}
-                                            className="mt-0.5 w-full border border-border/50 bg-background/60 px-2 py-1.5 text-xs font-mono"
+                                            className={cn(inputClass, "mt-0.5")}
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-[9px] font-mono uppercase text-muted-foreground">
+                                        <label className="text-xs font-bold tracking-wide text-white/50">
                                             End (optional)
                                         </label>
                                         <input
                                             type="date"
                                             value={evEnd}
                                             onChange={(e) => setEvEnd(e.target.value)}
-                                            className="mt-0.5 w-full border border-border/50 bg-background/60 px-2 py-1.5 text-xs font-mono"
+                                            className={cn(inputClass, "mt-0.5")}
                                         />
                                     </div>
                                 </div>
-                                <label className="flex items-center gap-2 text-[10px] font-mono uppercase">
+                                <label className="flex items-center gap-2 text-xs font-bold tracking-wide">
                                     <input
                                         type="checkbox"
                                         checked={evAllDay}
@@ -608,13 +597,13 @@ export default function EboardPage() {
                                             type="time"
                                             value={evStartTime}
                                             onChange={(e) => setEvStartTime(e.target.value)}
-                                            className="border border-border/50 bg-background/60 px-2 py-1.5 text-xs font-mono"
+                                            className={inputClass}
                                         />
                                         <input
                                             type="time"
                                             value={evEndTime}
                                             onChange={(e) => setEvEndTime(e.target.value)}
-                                            className="border border-border/50 bg-background/60 px-2 py-1.5 text-xs font-mono"
+                                            className={inputClass}
                                         />
                                     </div>
                                 )}
@@ -622,15 +611,15 @@ export default function EboardPage() {
                                     value={evLocation}
                                     onChange={(e) => setEvLocation(e.target.value)}
                                     placeholder="Location / link"
-                                    className="w-full border border-border/50 bg-background/60 px-3 py-2 text-xs font-mono focus:border-primary/50 focus:outline-none"
+                                    className={inputClass}
                                 />
                                 <div>
-                                    <p className="text-[9px] font-mono uppercase text-muted-foreground mb-1 flex items-center gap-1">
+                                    <p className="text-xs font-bold tracking-wide text-white/50 mb-1 flex items-center gap-1">
                                         <Users className="h-3 w-3" /> Invitees (optional)
                                     </p>
-                                    <div className="max-h-24 overflow-y-auto custom-scroll border border-border/40 p-1 space-y-0.5">
+                                    <div className="max-h-24 overflow-y-auto custom-scroll border border-[rgba(0,255,65,0.2)] p-1 space-y-0.5">
                                         {assignableMembers.slice(0, 40).map((m) => (
-                                            <label key={m.id} className="flex items-center gap-2 text-[10px] font-mono">
+                                            <label key={m.id} className="flex items-center gap-2 text-xs">
                                                 <input
                                                     type="checkbox"
                                                     checked={evAttendees.includes(m.id)}
@@ -646,7 +635,7 @@ export default function EboardPage() {
                                         type="button"
                                         onClick={handleSaveCalendarEvent}
                                         disabled={evSaving || !evTitle.trim()}
-                                        className="flex-1 border border-primary bg-primary py-2 text-[10px] font-mono font-bold uppercase tracking-widest text-primary-foreground disabled:opacity-50"
+                                        className="etower-soft-btn etower-btn--primary flex-1 py-2 text-xs disabled:opacity-50"
                                     >
                                         {evSaving ? "Saving…" : editingEventId ? "Update" : "Save"}
                                     </button>
@@ -656,7 +645,7 @@ export default function EboardPage() {
                                             setShowEventForm(false);
                                             resetEventForm();
                                         }}
-                                        className="border border-border/50 px-3 py-2 text-[10px] font-mono uppercase text-muted-foreground"
+                                        className="etower-soft-btn etower-soft-btn etower-soft-btn--ghost px-3 py-2 text-xs"
                                     >
                                         Cancel
                                     </button>
@@ -685,10 +674,8 @@ export default function EboardPage() {
                                 type="button"
                                 onClick={() => setTaskFilter(key)}
                                 className={cn(
-                                    "px-3 py-1.5 text-[9px] font-mono font-bold uppercase tracking-widest border",
-                                    taskFilter === key
-                                        ? "border-primary bg-primary/10 text-primary"
-                                        : "border-border/50 text-muted-foreground hover:border-primary/30"
+                                    "etower-soft-btn px-3 py-1.5 text-[10px] font-bold tracking-wide",
+                                    taskFilter === key ? "etower-btn--primary" : "etower-soft-btn etower-soft-btn--ghost text-white/60"
                                 )}
                             >
                                 {label}
@@ -698,7 +685,7 @@ export default function EboardPage() {
                             <button
                                 type="button"
                                 onClick={() => setShowTaskForm((v) => !v)}
-                                className="ml-auto inline-flex items-center gap-1 border border-primary/50 bg-primary/10 px-3 py-1.5 text-[9px] font-mono font-bold uppercase tracking-widest text-primary"
+                                className="ml-auto etower-soft-btn etower-btn--primary text-[10px] px-3 py-1.5"
                             >
                                 <Plus className="h-3 w-3" /> New task
                             </button>
@@ -706,39 +693,39 @@ export default function EboardPage() {
                     </div>
 
                     {showTaskForm && canAccess && (
-                        <div className="hud-panel border border-primary/30 bg-card/50 p-4 sm:p-6 space-y-4">
-                            <h3 className="text-[10px] font-mono font-bold uppercase tracking-widest text-primary">Create task</h3>
+                        <div className="etower-soft-card p-4 sm:p-6 space-y-4">
+                            <p className="etower-section-label">Create task</p>
                             <input
                                 value={taskTitle}
                                 onChange={(e) => setTaskTitle(e.target.value)}
                                 placeholder="Title *"
-                                className="w-full border border-border/50 bg-background/60 px-3 py-2 text-sm font-mono uppercase focus:border-primary/50 focus:outline-none"
+                                className={inputClass}
                             />
                             <textarea
                                 value={taskDesc}
                                 onChange={(e) => setTaskDesc(e.target.value)}
                                 placeholder="Description"
                                 rows={3}
-                                className="w-full border border-border/50 bg-background/60 px-3 py-2 text-sm font-mono focus:border-primary/50 focus:outline-none resize-none"
+                                className={cn(inputClass, "resize-none")}
                             />
                             <div className="grid sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-[9px] font-mono uppercase text-muted-foreground">Due date</label>
+                                    <label className="text-xs font-bold tracking-wide text-white/50">Due date</label>
                                     <input
                                         type="date"
                                         value={taskDue}
                                         onChange={(e) => setTaskDue(e.target.value)}
-                                        className="mt-1 w-full border border-border/50 bg-background/60 px-3 py-2 text-xs font-mono"
+                                        className={cn(inputClass, "mt-1")}
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-[9px] font-mono uppercase text-muted-foreground flex items-center gap-1">
+                                    <label className="text-xs font-bold tracking-wide text-white/50 flex items-center gap-1">
                                         <Flag className="h-3 w-3" /> Priority
                                     </label>
                                     <select
                                         value={taskPriority}
                                         onChange={(e) => setTaskPriority(e.target.value as EboardTaskPriority)}
-                                        className="mt-1 w-full border border-border/50 bg-background/60 px-3 py-2 text-xs font-mono"
+                                        className={cn(inputClass, "mt-1")}
                                     >
                                         <option value="low">Low</option>
                                         <option value="normal">Normal</option>
@@ -748,10 +735,10 @@ export default function EboardPage() {
                                 </div>
                             </div>
                             <div>
-                                <p className="text-[9px] font-mono uppercase text-muted-foreground mb-2">Assign to</p>
-                                <div className="max-h-32 overflow-y-auto custom-scroll border border-border/40 p-2 grid sm:grid-cols-2 gap-1">
+                                <p className="text-xs font-bold tracking-wide text-white/50 mb-2">Assign to</p>
+                                <div className="max-h-32 overflow-y-auto custom-scroll border border-[rgba(0,255,65,0.2)] p-2 grid sm:grid-cols-2 gap-1">
                                     {assignableMembers.map((m) => (
-                                        <label key={m.id} className="flex items-center gap-2 text-[10px] font-mono">
+                                        <label key={m.id} className="flex items-center gap-2 text-xs">
                                             <input
                                                 type="checkbox"
                                                 checked={taskAssignees.includes(m.id)}
@@ -766,7 +753,7 @@ export default function EboardPage() {
                                 type="button"
                                 onClick={handleSaveTask}
                                 disabled={taskSaving || !taskTitle.trim()}
-                                className="border border-primary bg-primary px-6 py-2.5 text-[10px] font-mono font-bold uppercase tracking-widest text-primary-foreground disabled:opacity-50"
+                                className="etower-soft-btn etower-btn--primary px-6 py-2.5 text-xs disabled:opacity-50"
                             >
                                 {taskSaving ? "Saving…" : "Create task"}
                             </button>
@@ -780,7 +767,7 @@ export default function EboardPage() {
                             </div>
                         )}
                         {!loading && filteredTasks.length === 0 && (
-                            <p className="text-center text-[10px] font-mono text-muted-foreground uppercase tracking-widest py-12">
+                            <p className="text-center text-xs text-white/50 py-12">
                                 No tasks match this filter.
                             </p>
                         )}
@@ -788,25 +775,25 @@ export default function EboardPage() {
                             filteredTasks.map((t) => (
                                 <div
                                     key={t.id}
-                                    className="hud-panel border border-border/40 bg-card/40 p-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
+                                    className="etower-soft-card p-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
                                 >
                                     <div className="min-w-0 flex-1 space-y-2">
                                         <div className="flex flex-wrap items-center gap-2">
-                                            <span className={cn("text-[9px] font-mono font-bold uppercase px-2 py-0.5 border", priorityClass(t.priority))}>
+                                            <span className={cn("text-[10px] font-bold uppercase px-2 py-0.5 border", priorityClass(t.priority))}>
                                                 {priorityLabel(t.priority)}
                                             </span>
-                                            <span className="text-[9px] font-mono uppercase text-muted-foreground border border-border/40 px-2 py-0.5">
+                                            <span className="text-[10px] uppercase text-white/50 border border-[rgba(0,255,65,0.2)] px-2 py-0.5">
                                                 {t.status.replace("_", " ")}
                                             </span>
                                             {t.dueDate && (
-                                                <span className="text-[9px] font-mono text-primary">Due {t.dueDate}</span>
+                                                <span className="text-[10px] text-[#00ff41]">Due {t.dueDate}</span>
                                             )}
                                         </div>
-                                        <h3 className="font-bold font-mono uppercase tracking-tight">{t.title}</h3>
+                                        <h3 className="font-bold uppercase tracking-tight">{t.title}</h3>
                                         {t.description && (
-                                            <p className="text-xs font-mono text-muted-foreground whitespace-pre-wrap">{t.description}</p>
+                                            <p className="text-xs text-white/55 whitespace-pre-wrap">{t.description}</p>
                                         )}
-                                        <p className="text-[10px] font-mono text-muted-foreground">
+                                        <p className="text-xs text-white/50">
                                             Assigned: {t.assigneeUids.map((u) => nameByUid(u)).join(", ") || "—"}
                                         </p>
                                     </div>
@@ -820,7 +807,7 @@ export default function EboardPage() {
                                                     completedAt: s === "done" ? serverTimestamp() : null,
                                                 });
                                             }}
-                                            className="border border-border/50 bg-background/60 px-2 py-1.5 text-[10px] font-mono uppercase"
+                                            className={cn(inputClass, "text-xs uppercase py-1.5")}
                                         >
                                             <option value="todo">To do</option>
                                             <option value="in_progress">In progress</option>
@@ -833,7 +820,7 @@ export default function EboardPage() {
                                                 onClick={() => {
                                                     if (confirm("Delete this task?")) void deleteTask(t.id);
                                                 }}
-                                                className="inline-flex items-center gap-1 text-[9px] font-mono uppercase text-destructive hover:underline"
+                                                className="inline-flex items-center gap-1 text-[10px] uppercase text-destructive hover:underline"
                                             >
                                                 <Trash2 className="h-3 w-3" /> Delete
                                             </button>

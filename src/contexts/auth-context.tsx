@@ -14,6 +14,8 @@ import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { parseClubRole, parseResidency, type ResidencyType } from "@/lib/member-residency";
 import { syncPlatformStats } from "@/lib/platform-stats";
+import { DEMO_MODE } from "@/lib/demo-mode";
+import { DEMO_PROFILE, DEMO_USER } from "@/lib/demo-dashboard-data";
 
 export type UserRole =
     | "member"
@@ -86,6 +88,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [needsOnboarding, setNeedsOnboarding] = useState(false);
 
     useEffect(() => {
+        if (DEMO_MODE) {
+            setUser(DEMO_USER as unknown as User);
+            setProfile(DEMO_PROFILE);
+            setNeedsOnboarding(false);
+            setLoading(false);
+            return;
+        }
+
         const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
             setUser(firebaseUser);
 
@@ -190,24 +200,53 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     const signInWithGoogle = async () => {
+        if (DEMO_MODE) {
+            setUser(DEMO_USER as unknown as User);
+            setProfile(DEMO_PROFILE);
+            setNeedsOnboarding(false);
+            return;
+        }
         const provider = new GoogleAuthProvider();
         await signInWithPopup(auth, provider);
     };
 
     const signInWithEmail = async (email: string, password: string) => {
+        if (DEMO_MODE) {
+            setUser(DEMO_USER as unknown as User);
+            setProfile(DEMO_PROFILE);
+            setNeedsOnboarding(false);
+            return;
+        }
         await signInWithEmailAndPassword(auth, email, password);
     };
 
     const signUpWithEmail = async (email: string, password: string) => {
+        if (DEMO_MODE) {
+            setUser(DEMO_USER as unknown as User);
+            setProfile(DEMO_PROFILE);
+            setNeedsOnboarding(false);
+            return;
+        }
         await createUserWithEmailAndPassword(auth, email, password);
     };
 
     const signOut = async () => {
+        if (DEMO_MODE) {
+            // Stay signed into demo identity so the portal remains usable offline
+            setUser(DEMO_USER as unknown as User);
+            setProfile(DEMO_PROFILE);
+            return;
+        }
         await firebaseSignOut(auth);
         setProfile(null);
     };
 
     const refreshProfile = async () => {
+        if (DEMO_MODE) {
+            setProfile(DEMO_PROFILE);
+            setNeedsOnboarding(false);
+            return;
+        }
         const currentUser = auth.currentUser;
         if (!currentUser) return;
         try {

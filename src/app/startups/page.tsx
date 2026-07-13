@@ -12,10 +12,10 @@ export default function StartupsPage() {
     <div className="etower-page min-h-screen">
       <EtowerNav />
       <main className="pt-8 pb-0">
-        <section className="py-16 px-4 sm:px-6 border-b border-[rgba(0,255,65,0.3)]">
+        <section className="py-16 px-4 sm:px-6 border-b border-[rgba(0,255,65,0.22)]">
           <div className="max-w-6xl mx-auto">
             <FadeIn>
-              <p className="etower-section-label mb-3">Featured Startups</p>
+              <p className="etower-section-label mb-3">Featured startups</p>
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
                 Ventures from our community
               </h1>
@@ -24,17 +24,19 @@ export default function StartupsPage() {
               </p>
             </FadeIn>
 
-            <div className="mt-14 grid md:grid-cols-3 gap-8">
+            <div className="mt-14 grid md:grid-cols-3 gap-6">
               {FEATURED_STARTUPS.map((s, i) => (
                 <FadeIn key={s.id} delay={i * 100}>
-                  <article className="etower-startup-card p-8 flex flex-col h-full">
-                    <div className="w-16 h-16 etower-gradient flex items-center justify-center text-2xl font-bold mb-6">
+                  <article className="rounded-2xl border border-[rgba(0,255,65,0.18)] bg-[rgba(20,32,51,0.9)] p-8 flex flex-col h-full shadow-[0_12px_32px_rgba(0,0,0,0.22)] hover:border-[rgba(0,255,65,0.4)] transition-colors">
+                    <div className="w-16 h-16 rounded-2xl etower-gradient flex items-center justify-center text-2xl font-bold mb-6">
                       {s.initial}
                     </div>
-                    <span className="etower-startup-badge w-fit mb-3">{s.category}</span>
+                    <span className="inline-flex w-fit mb-3 rounded-full border border-[rgba(0,255,65,0.28)] bg-[rgba(0,255,65,0.08)] px-3 py-1 text-[10px] font-semibold text-[#00ff41]">
+                      {s.category}
+                    </span>
                     <h2 className="text-xl font-bold">{s.name}</h2>
                     <p className="mt-3 text-sm text-white/60 flex-1 leading-relaxed">{s.overview}</p>
-                    <p className="mt-5 text-sm border-t border-[rgba(0,255,65,0.3)] pt-5">
+                    <p className="mt-5 text-sm border-t border-[rgba(0,255,65,0.14)] pt-5">
                       <span className="font-semibold">Founded by</span>{" "}
                       <span className="text-white/60">{s.founder}</span>
                     </p>
@@ -58,7 +60,7 @@ export default function StartupsPage() {
             <div className="mt-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
               {HERO_GALLERY_BUSINESSES.map((biz, i) => (
                 <FadeIn key={biz.id} delay={i * 30}>
-                  <div className="etower-card p-4 text-center">
+                  <div className="rounded-2xl border border-[rgba(0,255,65,0.16)] bg-[rgba(20,32,51,0.88)] p-4 text-center shadow-[0_8px_22px_rgba(0,0,0,0.18)] hover:border-[rgba(0,255,65,0.35)] transition-colors">
                     <div className="h-12 flex items-center justify-center mb-3">
                       <Image
                         src={biz.logo}

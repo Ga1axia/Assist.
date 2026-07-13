@@ -33,6 +33,8 @@ import {
 import { isStartupPubliclyVisible } from "@/lib/startup-gallery";
 import { formatTimestamp, parseStartupDocument, type StartupItem } from "@/lib/startup-document";
 import { parseClubRole, parseResidency, type ResidencyType } from "@/lib/member-residency";
+import { DEMO_MODE } from "@/lib/demo-mode";
+import { getDemoCollection, DEMO_ORG_SETTINGS } from "@/lib/demo-dashboard-data";
 
 // ──────────────────────────────────────
 // Generic real-time collection hook
@@ -52,6 +54,14 @@ function useCollection<T extends { id: string }>(
             setLoading(false);
             return;
         }
+
+        if (DEMO_MODE) {
+            setData(getDemoCollection<T>(collectionName));
+            setLoading(false);
+            setError(null);
+            return;
+        }
+
         setLoading(true);
         const q = query(collection(db, collectionName), ...constraints);
         const unsubscribe = onSnapshot(
@@ -137,6 +147,7 @@ export function useFeed(enabled: boolean = true) {
     );
 
     const togglePin = async (itemId: string, currentlyPinned: boolean, userId: string) => {
+        if (DEMO_MODE) return;
         await updateDoc(doc(db, "activityFeed", itemId), {
             pinned: !currentlyPinned,
             pinnedBy: !currentlyPinned ? userId : null,
@@ -302,6 +313,7 @@ export function useEvents(enabled: boolean = true) {
             housingHostUids?: string[];
         }
     ) => {
+        if (DEMO_MODE) return;
         const startTime = (event as { startTime?: string }).startTime ?? "";
         const endTime = (event as { endTime?: string }).endTime ?? "";
         const rec = event.recurrence;
@@ -331,12 +343,14 @@ export function useEvents(enabled: boolean = true) {
     };
 
     const rsvp = async (eventId: string, userId: string) => {
+        if (DEMO_MODE) return;
         await updateDoc(doc(db, "events", eventId), {
             attendees: arrayUnion(userId),
         });
     };
 
     const cancelRsvp = async (eventId: string, userId: string) => {
+        if (DEMO_MODE) return;
         await updateDoc(doc(db, "events", eventId), {
             attendees: arrayRemove(userId),
         });
@@ -344,6 +358,7 @@ export function useEvents(enabled: boolean = true) {
 
     /** Set admin-recorded attendance (non-alumni) for one occurrence date. */
     const setEventOccurrenceAttendance = async (eventId: string, occurrenceYmd: string, attendanceIds: string[]) => {
+        if (DEMO_MODE) return;
         const key = `attendanceByDate.${occurrenceYmd}`;
         await updateDoc(doc(db, "events", eventId), {
             [key]: attendanceIds,
@@ -374,6 +389,7 @@ export function useEvents(enabled: boolean = true) {
             endTime?: string;
         }
     ) => {
+        if (DEMO_MODE) return;
         const payload: Record<string, unknown> = {};
         if (updates.title !== undefined) payload.title = updates.title;
         if (updates.description !== undefined) payload.description = updates.description;
@@ -404,6 +420,7 @@ export function useEvents(enabled: boolean = true) {
 
     /** Delete event (admin/events role). */
     const deleteEvent = async (eventId: string) => {
+        if (DEMO_MODE) return;
         await deleteDoc(doc(db, "events", eventId));
     };
 
@@ -527,6 +544,7 @@ export function useResources(onlyApproved = true, enabled = true) {
     const filteredData = onlyApproved ? result.data.filter((r) => r.approved) : result.data;
 
     const createResource = async (resource: Partial<ResourceItem> & { uploadedById: string }) => {
+        if (DEMO_MODE) return;
         await addDoc(collection(db, "resources"), {
             ...resource,
             approved: false,
@@ -536,10 +554,12 @@ export function useResources(onlyApproved = true, enabled = true) {
     };
 
     const approveResource = async (resourceId: string) => {
+        if (DEMO_MODE) return;
         await updateDoc(doc(db, "resources", resourceId), { approved: true });
     };
 
     const rejectResource = async (resourceId: string) => {
+        if (DEMO_MODE) return;
         await deleteDoc(doc(db, "resources", resourceId));
     };
 
@@ -596,6 +616,7 @@ export function useProjects(enabled: boolean = true) {
     );
 
     const createProject = async (project: Partial<ProjectItem>) => {
+        if (DEMO_MODE) return;
         const { tasks, ...rest } = project;
         await addDoc(collection(db, "projects"), {
             ...rest,
@@ -608,6 +629,7 @@ export function useProjects(enabled: boolean = true) {
     };
 
     const updateProject = async (projectId: string, updates: Partial<ProjectItem>) => {
+        if (DEMO_MODE) return;
         await updateDoc(doc(db, "projects", projectId), {
             ...updates,
             updatedAt: serverTimestamp(),
@@ -615,6 +637,7 @@ export function useProjects(enabled: boolean = true) {
     };
 
     const addProjectTask = async (projectId: string, title: string) => {
+        if (DEMO_MODE) return;
         const project = result.data.find((p) => p.id === projectId);
         const currentTasks = project?.tasks || [];
         const newTask: ProjectTask = {
@@ -629,6 +652,7 @@ export function useProjects(enabled: boolean = true) {
     };
 
     const updateProjectTask = async (projectId: string, taskId: string, updates: Partial<ProjectTask>) => {
+        if (DEMO_MODE) return;
         const project = result.data.find((p) => p.id === projectId);
         const tasks = (project?.tasks || []).map((t) =>
             t.id === taskId ? { ...t, ...updates } : t
@@ -640,6 +664,7 @@ export function useProjects(enabled: boolean = true) {
     };
 
     const removeProjectTask = async (projectId: string, taskId: string) => {
+        if (DEMO_MODE) return;
         const project = result.data.find((p) => p.id === projectId);
         const tasks = (project?.tasks || []).filter((t) => t.id !== taskId);
         await updateDoc(doc(db, "projects", projectId), {
@@ -683,6 +708,7 @@ export function useInquiries(enabled: boolean = true) {
     );
 
     const replyToInquiry = async (inquiryId: string, reply: string, repliedBy: string) => {
+        if (DEMO_MODE) return;
         await updateDoc(doc(db, "inquiries", inquiryId), {
             reply,
             repliedBy,
@@ -691,6 +717,7 @@ export function useInquiries(enabled: boolean = true) {
     };
 
     const publishToFaq = async (inquiryId: string, question: string, answer: string) => {
+        if (DEMO_MODE) return;
         await addDoc(collection(db, "faq"), {
             question,
             answer,
@@ -763,6 +790,7 @@ export function useActionItems(enabled: boolean = true) {
     );
 
     const completeActionItem = async (itemId: string, userId: string, currentlyCompleted: boolean) => {
+        if (DEMO_MODE) return;
         const itemRef = doc(db, "actionItems", itemId);
         await updateDoc(itemRef, {
             completedBy: currentlyCompleted ? arrayRemove(userId) : arrayUnion(userId)
@@ -796,6 +824,7 @@ export type StartupUpdatePayload = Partial<
 >;
 
 export async function updateStartup(startupId: string, patch: StartupUpdatePayload) {
+    if (DEMO_MODE) return;
     const cleaned: Record<string, unknown> = {};
     for (const [k, v] of Object.entries(patch)) {
         if (v !== undefined) cleaned[k] = v;
@@ -808,6 +837,7 @@ export async function updateStartup(startupId: string, patch: StartupUpdatePaylo
 }
 
 export async function deleteStartup(startupId: string) {
+    if (DEMO_MODE) return;
     await deleteDoc(doc(db, "startups", startupId));
 }
 
@@ -816,6 +846,7 @@ export async function reviewStartupListing(
     decision: "approved" | "rejected",
     reviewer: { uid: string; name: string }
 ) {
+    if (DEMO_MODE) return;
     await updateDoc(doc(db, "startups", startupId), {
         status: decision,
         reviewedByUid: reviewer.uid,
@@ -931,6 +962,7 @@ export function useBudgets(enabled: boolean = true) {
         uid: string;
         displayName: string;
     }) => {
+        if (DEMO_MODE) return;
         await addDoc(collection(db, "budgets"), {
             title: payload.title.trim() || "Untitled budget",
             fiscalYear: payload.fiscalYear.trim(),
@@ -953,6 +985,7 @@ export function useBudgets(enabled: boolean = true) {
         budgetId: string,
         updates: Partial<Pick<BudgetItem, "title" | "fiscalYear" | "expectedAttendees" | "rows">>
     ) => {
+        if (DEMO_MODE) return;
         const payload: Record<string, unknown> = { updatedAt: serverTimestamp() };
         if (updates.title !== undefined) payload.title = updates.title;
         if (updates.fiscalYear !== undefined) payload.fiscalYear = updates.fiscalYear;
@@ -972,6 +1005,7 @@ export function useBudgets(enabled: boolean = true) {
     };
 
     const deleteBudget = async (budgetId: string) => {
+        if (DEMO_MODE) return;
         await deleteDoc(doc(db, "budgets", budgetId));
     };
 
@@ -996,6 +1030,14 @@ export function useOrgSettings(enabled: boolean = true) {
             setData(null);
             return;
         }
+
+        if (DEMO_MODE) {
+            setData(DEMO_ORG_SETTINGS);
+            setLoading(false);
+            setError(null);
+            return;
+        }
+
         setLoading(true);
         const ref = doc(db, "orgSettings", ORG_SETTINGS_CLUB_DOC_ID);
         const unsubscribe = onSnapshot(
@@ -1030,6 +1072,7 @@ export function useOrgSettings(enabled: boolean = true) {
     }, [enabled]);
 
     const saveOrgSettings = async (payload: OrgSettingsData) => {
+        if (DEMO_MODE) return;
         await setDoc(
             doc(db, "orgSettings", ORG_SETTINGS_CLUB_DOC_ID),
             {
@@ -1160,6 +1203,7 @@ export function useEboardTasks(enabled: boolean = true) {
         status?: EboardTaskStatus;
         createdBy: string;
     }) => {
+        if (DEMO_MODE) return;
         await addDoc(collection(db, "eboardTasks"), {
             title: input.title.trim(),
             description: input.description.trim(),
@@ -1180,6 +1224,7 @@ export function useEboardTasks(enabled: boolean = true) {
             Pick<EboardTaskItem, "title" | "description" | "assigneeUids" | "dueDate" | "status" | "priority">
         > & { completedAt?: unknown }
     ) => {
+        if (DEMO_MODE) return;
         const payload: Record<string, unknown> = { updatedAt: serverTimestamp() };
         if (patch.title !== undefined) payload.title = patch.title.trim();
         if (patch.description !== undefined) payload.description = patch.description.trim();
@@ -1194,6 +1239,7 @@ export function useEboardTasks(enabled: boolean = true) {
     };
 
     const deleteTask = async (taskId: string) => {
+        if (DEMO_MODE) return;
         await deleteDoc(doc(db, "eboardTasks", taskId));
     };
 
@@ -1220,6 +1266,7 @@ export function useEboardCalendarEvents(enabled: boolean = true) {
         attendeeUids: string[];
         createdBy: string;
     }) => {
+        if (DEMO_MODE) return;
         await addDoc(collection(db, "eboardCalendarEvents"), {
             title: input.title.trim(),
             description: input.description.trim(),
@@ -1253,6 +1300,7 @@ export function useEboardCalendarEvents(enabled: boolean = true) {
             >
         >
     ) => {
+        if (DEMO_MODE) return;
         const payload: Record<string, unknown> = { updatedAt: serverTimestamp() };
         if (patch.title !== undefined) payload.title = patch.title.trim();
         if (patch.description !== undefined) payload.description = patch.description.trim();
@@ -1273,6 +1321,7 @@ export function useEboardCalendarEvents(enabled: boolean = true) {
     };
 
     const deleteCalendarEvent = async (eventId: string) => {
+        if (DEMO_MODE) return;
         await deleteDoc(doc(db, "eboardCalendarEvents", eventId));
     };
 
@@ -1292,6 +1341,17 @@ export function useDashboardStats() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        if (DEMO_MODE) {
+            setStats({
+                totalProjects: 2,
+                totalMembers: 5,
+                totalResources: 3,
+                activeProjects: 1,
+            });
+            setLoading(false);
+            return;
+        }
+
         let cancelled = false;
 
         async function fetchCounts(signedIn: boolean) {
@@ -1343,4 +1403,34 @@ export function useDashboardStats() {
     }, []);
 
     return { stats, loading };
+}
+
+// ──────────────────────────────────────
+// Newsletter subscribers (Admin / leadership)
+// ──────────────────────────────────────
+export interface NewsletterSubscriberItem {
+    id: string;
+    email: string;
+    source: string;
+    date: string;
+}
+
+export function useNewsletterSubscribers(enabled: boolean = true) {
+    const result = useCollection<NewsletterSubscriberItem>(
+        "newsletterSubscribers",
+        [],
+        (raw, id) => ({
+            id,
+            email: raw.email || "",
+            source: raw.source || "unknown",
+            date: formatTimestamp(raw.createdAt) || "",
+        }),
+        enabled
+    );
+
+    const removeSubscriber = async (_subscriberId: string) => {
+        if (DEMO_MODE) return;
+    };
+
+    return { ...result, removeSubscriber };
 }

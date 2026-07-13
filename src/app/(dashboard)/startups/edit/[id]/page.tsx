@@ -10,8 +10,10 @@ import { useAuth } from "@/contexts/auth-context";
 import { parseStartupDocument, updateStartup } from "@/hooks/useFirestore";
 import { STARTUP_BUSINESS_CATEGORIES, isStartupBusinessCategory } from "@/lib/startup-gallery";
 import { canReviewStartupSubmissions } from "@/lib/roles";
-import { ArrowLeft, Loader2, Rocket, Send, ImageIcon } from "lucide-react";
+import { ArrowLeft, Loader2, Send, ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { PageHeader } from "@/components/page-header";
+import { DEMO_MODE } from "@/lib/demo-mode";
 
 export default function EditStartupPage() {
     const router = useRouter();
@@ -124,6 +126,10 @@ export default function EditStartupPage() {
         setSending(true);
         setError("");
         try {
+            if (DEMO_MODE) {
+                router.push("/admin");
+                return;
+            }
             let logoUrl: string | null | undefined = undefined;
             if (logo) {
                 const safe = logo.name.replace(/[^\w.-]/g, "_").slice(0, 80);
@@ -196,7 +202,7 @@ export default function EditStartupPage() {
             <div className="mx-auto max-w-3xl space-y-4 pb-16 pt-4">
                 <Link
                     href="/startups"
-                    className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-primary"
+                    className="inline-flex items-center gap-2 text-xs text-white/50 hover:text-[#00ff41] transition-colors"
                 >
                     <ArrowLeft className="h-4 w-4" /> Back to gallery
                 </Link>
@@ -210,7 +216,7 @@ export default function EditStartupPage() {
             <div className="mx-auto max-w-3xl space-y-4 pb-16 pt-4">
                 <Link
                     href="/startups"
-                    className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-primary"
+                    className="inline-flex items-center gap-2 text-xs tracking-wide text-muted-foreground hover:text-primary"
                 >
                     <ArrowLeft className="h-4 w-4" /> Back to gallery
                 </Link>
@@ -222,37 +228,33 @@ export default function EditStartupPage() {
     }
 
     const inputClass =
-        "w-full border border-border/50 bg-background/60 px-4 py-3 font-mono text-sm transition-colors focus:border-primary/50 focus:outline-none hud-panel-sm";
+        "w-full border border-[rgba(0,255,65,0.3)] bg-[#0a1628] px-4 py-3 text-sm transition-colors focus:border-[#00ff41] focus:outline-none";
 
     return (
         <div className="mx-auto max-w-3xl animate-fade-in space-y-6 pb-16 pt-4">
             <Link
                 href="/startups"
-                className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-primary"
+                className="inline-flex items-center gap-2 text-xs font-bold tracking-wide text-white/50 hover:text-[#00ff41] transition-colors"
             >
                 <ArrowLeft className="h-4 w-4" /> Back to gallery
             </Link>
 
-            <div className="hud-panel border border-primary/30 bg-card/70 p-6 sm:p-8 scanlines">
-                <div className="mb-6 flex items-center gap-3 border-b border-border/40 pb-4">
-                    <Rocket className="h-6 w-6 text-primary" />
-                    <div>
-                        <h1 className="text-xl font-black uppercase tracking-tight">Edit startup</h1>
-                        <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
-                            Updates appear immediately in the public gallery
-                        </p>
-                    </div>
-                </div>
+            <PageHeader
+                eyebrow="Startup gallery"
+                title="Edit startup"
+                description="Updates appear immediately in the public gallery."
+            />
 
+            <div className="etower-soft-card p-6 sm:p-8">
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <section className="space-y-4">
-                        <h2 className="text-[10px] font-mono font-bold uppercase tracking-widest text-primary border-b border-border/30 pb-2">Company</h2>
+                        <p className="etower-section-label border-b border-[rgba(0,255,65,0.2)] pb-2">Company</p>
                         <div>
-                            <label className="mb-1.5 block text-[10px] font-mono font-bold uppercase tracking-widest text-muted-foreground">Company name *</label>
+                            <label className="mb-1.5 block text-xs font-bold tracking-wide text-white/50">Company name *</label>
                             <input value={name} onChange={(e) => setName(e.target.value)} className={cn(inputClass, "uppercase")} placeholder="Acme Inc." />
                         </div>
                         <div>
-                            <label className="mb-1.5 block text-[10px] font-mono font-bold uppercase tracking-widest text-muted-foreground">Business category *</label>
+                            <label className="mb-1.5 block text-xs font-bold tracking-wide text-white/50">Business category *</label>
                             <select value={businessCategory} onChange={(e) => setBusinessCategory(e.target.value)} className={inputClass}>
                                 {STARTUP_BUSINESS_CATEGORIES.map((c) => (
                                     <option key={c} value={c}>
@@ -262,7 +264,7 @@ export default function EditStartupPage() {
                             </select>
                         </div>
                         <div>
-                            <label className="mb-1.5 block text-[10px] font-mono font-bold uppercase tracking-widest text-muted-foreground">Year founded *</label>
+                            <label className="mb-1.5 block text-xs font-bold tracking-wide text-white/50">Year founded *</label>
                             <input
                                 value={foundedYear}
                                 onChange={(e) => setFoundedYear(e.target.value.replace(/\D/g, "").slice(0, 4))}
@@ -271,7 +273,7 @@ export default function EditStartupPage() {
                             />
                         </div>
                         <div>
-                            <label className="mb-1.5 block text-[10px] font-mono font-bold uppercase tracking-widest text-muted-foreground">Company overview *</label>
+                            <label className="mb-1.5 block text-xs font-bold tracking-wide text-white/50">Company overview *</label>
                             <textarea
                                 value={companyOverview}
                                 onChange={(e) => setCompanyOverview(e.target.value)}
@@ -281,64 +283,64 @@ export default function EditStartupPage() {
                             />
                         </div>
                         <div>
-                            <label className="mb-1.5 block text-[10px] font-mono font-bold uppercase tracking-widest text-muted-foreground">Founder story *</label>
+                            <label className="mb-1.5 block text-xs font-bold tracking-wide text-white/50">Founder story *</label>
                             <textarea
                                 value={founderStory}
                                 onChange={(e) => setFounderStory(e.target.value)}
                                 rows={6}
                                 className={cn(inputClass, "resize-none")}
-                                placeholder="Tell the CODE community your story…"
+                                placeholder="Tell the eTower community your story…"
                             />
                         </div>
                         <div>
-                            <label className="mb-1.5 block text-[10px] font-mono font-bold uppercase tracking-widest text-muted-foreground">Founding team (public names) *</label>
+                            <label className="mb-1.5 block text-xs font-bold tracking-wide text-white/50">Founding team (public names) *</label>
                             <input value={founders} onChange={(e) => setFounders(e.target.value)} className={inputClass} placeholder="Names as they should appear publicly" />
                         </div>
                     </section>
 
                     <section className="space-y-4">
-                        <h2 className="text-[10px] font-mono font-bold uppercase tracking-widest text-primary border-b border-border/30 pb-2">Links & brand</h2>
+                        <p className="etower-section-label border-b border-[rgba(0,255,65,0.2)] pb-2">Links & brand</p>
                         <div>
-                            <label className="mb-1.5 block text-[10px] font-mono font-bold uppercase tracking-widest text-muted-foreground">Company website</label>
+                            <label className="mb-1.5 block text-xs font-bold tracking-wide text-white/50">Company website</label>
                             <input type="url" value={website} onChange={(e) => setWebsite(e.target.value)} className={inputClass} placeholder="https://…" />
                         </div>
                         <div>
-                            <label className="mb-1.5 block text-[10px] font-mono font-bold uppercase tracking-widest text-muted-foreground">Instagram</label>
+                            <label className="mb-1.5 block text-xs font-bold tracking-wide text-white/50">Instagram</label>
                             <input value={instagramUrl} onChange={(e) => setInstagramUrl(e.target.value)} className={inputClass} placeholder="@handle or full profile URL" />
                         </div>
                         <div>
-                            <label className="mb-1.5 block text-[10px] font-mono font-bold uppercase tracking-widest text-muted-foreground">Company LinkedIn</label>
+                            <label className="mb-1.5 block text-xs font-bold tracking-wide text-white/50">Company LinkedIn</label>
                             <input value={linkedinCompanyUrl} onChange={(e) => setLinkedinCompanyUrl(e.target.value)} className={inputClass} placeholder="company/your-company or full URL" />
                         </div>
                         <div>
-                            <label className="mb-1.5 block text-[10px] font-mono font-bold uppercase tracking-widest text-muted-foreground">Company logo (optional)</label>
+                            <label className="mb-1.5 block text-xs font-bold tracking-wide text-white/50">Company logo (optional)</label>
                             <input ref={logoRef} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={handleLogo} />
                             <button
                                 type="button"
                                 onClick={() => logoRef.current?.click()}
                                 className={cn(
-                                    "flex w-full cursor-pointer flex-col items-center justify-center gap-2 border border-dashed px-4 py-6 transition-colors hud-corners",
-                                    logo || logoPreview ? "border-primary/40 bg-primary/5" : "border-border/50 bg-card/40 hover:border-primary/50"
+                                    "flex w-full cursor-pointer flex-col items-center justify-center gap-2 border border-dashed px-4 py-6 transition-colors",
+                                    logo || logoPreview ? "border-[#00ff41]/40 bg-[#00ff41]/5" : "border-[rgba(0,255,65,0.3)] bg-[#0a1628] hover:border-[#00ff41]"
                                 )}
                             >
                                 {logoPreview ? (
-                                    <img src={logoPreview} alt="" className="h-20 w-20 border border-primary/30 object-contain" />
+                                    <img src={logoPreview} alt="" className="h-20 w-20 border border-[rgba(0,255,65,0.3)] object-contain" />
                                 ) : (
-                                    <ImageIcon className="h-8 w-8 text-muted-foreground/50" />
+                                    <ImageIcon className="h-8 w-8 text-white/40" />
                                 )}
-                                <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+                                <span className="text-xs font-bold tracking-wide text-white/50">
                                     {logo ? "Tap to replace image" : "PNG, JPG, or WebP"}
                                 </span>
                             </button>
                         </div>
                     </section>
 
-                    {error && <p className="text-xs font-mono text-destructive">{error}</p>}
+                    {error && <p className="text-xs text-destructive">{error}</p>}
 
                     <button
                         type="submit"
                         disabled={sending}
-                        className="flex w-full items-center justify-center gap-2 border border-primary bg-primary py-3 font-mono text-xs font-bold uppercase tracking-widest text-primary-foreground transition-all hover:brightness-110 disabled:opacity-50 hud-panel glow-border-strong"
+                        className="etower-soft-btn etower-btn--primary w-full h-11 text-sm disabled:opacity-50"
                     >
                         {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                         {sending ? "Saving…" : "Save changes"}
