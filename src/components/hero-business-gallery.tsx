@@ -2,7 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, type CSSProperties, type ReactNode } from "react";
+import {
+  useState,
+  useSyncExternalStore,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import { ArrowRight } from "lucide-react";
 import {
   HERO_STATS,
@@ -15,15 +20,7 @@ type HeroBusinessGalleryProps = {
   flipActive?: boolean;
 };
 
-/**
- * Center 3×3 only (rows 2–4, cols 2–4):
- *  6  7  8
- * 11 12 13
- * 16 17 18
- *
- * Placement is intentionally asymmetric — not a cross or grid of words.
- */
-const FLIPS: {
+type FlipDef = {
   index: number;
   delayMs: number;
   kind: "word" | "cta" | "stat" | "line";
@@ -31,7 +28,15 @@ const FLIPS: {
   line?: string;
   asHeading?: boolean;
   statIndex?: number;
-}[] = [
+};
+
+/**
+ * Desktop 5×5 center 3×3 (rows 2–4, cols 2–4):
+ *  6  7  8
+ * 11 12 13
+ * 16 17 18
+ */
+const DESKTOP_FLIPS: FlipDef[] = [
   { index: 6, delayMs: 40, kind: "line", line: "Babson", asHeading: true },
   { index: 8, delayMs: 110, kind: "word", word: "Live" },
   { index: 12, delayMs: 180, kind: "word", word: "Learn" },
@@ -41,7 +46,30 @@ const FLIPS: {
   { index: 17, delayMs: 460, kind: "stat", statIndex: 2 },
 ];
 
-const OCCUPIED = new Set(FLIPS.map((f) => f.index));
+/** Mobile 3×3 — same content, larger cells */
+const MOBILE_FLIPS: FlipDef[] = [
+  { index: 0, delayMs: 40, kind: "line", line: "Babson", asHeading: true },
+  { index: 2, delayMs: 110, kind: "word", word: "Live" },
+  { index: 3, delayMs: 180, kind: "word", word: "Learn" },
+  { index: 4, delayMs: 250, kind: "cta" },
+  { index: 5, delayMs: 320, kind: "word", word: "Launch" },
+  { index: 6, delayMs: 390, kind: "stat", statIndex: 0 },
+  { index: 8, delayMs: 460, kind: "stat", statIndex: 2 },
+];
+
+function subscribeMobile(onChange: () => void) {
+  const mq = window.matchMedia("(max-width: 768px)");
+  mq.addEventListener("change", onChange);
+  return () => mq.removeEventListener("change", onChange);
+}
+
+function useIsMobile() {
+  return useSyncExternalStore(
+    subscribeMobile,
+    () => window.matchMedia("(max-width: 768px)").matches,
+    () => false
+  );
+}
 
 function GalleryLogo({ biz }: { biz: HeroGalleryBusiness }) {
   const [logoFailed, setLogoFailed] = useState(false);
@@ -71,7 +99,7 @@ function GalleryFace({ biz, priority }: { biz: HeroGalleryBusiness; priority?: b
         src={biz.image}
         alt=""
         fill
-        sizes="20vw"
+        sizes="(max-width: 768px) 33vw, 20vw"
         className="hero-gallery__photo object-cover"
         unoptimized
         priority={priority}
@@ -90,18 +118,28 @@ function PhotoCell({
   biz,
   style,
   priority,
+  revealed,
+  onToggle,
 }: {
   biz: HeroGalleryBusiness;
   style: CSSProperties;
   priority?: boolean;
+  revealed: boolean;
+  onToggle: () => void;
 }) {
   return (
-    <div className="hero-gallery__cell group" style={style}>
+    <button
+      type="button"
+      className={cn("hero-gallery__cell group", revealed && "hero-gallery__cell--revealed")}
+      style={style}
+      onClick={onToggle}
+      aria-label={`${biz.name}${revealed ? "" : " — tap to view photo"}`}
+    >
       <GalleryFace biz={biz} priority={priority} />
-      <div className="hero-gallery__name absolute bottom-0 left-0 right-0 px-2 py-2 bg-gradient-to-t from-black/55 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+      <div className="hero-gallery__name absolute bottom-0 left-0 right-0 px-2 py-2 bg-gradient-to-t from-black/55 to-transparent">
         <p className="text-white text-[10px] sm:text-xs font-semibold truncate">{biz.name}</p>
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -136,7 +174,7 @@ function FlipTile({
   );
 }
 
-function FlipBack({ flip }: { flip: (typeof FLIPS)[number] }) {
+function FlipBack({ flip }: { flip: FlipDef }) {
   if (flip.kind === "word" && flip.word) {
     return (
       <div className="hero-flip__glass hero-flip__glass--word">
@@ -169,43 +207,63 @@ function FlipBack({ flip }: { flip: (typeof FLIPS)[number] }) {
   return (
     <div className="hero-flip__glass hero-flip__glass--stat">
       <strong>{stat.value}</strong>
-      <span>{stat.label}</span>
+      <span className="hero-flip__stat-label">{stat.label}</span>
+      <span className="hero-flip__stat-label-short">{stat.label.split(" ")[0]}</span>
     </div>
   );
 }
 
 export function HeroBusinessGallery({ flipActive = false }: HeroBusinessGalleryProps) {
-  const fronts = HERO_GALLERY_BUSINESSES.slice(0, FLIPS.length);
-  const mosaic = HERO_GALLERY_BUSINESSES.slice(FLIPS.length);
+  const isMobile = useIsMobile();
+  const [revealed, setRevealed] = useState<Record<string, boolean>>({});
+
+  const gridSize = isMobile ? 3 : 5;
+  const flips = isMobile ? MOBILE_FLIPS : DESKTOP_FLIPS;
+  const occupied = new Set(flips.map((f) => f.index));
+  const total = gridSize * gridSize;
+
+  const fronts = HERO_GALLERY_BUSINESSES.slice(0, flips.length);
+  const mosaic = HERO_GALLERY_BUSINESSES.slice(flips.length);
   let m = 0;
 
-  const photoCells = Array.from({ length: 25 }, (_, i) => {
-    if (OCCUPIED.has(i)) return null;
-    const col = (i % 5) + 1;
-    const row = Math.floor(i / 5) + 1;
+  const photoCells = Array.from({ length: total }, (_, i) => {
+    if (occupied.has(i)) return null;
+    const col = (i % gridSize) + 1;
+    const row = Math.floor(i / gridSize) + 1;
     const biz = mosaic[m++ % mosaic.length];
+    const key = `${biz.id}-${i}`;
     return (
       <PhotoCell
-        key={`${biz.id}-${i}`}
+        key={key}
         biz={biz}
-        priority={i < 8}
+        priority={i < 6}
+        revealed={!!revealed[key]}
+        onToggle={() => setRevealed((prev) => ({ ...prev, [key]: !prev[key] }))}
         style={{ gridColumn: col, gridRow: row }}
       />
     );
   });
 
   return (
-    <div className="hero-gallery">
+    <div
+      className={cn("hero-gallery", isMobile && "hero-gallery--mobile")}
+      style={
+        {
+          "--hero-cols": gridSize,
+          "--hero-rows": gridSize,
+        } as CSSProperties
+      }
+    >
       <p className="sr-only">
         eTower at Babson — live, learn, and launch with Boston&apos;s next entrepreneurs.
       </p>
       {photoCells}
-      {FLIPS.map((flip, i) => {
-        const col = (flip.index % 5) + 1;
-        const row = Math.floor(flip.index / 5) + 1;
+      {flips.map((flip, i) => {
+        const col = (flip.index % gridSize) + 1;
+        const row = Math.floor(flip.index / gridSize) + 1;
         return (
           <FlipTile
-            key={flip.index}
+            key={`${isMobile ? "m" : "d"}-${flip.index}`}
             className={`hero-flip--${flip.kind}`}
             flipped={flipActive}
             delayMs={flip.delayMs}

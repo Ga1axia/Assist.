@@ -39,6 +39,10 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ??
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")
+  ),
   title: "eTower — Babson's Premier Entrepreneurial Community",
   description:
     "Where Boston's next generation of entrepreneurs live, learn, and launch. Join eTower at Babson College.",
@@ -46,6 +50,27 @@ export const metadata: Metadata = {
   icons: {
     icon: "/etowerlogo.png",
     apple: "/etowerlogo.png",
+  },
+  openGraph: {
+    title: "eTower — Babson's Premier Entrepreneurial Community",
+    description:
+      "Where Boston's next generation of entrepreneurs live, learn, and launch. Join eTower at Babson College.",
+    type: "website",
+    images: [
+      {
+        url: "/og-landing.png",
+        width: 1200,
+        height: 630,
+        alt: "eTower landing page — Live, Learn, Launch",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "eTower — Babson's Premier Entrepreneurial Community",
+    description:
+      "Where Boston's next generation of entrepreneurs live, learn, and launch. Join eTower at Babson College.",
+    images: ["/og-landing.png"],
   },
 };
 

@@ -31,7 +31,7 @@ function IntroGraphicStrip() {
           className="etower-intro__logo"
           priority
         />
-        <p className="etower-intro__tagline text-center whitespace-nowrap">
+        <p className="etower-intro__tagline">
           Entrepreneurs · Live · Learn · Launch
         </p>
       </div>
