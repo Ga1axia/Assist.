@@ -20,14 +20,15 @@ type EtowerColumnIntroProps = {
 
 function IntroGraphicStrip() {
   return (
-    <div className="etower-intro__strip-inner flex h-full w-full items-center justify-center bg-[#0a1628]">
-      <div className="etower-intro__content flex flex-col items-center gap-5 sm:gap-8 px-4">
+    <div className="etower-intro__strip-inner flex h-full w-full items-center justify-center bg-[#14261A]">
+      <div className="etower-intro__content flex flex-col items-center gap-4 sm:gap-6 px-4">
+        <p className="etower-intro__welcome">Welcome to</p>
         <Image
           src={ETOWER_LOGO}
           alt="eTower"
-          width={480}
-          height={120}
-          className="etower-intro__logo brightness-0 invert"
+          width={720}
+          height={180}
+          className="etower-intro__logo"
           priority
         />
         <p className="etower-intro__tagline text-center whitespace-nowrap">
@@ -99,7 +100,7 @@ export function EtowerColumnIntro({ onComplete }: EtowerColumnIntroProps) {
           <div
             key={i}
             className={cn(
-              "etower-intro__col absolute top-0 bottom-0 overflow-hidden bg-[#0a1628]",
+              "etower-intro__col absolute top-0 bottom-0 overflow-hidden bg-[#14261A]",
               separating &&
                 (direction === "up"
                   ? "etower-intro__col-exit-up"

@@ -44,8 +44,8 @@ export const metadata: Metadata = {
     "Where Boston's next generation of entrepreneurs live, learn, and launch. Join eTower at Babson College.",
   keywords: ["eTower", "Babson", "entrepreneurship", "startups", "living learning community"],
   icons: {
-    icon: "/logo/etower-logo-new.png",
-    apple: "/logo/etower-logo-new.png",
+    icon: "/etowerlogo.png",
+    apple: "/etowerlogo.png",
   },
 };
 

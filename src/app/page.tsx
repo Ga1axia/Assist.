@@ -10,6 +10,7 @@ import {
   Lightbulb,
   Network,
   TrendingUp,
+  ExternalLink,
 } from "lucide-react";
 import { EtowerColumnIntro } from "@/components/etower-column-intro";
 import { EtowerNav } from "@/components/etower-nav";
@@ -21,6 +22,7 @@ import { cn } from "@/lib/utils";
 import {
   ETOWER,
   IMPACT_METRICS,
+  FEATURED_STARTUPS,
   TESTIMONIALS,
   JOIN_PILLARS,
   SOCIAL_POSTS,
@@ -35,9 +37,11 @@ const MARQUEE_ITEMS = [
   "Est. 2001",
   "Babson College",
 ];
+const HERO_TEXT_DELAY_MS = 1600;
 
 export default function LandingPage() {
   const [introDone, setIntroDone] = useState(false);
+  const [heroTextVisible, setHeroTextVisible] = useState(false);
   const handleIntroComplete = useCallback(() => {
     setIntroDone(true);
   }, []);
@@ -52,6 +56,12 @@ export default function LandingPage() {
     }
   }, []);
 
+  useEffect(() => {
+    if (!introDone) return;
+    const timer = window.setTimeout(() => setHeroTextVisible(true), HERO_TEXT_DELAY_MS);
+    return () => window.clearTimeout(timer);
+  }, [introDone]);
+
   const featuredQuote = TESTIMONIALS[0];
   const gridQuotes = TESTIMONIALS.slice(1);
 
@@ -62,9 +72,9 @@ export default function LandingPage() {
       <div className={cn("etower-page__main", introDone && "etower-page__main--visible")}>
         <EtowerNav />
 
-        {/* Hero — 5×5 business gallery only */}
+        {/* Hero — gallery tiles flip to glassy content */}
         <section id="top" className="etower-hero-gallery-wrap relative scroll-mt-0">
-          <HeroBusinessGallery />
+          <HeroBusinessGallery flipActive={heroTextVisible} />
         </section>
 
         {/* Marquee */}
@@ -78,7 +88,7 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Our Impact — dark section */}
+        {/* Our Impact */}
         <section id="impact" className="etower-impact py-24 px-4 sm:px-6 scroll-mt-20">
           <div className="relative max-w-6xl mx-auto">
             <FadeIn>
@@ -86,10 +96,10 @@ export default function LandingPage() {
                 <p className="text-sm font-semibold uppercase tracking-widest etower-section-label mb-3">
                   Our Impact
                 </p>
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-[#14261A]">
                   Billions in value across industries
                 </h2>
-                <p className="mt-4 text-white/60 leading-relaxed">
+                <p className="mt-4 text-[rgba(20,38,26,0.62)] leading-relaxed">
                   eTower has built one of the most successful entrepreneurship communities in
                   Boston, with alumni creating lasting impact worldwide.
                 </p>
@@ -100,9 +110,68 @@ export default function LandingPage() {
                 <FadeIn key={m.label} delay={i * 80}>
                   <div className="etower-impact-card h-full">
                     <div className="etower-stat-value">{m.value}</div>
-                    <h3 className="mt-4 font-bold text-white">{m.label}</h3>
-                    <p className="mt-2 text-sm text-white/55">{m.description}</p>
+                    <h3 className="mt-4 font-bold text-[#14261A]">{m.label}</h3>
+                    <p className="mt-2 text-sm text-[rgba(20,38,26,0.55)]">{m.description}</p>
                   </div>
+                </FadeIn>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Featured Startups */}
+        <section className="py-24 px-4 sm:px-6 bg-[#F3F6F4]">
+          <div className="max-w-6xl mx-auto">
+            <FadeIn>
+              <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-14">
+                <div>
+                  <p className="etower-section-label mb-3">Featured Startups</p>
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-[#0A111F]">
+                    Ventures from our community
+                  </h2>
+                  <p className="mt-3 text-[rgba(10,17,31,0.6)] max-w-xl leading-relaxed">
+                    Real companies founded by eTower residents and alumni — building from Babson outward.
+                  </p>
+                </div>
+                <Link
+                  href="/startups"
+                  className="etower-btn etower-btn--outline px-5 py-2.5 text-sm shrink-0"
+                >
+                  View All
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </FadeIn>
+            <div className="grid md:grid-cols-3 gap-6">
+              {FEATURED_STARTUPS.map((s, i) => (
+                <FadeIn key={s.id} delay={i * 90}>
+                  <article className="etower-startup-card p-7 flex flex-col h-full">
+                    <div className="h-14 flex items-center mb-5">
+                      <Image
+                        src={s.logo}
+                        alt={`${s.name} logo`}
+                        width={120}
+                        height={48}
+                        className="max-h-12 w-auto object-contain"
+                        unoptimized
+                      />
+                    </div>
+                    <span className="etower-startup-badge mb-3 w-fit">{s.category}</span>
+                    <h3 className="text-xl font-bold text-[#0A111F]">{s.name}</h3>
+                    <p className="mt-3 text-sm text-[rgba(10,17,31,0.6)] flex-1 leading-relaxed">
+                      {s.overview}
+                    </p>
+                    <p className="mt-5 text-sm border-t border-[rgba(90,173,74,0.22)] pt-4 text-[rgba(10,17,31,0.6)]">
+                      <span className="font-semibold text-[#0A111F]">Founded by</span> {s.founder}
+                    </p>
+                    <Link
+                      href="/startups"
+                      className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[#3D8A35]"
+                    >
+                      Explore
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </Link>
+                  </article>
                 </FadeIn>
               ))}
             </div>
@@ -112,13 +181,13 @@ export default function LandingPage() {
         {/* eTower Outlets */}
         <EtowerOutletsSection />
 
-        {/* Testimonials */}
-        <section className="py-24 px-4 sm:px-6 border-t border-[rgba(0,255,65,0.18)]">
+        {/* Testimonials — light */}
+        <section className="py-24 px-4 sm:px-6 border-t border-[rgba(90,173,74,0.22)]">
           <div className="max-w-6xl mx-auto">
             <FadeIn>
               <div className="text-center mb-14">
                 <p className="etower-section-label mb-3">What Our Community Says</p>
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#0A111F]">
                   Hear from residents and alumni
                 </h2>
               </div>
@@ -127,16 +196,16 @@ export default function LandingPage() {
             <FadeIn delay={100}>
               <blockquote className="etower-testimonial-featured mb-8 relative z-10">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-16 h-16 rounded-full etower-gradient flex items-center justify-center font-bold">
+                  <div className="w-16 h-16 rounded-full etower-gradient flex items-center justify-center font-bold text-white">
                     {featuredQuote.initials}
                   </div>
                   <div>
-                    <p className="font-bold text-lg">{featuredQuote.name}</p>
-                    <p className="text-sm text-white/60">{featuredQuote.role}</p>
-                    <p className="text-sm text-[#00ff41] font-medium">{featuredQuote.company}</p>
+                    <p className="font-bold text-lg text-[#0A111F]">{featuredQuote.name}</p>
+                    <p className="text-sm text-[rgba(10,17,31,0.6)]">{featuredQuote.role}</p>
+                    <p className="text-sm text-[#3D8A35] font-medium">{featuredQuote.company}</p>
                   </div>
                 </div>
-                <p className="text-lg sm:text-xl leading-relaxed text-white/90 max-w-3xl relative z-10">
+                <p className="text-lg sm:text-xl leading-relaxed text-[rgba(10,17,31,0.8)] max-w-3xl relative z-10">
                   &ldquo;{featuredQuote.quote}&rdquo;
                 </p>
               </blockquote>
@@ -147,15 +216,15 @@ export default function LandingPage() {
                 <FadeIn key={t.name} delay={150 + i * 80}>
                   <blockquote className="etower-card p-6 h-full">
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-11 h-11 rounded-full etower-gradient flex items-center justify-center font-bold text-xs">
+                      <div className="w-11 h-11 rounded-full etower-gradient flex items-center justify-center font-bold text-xs text-white">
                         {t.initials}
                       </div>
                       <div>
-                        <p className="font-bold text-sm">{t.name}</p>
-                        <p className="text-xs text-white/60">{t.role}</p>
+                        <p className="font-bold text-sm text-[#0A111F]">{t.name}</p>
+                        <p className="text-xs text-[rgba(10,17,31,0.6)]">{t.role}</p>
                       </div>
                     </div>
-                    <p className="text-sm text-white/60 leading-relaxed line-clamp-4">
+                    <p className="text-sm text-[rgba(10,17,31,0.6)] leading-relaxed line-clamp-4">
                       &ldquo;{t.quote}&rdquo;
                     </p>
                   </blockquote>
@@ -166,12 +235,12 @@ export default function LandingPage() {
         </section>
 
         {/* Instagram */}
-        <section className="py-24 px-4 sm:px-6 border-t border-[rgba(0,255,65,0.18)]">
+        <section className="py-24 px-4 sm:px-6 border-t border-[rgba(90,173,74,0.22)] bg-[#F3F6F4]">
           <div className="max-w-6xl mx-auto">
             <FadeIn>
               <div className="text-center mb-14">
                 <p className="etower-section-label mb-3">Follow Our Journey</p>
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#0A111F]">
                   Stay connected on Instagram
                 </h2>
               </div>
@@ -181,14 +250,20 @@ export default function LandingPage() {
                 <FadeIn key={i} delay={i * 70}>
                   <div className="etower-social-card etower-card relative">
                     <div className="etower-social-card__img relative">
-                      <Image src="/logo/etower-logo-new.png" alt="" width={48} height={48} className="opacity-25 brightness-0 invert" />
+                      <Image
+                        src="/etowerlogo.png"
+                        alt=""
+                        width={48}
+                        height={48}
+                        className="opacity-40"
+                      />
                       <div className="etower-social-card__overlay">
                         <p className="text-white text-xs line-clamp-2">{post.caption}</p>
                       </div>
                     </div>
                     <div className="p-4">
-                      <p className="text-sm text-white/60 line-clamp-2">{post.caption}</p>
-                      <p className="mt-2 text-xs text-white/40">
+                      <p className="text-sm text-[rgba(10,17,31,0.6)] line-clamp-2">{post.caption}</p>
+                      <p className="mt-2 text-xs text-[rgba(10,17,31,0.4)]">
                         {post.likes} likes · {post.comments} comments
                       </p>
                     </div>
@@ -221,11 +296,11 @@ export default function LandingPage() {
                   const Icon = PILLAR_ICONS[i];
                   return (
                     <div key={pillar.title} className="etower-card p-6 text-center group">
-                      <div className="w-12 h-12 rounded-xl etower-gradient flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                      <div className="w-12 h-12 rounded-xl etower-gradient flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform text-white">
                         <Icon className="w-5 h-5" />
                       </div>
-                      <h3 className="font-bold">{pillar.title}</h3>
-                      <p className="mt-2 text-sm text-white/60">{pillar.description}</p>
+                      <h3 className="font-bold text-[#0A111F]">{pillar.title}</h3>
+                      <p className="mt-2 text-sm text-[rgba(10,17,31,0.6)]">{pillar.description}</p>
                     </div>
                   );
                 })}
@@ -235,7 +310,7 @@ export default function LandingPage() {
             <FadeIn delay={150}>
               <div className="etower-cta-banner">
                 <div className="relative z-10">
-                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
                     Ready to Join eTower?
                   </h2>
                   <p className="mt-4 text-white/70 max-w-xl mx-auto">
@@ -264,9 +339,6 @@ export default function LandingPage() {
             </FadeIn>
           </div>
         </section>
-
-        <div id="residents" className="scroll-mt-20" />
-        <div id="alumni" className="scroll-mt-20" />
 
         <EtowerFooter />
       </div>

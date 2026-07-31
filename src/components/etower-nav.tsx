@@ -5,14 +5,15 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Instagram } from "lucide-react";
-import { ETOWER, ETOWER_LOGO } from "@/lib/demo-data";
+import { ETOWER, ETOWER_LOGO_NAV } from "@/lib/demo-data";
 import { useOptionalAuth } from "@/contexts/auth-context";
 import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
-  { href: "/startups", label: "Startups" },
+  { href: "/residents", label: "Residents" },
+  { href: "/alumni", label: "Alumni" },
   { href: "/our-story", label: "Our Story" },
-  { href: "/#outlets", label: "Outlets" },
+  { href: "/startups", label: "Startups" },
   { href: "/#join", label: "Join eTower" },
   { href: "/#contact", label: "Contact" },
 ];
@@ -53,14 +54,14 @@ export function EtowerNav() {
       )}
       aria-hidden={isLanding && !scrolled}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between gap-4">
         <Link href="/" className="flex items-center gap-2.5 shrink-0">
           <Image
-            src={ETOWER_LOGO}
+            src={ETOWER_LOGO_NAV}
             alt="eTower"
-            width={120}
-            height={32}
-            className="h-8 w-auto object-contain brightness-0 invert"
+            width={270}
+            height={72}
+            className="etower-nav__logo h-[4.5rem] w-auto object-contain"
             priority
           />
         </Link>

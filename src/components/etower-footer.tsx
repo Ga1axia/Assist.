@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ETOWER, ETOWER_LOGO } from "@/lib/demo-data";
+import { ETOWER, ETOWER_LOGO_LIGHT } from "@/lib/demo-data";
 
 export function EtowerFooter() {
   return (
@@ -12,11 +12,11 @@ export function EtowerFooter() {
         <div className="flex flex-col md:flex-row justify-between gap-10">
           <div>
             <Image
-              src={ETOWER_LOGO}
+              src={ETOWER_LOGO_LIGHT}
               alt="eTower"
               width={140}
               height={36}
-              className="h-9 w-auto object-contain brightness-0 invert"
+              className="h-9 w-auto object-contain"
             />
             <p className="mt-4 text-sm text-white/60 max-w-xs leading-relaxed">
               Babson&apos;s premier entrepreneurial living community fostering innovation
@@ -25,23 +25,23 @@ export function EtowerFooter() {
           </div>
           <div className="flex flex-wrap gap-12 sm:gap-16">
             <div>
-              <p className="text-sm font-semibold mb-4 text-[#00ff41]">Quick Links</p>
+              <p className="text-sm font-semibold mb-4 text-[#8FD47A]">Quick Links</p>
               <ul className="space-y-2 text-sm text-white/60">
-                <li><Link href="/#residents" className="transition-colors">Current Residents</Link></li>
-                <li><Link href="/#alumni" className="transition-colors">Alumni Network</Link></li>
+                <li><Link href="/residents" className="transition-colors">Residents</Link></li>
+                <li><Link href="/alumni" className="transition-colors">Alumni</Link></li>
                 <li><Link href="/our-story" className="transition-colors">Our Story</Link></li>
                 <li><Link href="/startups" className="transition-colors">Startups</Link></li>
               </ul>
             </div>
             <div>
-              <p className="text-sm font-semibold mb-4 text-[#00ff41]">Get Involved</p>
+              <p className="text-sm font-semibold mb-4 text-[#8FD47A]">Get Involved</p>
               <ul className="space-y-2 text-sm text-white/60">
                 <li><Link href="/#join" className="transition-colors">Join eTower</Link></li>
                 <li><a href={`mailto:${ETOWER.email}`} className="transition-colors">Contact Us</a></li>
               </ul>
             </div>
             <div>
-              <p className="text-sm font-semibold mb-4 text-[#00ff41]">Contact</p>
+              <p className="text-sm font-semibold mb-4 text-[#8FD47A]">Contact</p>
               <ul className="space-y-2 text-sm text-white/60">
                 <li>
                   <a href={`mailto:${ETOWER.email}`} className="transition-colors">
@@ -53,7 +53,7 @@ export function EtowerFooter() {
             </div>
           </div>
         </div>
-        <div className="mt-12 pt-8 border-t border-[rgba(0,255,65,0.18)] flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-white/40">
+        <div className="mt-12 pt-8 border-t border-[rgba(90,173,74,0.22)] flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-white/40">
           <p>© {new Date().getFullYear()} eTower. All rights reserved.</p>
           <div className="flex gap-6">
             <span>Privacy Policy</span>

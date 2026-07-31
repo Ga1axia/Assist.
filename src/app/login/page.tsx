@@ -54,7 +54,7 @@ export default function LoginPage() {
                         alt="eTower"
                         width={200}
                         height={56}
-                        className="h-14 w-auto mx-auto object-contain brightness-0 invert mb-8"
+                        className="h-14 w-auto mx-auto object-contain mb-8"
                         priority
                     />
                     <h1 className="text-4xl font-black tracking-tight mb-4">
@@ -94,7 +94,7 @@ export default function LoginPage() {
                             alt="eTower"
                             width={120}
                             height={32}
-                            className="h-8 w-auto object-contain brightness-0 invert"
+                            className="h-8 w-auto object-contain"
                         />
                     </div>
 

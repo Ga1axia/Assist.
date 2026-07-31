@@ -1,6 +1,11 @@
 /** eTower static content — entrepreneurship community */
 
-export const ETOWER_LOGO = "/logo/etower-logo-new.png";
+/** Primary brand mark — green E + white wordmark on black (from logos/etowerlogo.png). */
+export const ETOWER_LOGO = "/etowerlogo.png";
+/** Alias kept for dark surfaces; same asset as ETOWER_LOGO. */
+export const ETOWER_LOGO_LIGHT = "/etowerlogo.png";
+/** Nav variant — green E (white glyph) + black wordmark, transparent bg. */
+export const ETOWER_LOGO_NAV = "/etowerlogo-nav.png";
 
 export const ETOWER = {
   name: "eTower",
@@ -49,36 +54,128 @@ export type FeaturedStartup = {
   overview: string;
   founder: string;
   initial: string;
+  logo: string;
 };
 
-export const FEATURED_STARTUPS: FeaturedStartup[] = [
-  {
-    id: "elcove",
-    name: "Elcove",
-    category: "Sustainability",
-    overview:
-      "Sustainable and eco-friendly cleaning products made with plant-based ingredients and refillable containers to reduce waste.",
-    founder: "Anastacia Yefimenko",
-    initial: "E",
-  },
-  {
-    id: "c4p",
-    name: "Computers4People",
-    category: "Social Impact",
-    overview:
-      "Bridging the digital divide by providing refurbished computers and technology education to underserved communities.",
-    founder: "Dylan Zajac",
-    initial: "C",
-  },
+/** Local brand marks from /public/logos (copied from repo logos/) */
+export const COMMUNITY_VENTURES = [
   {
     id: "junk-teens",
     name: "Junk Teens",
     category: "Service",
     overview:
-      "Youth-focused junk removal service that provides employment opportunities for teenagers while helping communities with waste management.",
+      "Youth-focused junk removal that employs teenagers while helping communities clear clutter and waste.",
     founder: "Kirk McKinney",
-    initial: "J",
+    initial: "JT",
+    logo: "/logos/JunkTeens.png",
+    image: "https://images.unsplash.com/photo-1621451537084-624c072d4aee?w=640&h=360&fit=crop&q=80",
   },
+  {
+    id: "sunu-body",
+    name: "Sunu Body",
+    category: "Wellness",
+    overview: "Bodycare and wellness brand built for everyday rituals that feel intentional and lasting.",
+    founder: "eTower Resident",
+    initial: "SB",
+    logo: "/logos/SunuBody.png",
+    image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=640&h=360&fit=crop&q=80",
+  },
+  {
+    id: "truvit",
+    name: "TRUVIT",
+    category: "Health",
+    overview: "Health and nutrition venture focused on clearer choices for modern lifestyles.",
+    founder: "eTower Alumni",
+    initial: "TV",
+    logo: "/logos/Truvit.png",
+    image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=640&h=360&fit=crop&q=80",
+  },
+  {
+    id: "checkmate",
+    name: "Checkmate Academy",
+    category: "Education",
+    overview: "Chess education that builds focus, strategy, and confidence for the next generation of thinkers.",
+    founder: "eTower Resident",
+    initial: "CA",
+    logo: "/logos/CheckmateAcademy.png",
+    image: "https://images.unsplash.com/photo-1529699211952-484e3085560c?w=640&h=360&fit=crop&q=80",
+  },
+  {
+    id: "empower",
+    name: "Empower Sports Academy",
+    category: "Sports",
+    overview: "Athlete development academy helping young talent train harder and dream bigger.",
+    founder: "eTower Resident",
+    initial: "ES",
+    logo: "/logos/EmpowerSportsAcademy.png",
+    image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=640&h=360&fit=crop&q=80",
+  },
+  {
+    id: "desi-eats",
+    name: "Desi Eats",
+    category: "Food",
+    overview: "Flavor-forward food brand bringing bold Desi-inspired eats to campus and beyond.",
+    founder: "eTower Resident",
+    initial: "DE",
+    logo: "/logos/DesiEats.png",
+    image: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=640&h=360&fit=crop&q=80",
+  },
+  {
+    id: "arcangel",
+    name: "Arcangel",
+    category: "Tech",
+    overview: "Community-built venture pushing creative tech products from idea to launch.",
+    founder: "eTower Alumni",
+    initial: "AR",
+    logo: "/logos/arcangel.png",
+    image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=640&h=360&fit=crop&q=80",
+  },
+] as const;
+
+export const FEATURED_STARTUPS: FeaturedStartup[] = COMMUNITY_VENTURES.slice(0, 3).map((v) => ({
+  id: v.id,
+  name: v.name,
+  category: v.category,
+  overview: v.overview,
+  founder: v.founder,
+  initial: v.initial,
+  logo: v.logo,
+}));
+
+export type ResidentProfile = {
+  name: string;
+  role: string;
+  focus: string;
+  year: string;
+  initials: string;
+};
+
+export const CURRENT_RESIDENTS: ResidentProfile[] = [
+  { name: "Kirk McKinney", role: "Resident", focus: "Junk Teens", year: "2026", initials: "KM" },
+  { name: "Anastacia Yefimenko", role: "Resident", focus: "Elcove", year: "2026", initials: "AY" },
+  { name: "Maya Chen", role: "Resident", focus: "Consumer products", year: "2027", initials: "MC" },
+  { name: "Jordan Lee", role: "Resident", focus: "Fintech", year: "2026", initials: "JL" },
+  { name: "Sam Ortiz", role: "Resident", focus: "EdTech", year: "2027", initials: "SO" },
+  { name: "Priya Shah", role: "Resident", focus: "Climate", year: "2026", initials: "PS" },
+  { name: "Alex Rivera", role: "President", focus: "Community ops", year: "2026", initials: "AR" },
+  { name: "Taylor Brooks", role: "Resident", focus: "Media", year: "2027", initials: "TB" },
+];
+
+export type AlumniProfile = {
+  name: string;
+  role: string;
+  company: string;
+  era: string;
+  initials: string;
+};
+
+export const ALUMNI_SPOTLIGHT: AlumniProfile[] = [
+  { name: "Ryan Laverty", role: "Founder", company: "Arist", era: "President 2018", initials: "RL" },
+  { name: "Jake Ross", role: "Founder", company: "Build You Marketing", era: "President 2022", initials: "JR" },
+  { name: "Andrew Foley", role: "Founder", company: "eTower", era: "Class of 2001", initials: "AF" },
+  { name: "IdeaPaint Team", role: "Founders", company: "IdeaPaint", era: "Early residents", initials: "IP" },
+  { name: "Dylan Zajac", role: "Founder", company: "Computers4People", era: "Alumni", initials: "DZ" },
+  { name: "Community Builders", role: "Operators", company: "100+ ventures", era: "2001–today", initials: "ET" },
 ];
 
 export type Testimonial = {
@@ -245,7 +342,7 @@ export type IntroColumnDirection = (typeof INTRO_COLUMN_DIRECTIONS)[number];
 export type HeroGalleryBusiness = {
   id: string;
   name: string;
-  /** Company logo (Clearbit or direct URL) */
+  /** Local company logo from /public/logos */
   logo: string;
   /** Product / brand photo matching the company */
   image: string;
@@ -253,181 +350,31 @@ export type HeroGalleryBusiness = {
   fallbackInitials: string;
 };
 
-/** Real eTower community ventures — logo + industry-matched imagery */
-export const HERO_GALLERY_BUSINESSES: HeroGalleryBusiness[] = [
-  {
-    id: "elcove",
-    name: "Elcove",
-    logo: "https://logo.clearbit.com/elcove.co",
-    image: "https://images.unsplash.com/photo-1610557892470-55d9d6d85525?w=640&h=360&fit=crop&q=80",
-    fallbackInitials: "EL",
-  },
-  {
-    id: "c4p",
-    name: "Computers4People",
-    logo: "https://logo.clearbit.com/computers4people.org",
-    image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa90?w=640&h=360&fit=crop&q=80",
-    fallbackInitials: "C4",
-  },
-  {
-    id: "junk-teens",
-    name: "Junk Teens",
-    logo: "https://logo.clearbit.com/junkteens.com",
-    image: "https://images.unsplash.com/photo-1621451537084-624c072d4aee?w=640&h=360&fit=crop&q=80",
-    fallbackInitials: "JT",
-  },
-  {
-    id: "arist",
-    name: "Arist",
-    logo: "https://logo.clearbit.com/arist.ai",
-    image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=640&h=360&fit=crop&q=80",
-    fallbackInitials: "AR",
-  },
-  {
-    id: "ideapaint",
-    name: "IdeaPaint",
-    logo: "https://logo.clearbit.com/ideapaint.com",
-    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=640&h=360&fit=crop&q=80",
-    fallbackInitials: "IP",
-  },
-  {
-    id: "sunu-body",
-    name: "Sunu Body",
-    logo: "https://logo.clearbit.com/sunubody.com",
-    image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=640&h=360&fit=crop&q=80",
-    fallbackInitials: "SB",
-  },
-  {
-    id: "cravery",
-    name: "The CRAVERY",
-    logo: "https://logo.clearbit.com/thecravery.com",
-    image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=640&h=360&fit=crop&q=80",
-    fallbackInitials: "TC",
-  },
-  {
-    id: "donutnv",
-    name: "DonutNV",
-    logo: "https://logo.clearbit.com/donutnv.com",
-    image: "https://images.unsplash.com/photo-1551024602-8e7632810941?w=640&h=360&fit=crop&q=80",
-    fallbackInitials: "DN",
-  },
-  {
-    id: "givingart",
-    name: "GivingArt",
-    logo: "https://logo.clearbit.com/givingart.org",
-    image: "https://images.unsplash.com/photo-1460666189562-9591f9a340b0?w=640&h=360&fit=crop&q=80",
-    fallbackInitials: "GA",
-  },
-  {
-    id: "chessmate",
-    name: "Chessmate Academy",
-    logo: "https://logo.clearbit.com/chessmateacademy.com",
-    image: "https://images.unsplash.com/photo-1529699211952-484e3085560c?w=640&h=360&fit=crop&q=80",
-    fallbackInitials: "CA",
-  },
-  {
-    id: "build-you",
-    name: "Build You Marketing",
-    logo: "https://logo.clearbit.com/buildyou.io",
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=640&h=360&fit=crop&q=80",
-    fallbackInitials: "BY",
-  },
-  {
-    id: "scavanger",
-    name: "Scavanger.Ai",
-    logo: "https://logo.clearbit.com/scavanger.ai",
-    image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=640&h=360&fit=crop&q=80",
-    fallbackInitials: "SA",
-  },
-  {
-    id: "poseidon",
-    name: "Poseidon Skin",
-    logo: "https://logo.clearbit.com/poseidonskin.com",
-    image: "https://images.unsplash.com/photo-1570172619644-dfd155d6990a?w=640&h=360&fit=crop&q=80",
-    fallbackInitials: "PS",
-  },
-  {
-    id: "finexus",
-    name: "Finexus",
-    logo: "https://logo.clearbit.com/finexus.com",
-    image: "https://images.unsplash.com/photo-1554224311-beee415bd251?w=640&h=360&fit=crop&q=80",
-    fallbackInitials: "FX",
-  },
-  {
-    id: "truvit",
-    name: "TRUVIT",
-    logo: "https://logo.clearbit.com/truvit.com",
-    image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=640&h=360&fit=crop&q=80",
-    fallbackInitials: "TV",
-  },
-  {
-    id: "dirty-gut",
-    name: "DIRTY GUT",
-    logo: "https://logo.clearbit.com/dirtygut.com",
-    image: "https://images.unsplash.com/photo-1490645935967-10de6ba17361?w=640&h=360&fit=crop&q=80",
-    fallbackInitials: "DG",
-  },
-  {
-    id: "athlete-zero",
-    name: "AthleteZero",
-    logo: "https://logo.clearbit.com/athletezero.com",
-    image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=640&h=360&fit=crop&q=80",
-    fallbackInitials: "AZ",
-  },
-  {
-    id: "sneakersoul",
-    name: "SneakerSoul",
-    logo: "https://logo.clearbit.com/sneakersoul.com",
-    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=640&h=360&fit=crop&q=80",
-    fallbackInitials: "SS",
-  },
-  {
-    id: "humanitees",
-    name: "HUMAN-I-TEES",
-    logo: "https://logo.clearbit.com/humanitees.com",
-    image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=640&h=360&fit=crop&q=80",
-    fallbackInitials: "HI",
-  },
-  {
-    id: "endspeciesism",
-    name: "endspeciesism.org",
-    logo: "https://logo.clearbit.com/endspeciesism.org",
-    image: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=640&h=360&fit=crop&q=80",
-    fallbackInitials: "ES",
-  },
-  {
-    id: "big-bear",
-    name: "BIG BEAR MOVERS",
-    logo: "https://logo.clearbit.com/bigbearmovers.com",
-    image: "https://images.unsplash.com/photo-1601584119907-f686a086079e?w=640&h=360&fit=crop&q=80",
-    fallbackInitials: "BB",
-  },
-  {
-    id: "nicio",
-    name: "NICIO MEDIA",
-    logo: "https://logo.clearbit.com/niciomedia.com",
-    image: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=640&h=360&fit=crop&q=80",
-    fallbackInitials: "NM",
-  },
-  {
-    id: "foregger",
-    name: "Foregger Energy",
-    logo: "https://logo.clearbit.com/foreggerenergy.com",
-    image: "https://images.unsplash.com/photo-1473341304170-fd89b6120921?w=640&h=360&fit=crop&q=80",
-    fallbackInitials: "FE",
-  },
-  {
-    id: "takkra",
-    name: "Takkra",
-    logo: "https://logo.clearbit.com/takkra.com",
-    image: "https://images.unsplash.com/photo-1454165804603-c034643a41a6?w=640&h=360&fit=crop&q=80",
-    fallbackInitials: "TK",
-  },
-  {
-    id: "mevot",
-    name: "MEVOT",
-    logo: "https://logo.clearbit.com/mevot.com",
-    image: "https://images.unsplash.com/photo-1563986768608-018db6845853?w=640&h=360&fit=crop&q=80",
-    fallbackInitials: "MV",
-  },
+/** Lifestyle / team photos from /public/logos/pics — paired to ventures where possible */
+const VENTURE_PICS: Record<string, string> = {
+  "junk-teens": "/logos/pics/jteens.png",
+  "sunu-body": "/logos/pics/Sunubody.png",
+  empower: "/logos/pics/Esports.png",
+  "desi-eats": "/logos/pics/desieats.png",
+  arcangel: "/logos/pics/arcangel.png",
+};
+
+const GALLERY_FILL_IMAGES = [
+  "/logos/pics/jteens.png",
+  "/logos/pics/Sunubody.png",
+  "/logos/pics/Esports.png",
+  "/logos/pics/desieats.png",
+  "/logos/pics/arcangel.png",
 ];
+
+/** 5×5 hero mosaic — frontal logos over cropped pics from /logos/pics */
+export const HERO_GALLERY_BUSINESSES: HeroGalleryBusiness[] = Array.from({ length: 25 }, (_, i) => {
+  const venture = COMMUNITY_VENTURES[i % COMMUNITY_VENTURES.length];
+  return {
+    id: `${venture.id}-${i}`,
+    name: venture.name,
+    logo: venture.logo,
+    image: VENTURE_PICS[venture.id] ?? GALLERY_FILL_IMAGES[i % GALLERY_FILL_IMAGES.length],
+    fallbackInitials: venture.initial,
+  };
+});

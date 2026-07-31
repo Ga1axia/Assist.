@@ -99,7 +99,7 @@ export function Sidebar() {
                     width={collapsed ? 28 : 110}
                     height={28}
                     className={cn(
-                        "object-contain brightness-0 invert shrink-0",
+                        "object-contain shrink-0",
                         collapsed ? "h-7 w-7" : "h-7 w-auto"
                     )}
                 />

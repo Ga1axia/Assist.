@@ -16,7 +16,7 @@ export function EtowerOutletsSection() {
         <FadeIn>
           <div className="text-center mb-14">
             <p className="etower-section-label mb-3">{sectionTitle}</p>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-[#0A111F]">
               Spaces built for founders
             </h2>
           </div>
@@ -29,10 +29,10 @@ export function EtowerOutletsSection() {
                 <Shirt className="w-6 h-6" />
               </div>
               <p className="etower-outlet-card__status">{clothing.status}</p>
-              <h3 className="mt-3 text-lg font-bold tracking-tight">
+              <h3 className="mt-3 text-lg font-bold tracking-tight text-[#0A111F]">
                 {clothing.title}
               </h3>
-              <p className="mt-3 text-sm text-white/60 flex-1">
+              <p className="mt-3 text-sm text-[rgba(10,17,31,0.6)] flex-1">
                 Official eTower apparel — launching soon for residents and alumni.
               </p>
             </article>
@@ -45,7 +45,7 @@ export function EtowerOutletsSection() {
             >
               <div className="bg-grid-megaphone absolute inset-0" aria-hidden />
               <div className="relative z-10 flex flex-col h-full">
-                <div className="etower-outlet-card__icon bg-[#00ff41] text-[#0a0a0a]">
+                <div className="etower-outlet-card__icon bg-[#5AAD4A] text-white">
                   <Megaphone className="w-6 h-6" />
                 </div>
                 <h3 className="etower-outlet-card__megaphone-title mt-4 text-xl font-bold">
